@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 import { ListingInquiryForm } from "@/components/listing-inquiry-form";
 import { ListingOfferBadge } from "@/components/listing-offer-badge";
+import { ListingPhotoGallery } from "@/components/listing-photo-gallery";
 import { ListingWhatsAppButton } from "@/components/listing-whatsapp-button";
+import { OpenInMapsLink } from "@/components/open-in-maps-link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { publicApiFetch } from "@/lib/public-api-fetch";
@@ -16,31 +19,171 @@ import {
 } from "@/lib/listing-types";
 import { propertyTypeLabel } from "@/lib/property-labels";
 import type { PropertyType } from "@/lib/property-types";
-import { siteName } from "@/lib/site-config";
+import { listingPublicUrl, siteName, siteOrigin } from "@/lib/site-config";
 
 type Props = { params: Promise<{ slug: string }> };
 
+function listingShareImage(listing: PublicListingDetail): string | null {
+  const raw =
+    listing.photos?.find((p) => p.url)?.url ?? listing.photo_url ?? null;
+  if (!raw) return null;
+  if (/^https?:\/\//i.test(raw)) return raw;
+  return new URL(raw.startsWith("/") ? raw : `/${raw}`, siteOrigin()).href;
+}
+
+function listingShareDescription(listing: PublicListingDetail): string {
+  const offerType = parseOfferType(listing.offer_type);
+  const price = formatRentCents(listing.rent_cents, listing.currency);
+  const suffix = listingPriceSuffix(offerType);
+  const priceLabel = suffix ? `${price}${suffix}` : price;
+  const parts = [
+    `${OFFER_TYPE_LABEL[offerType]} · ${priceLabel}`,
+    listing.location_label || null,
+    listing.description?.trim() || null,
+  ].filter(Boolean);
+  return parts.join(" · ").slice(0, 200);
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const path = `/inmueble/${encodeURIComponent(slug)}`;
   const result = await publicApiFetch<PublicListingDetail>(
     `/api/public/listings/${encodeURIComponent(slug)}`,
   );
   if (!result.ok) return { title: "Inmueble" };
 
   const listing = result.data;
+  const title = listing.title;
+  const description = listingShareDescription(listing);
+  const image = listingShareImage(listing);
+
   return {
-    title: listing.title,
-    description: listing.description?.slice(0, 160) ?? listing.location_label,
-    alternates: {
-      canonical: `/inmueble/${slug}`,
-    },
+    title,
+    description,
+    alternates: { canonical: path },
     openGraph: {
-      title: listing.title,
+      type: "website",
+      locale: "es_MX",
+      url: listingPublicUrl(slug),
       siteName: siteName(),
-      url: `/inmueble/${slug}`,
-      images: listing.photo_url ? [{ url: listing.photo_url }] : undefined,
+      title,
+      description,
+      ...(image ? { images: [{ url: image, alt: title }] } : {}),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
     },
   };
+}
+
+function specStyles(label: string) {
+  const styles: Record<
+    string,
+    { panel: string; label: string; value: string }
+  > = {
+    Recámaras: {
+      panel:
+        "bg-gradient-to-br from-blue-100/95 to-indigo-100/75 ring-blue-300/55 shadow-sm shadow-blue-950/8",
+      label: "text-blue-800/75",
+      value: "text-blue-950",
+    },
+    Baños: {
+      panel:
+        "bg-gradient-to-br from-sky-100/95 to-cyan-100/75 ring-sky-300/55 shadow-sm shadow-sky-950/8",
+      label: "text-sky-900/70",
+      value: "text-sky-950",
+    },
+    Terreno: {
+      panel:
+        "bg-gradient-to-br from-emerald-100/95 to-teal-100/75 ring-emerald-300/55 shadow-sm shadow-emerald-950/8",
+      label: "text-emerald-900/70",
+      value: "text-emerald-950",
+    },
+    Construcción: {
+      panel:
+        "bg-gradient-to-br from-violet-100/95 to-purple-100/75 ring-violet-300/55 shadow-sm shadow-violet-950/8",
+      label: "text-violet-900/70",
+      value: "text-violet-950",
+    },
+  };
+
+  return (
+    styles[label] ?? {
+      panel:
+        "bg-gradient-to-br from-white to-blue-50/80 ring-blue-950/10 shadow-sm",
+      label: "text-zinc-500",
+      value: "text-zinc-950",
+    }
+  );
+}
+
+function Spec({ label, value }: { label: string; value: string }) {
+  const tone = specStyles(label);
+
+  return (
+    <div
+      className={`min-w-[calc(50%-0.3125rem)] flex-1 rounded-2xl px-4 py-3.5 ring-1 sm:min-w-[6.5rem] sm:flex-none sm:py-3.5 ${tone.panel}`}
+    >
+      <dt
+        className={`text-xs font-semibold uppercase tracking-[0.14em] sm:text-[0.65rem] sm:tracking-[0.16em] ${tone.label}`}
+      >
+        {label}
+      </dt>
+      <dd
+        className={`mt-1 text-3xl font-semibold tabular-nums tracking-tight sm:text-2xl ${tone.value}`}
+      >
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+type InfoCardVariant = "description" | "location";
+
+const INFO_CARD_STYLES: Record<
+  InfoCardVariant,
+  { panel: string; title: string; accent: string }
+> = {
+  description: {
+    panel:
+      "bg-gradient-to-br from-amber-50/95 via-orange-50/35 to-blue-50/90 ring-amber-200/65 shadow-md shadow-amber-950/6",
+    title: "text-amber-900/75",
+    accent: "border-amber-400/80",
+  },
+  location: {
+    panel:
+      "bg-gradient-to-br from-emerald-50/95 via-teal-50/40 to-sky-50/85 ring-emerald-200/65 shadow-md shadow-emerald-950/6",
+    title: "text-emerald-900/75",
+    accent: "border-emerald-400/80",
+  },
+};
+
+function InfoCard({
+  title,
+  variant,
+  children,
+}: {
+  title: string;
+  variant: InfoCardVariant;
+  children: ReactNode;
+}) {
+  const tone = INFO_CARD_STYLES[variant];
+
+  return (
+    <div
+      className={`mt-8 rounded-2xl border-l-4 px-5 py-6 ring-1 sm:px-6 sm:py-5 ${tone.panel} ${tone.accent}`}
+    >
+      <h2
+        className={`text-xs font-semibold uppercase tracking-[0.14em] sm:text-[0.65rem] sm:tracking-[0.16em] ${tone.title}`}
+      >
+        {title}
+      </h2>
+      <div className="mt-3.5 sm:mt-3">{children}</div>
+    </div>
+  );
 }
 
 export default async function ListingDetailPage({ params }: Props) {
@@ -49,7 +192,14 @@ export default async function ListingDetailPage({ params }: Props) {
     `/api/public/listings/${encodeURIComponent(slug)}`,
   );
 
-  if (!result.ok) notFound();
+  if (result.status === 404) notFound();
+  if (!result.ok) {
+    return (
+      <div className="min-h-screen bg-[#f3f6fb] px-4 py-16 text-sm text-zinc-600">
+        No se pudo cargar el anuncio ({result.status}).
+      </div>
+    );
+  }
 
   const listing = result.data;
   const photos = listing.photos ?? [];
@@ -59,111 +209,129 @@ export default async function ListingDetailPage({ params }: Props) {
   const typeLabel =
     propertyTypeLabel[listing.property_type as PropertyType] ??
     listing.property_type;
+  const isSale = offerType === "sale";
+  const agency = listing.agency_name || siteName();
 
   return (
-    <div className="min-h-screen bg-[#f3f6fb]">
-      <SiteHeader />
-      <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-        <div className="overflow-hidden rounded-3xl bg-white ring-1 ring-zinc-200">
-          {photos.length > 0 ? (
-            <div className="grid gap-1 sm:grid-cols-2">
-              {photos.slice(0, 4).map((p) =>
-                p.url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={p.id}
-                    src={p.url}
-                    alt=""
-                    className="aspect-[4/3] w-full object-cover sm:col-span-1 first:sm:col-span-2 first:sm:row-span-2"
-                  />
-                ) : null,
-              )}
-            </div>
-          ) : listing.photo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={listing.photo_url}
-              alt=""
-              className="aspect-[16/10] w-full object-cover"
-            />
-          ) : null}
+    <div className="relative min-h-screen bg-[#f3f6fb]">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[22rem] bg-[radial-gradient(ellipse_at_top,_#dbeafe_0%,_transparent_55%),linear-gradient(180deg,_#eff6ff_0%,_#f3f6fb_75%)]"
+        aria-hidden
+      />
 
-          <div className="p-6 sm:p-8">
-            <div className="flex flex-wrap items-start gap-3">
-              <ListingOfferBadge offerType={offerType} />
-              <span className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-                {typeLabel}
-              </span>
-            </div>
-            <h1 className="mt-4 text-3xl font-semibold text-zinc-950 sm:text-4xl">
-              {listing.title}
-            </h1>
-            <p className="mt-2 text-zinc-600">{listing.location_label}</p>
-            <p className="mt-4 text-3xl font-semibold text-blue-700">
-              {formatRentCents(listing.rent_cents, listing.currency)}
-              {priceSuffix ? (
-                <span className="text-base font-medium text-zinc-500">
-                  {priceSuffix}
+      <div className="relative">
+        <SiteHeader />
+
+        <main className="mx-auto max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pt-8">
+          <ListingPhotoGallery
+            title={listing.title}
+            photos={photos}
+            fallbackUrl={listing.photo_url}
+          />
+
+          <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+            <article>
+              <div className="flex flex-wrap items-center gap-2">
+                <ListingOfferBadge offerType={offerType} />
+                <span className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                  {typeLabel}
                 </span>
-              ) : null}
-            </p>
+              </div>
+              <p className="mt-3 text-sm font-semibold uppercase tracking-[0.16em] text-blue-700 sm:text-xs sm:tracking-[0.2em]">
+                {listing.location_label}
+              </p>
+              <h1 className="mt-3 text-[1.85rem] font-semibold leading-tight tracking-tight text-zinc-950 sm:text-4xl sm:leading-[1.12]">
+                {listing.title}
+              </h1>
 
-            {specs.length > 0 ? (
-              <dl className="mt-6 flex flex-wrap gap-3">
-                {specs.map((s) => (
-                  <div
-                    key={s.label}
-                    className="rounded-xl bg-zinc-50 px-4 py-3 ring-1 ring-zinc-100"
-                  >
-                    <dt className="text-xs font-semibold uppercase text-zinc-500">
-                      {s.label}
-                    </dt>
-                    <dd className="mt-1 font-medium text-zinc-900">{s.value}</dd>
-                  </div>
+              <p className="mt-5 text-[2.15rem] font-semibold tabular-nums tracking-tight text-blue-700 sm:mt-6 sm:text-4xl">
+                {formatRentCents(listing.rent_cents, listing.currency)}
+                {priceSuffix ? (
+                  <span className="ml-2 text-lg font-medium tracking-normal text-zinc-500 sm:text-base">
+                    {priceSuffix}
+                  </span>
+                ) : null}
+              </p>
+
+              <dl className="mt-8 flex flex-wrap gap-2.5 sm:gap-3">
+                {specs.map((spec) => (
+                  <Spec key={spec.label} label={spec.label} value={spec.value} />
                 ))}
               </dl>
-            ) : null}
 
-            {listing.description ? (
-              <p className="mt-8 whitespace-pre-wrap text-justify text-zinc-700">
-                {listing.description}
+              {listing.description ? (
+                <InfoCard title="Descripción" variant="description">
+                  <p className="whitespace-pre-wrap text-justify text-lg leading-8 text-zinc-800 sm:text-base sm:leading-relaxed">
+                    {listing.description}
+                  </p>
+                </InfoCard>
+              ) : null}
+
+              {listing.address_label ||
+              (listing.latitude != null && listing.longitude != null) ? (
+                <InfoCard title="Ubicación" variant="location">
+                  {listing.address_label ? (
+                    <p className="text-lg leading-8 text-zinc-800 sm:text-base sm:leading-relaxed">
+                      {listing.address_label}
+                    </p>
+                  ) : null}
+                  {listing.latitude != null && listing.longitude != null ? (
+                    <div
+                      className={
+                        listing.address_label ? "mt-4 sm:mt-3" : undefined
+                      }
+                    >
+                      <OpenInMapsLink
+                        latitude={listing.latitude}
+                        longitude={listing.longitude}
+                        label={listing.title}
+                        showCoordinates={false}
+                        linkText="Ver en el mapa"
+                      />
+                    </div>
+                  ) : null}
+                </InfoCard>
+              ) : null}
+
+              <p className="mt-10 text-base text-zinc-500 sm:text-sm">
+                Anunciado por{" "}
+                <span className="font-semibold text-zinc-900">{agency}</span>
               </p>
-            ) : null}
+            </article>
 
-            {listing.address_label ? (
-              <p className="mt-6 text-sm text-zinc-600">{listing.address_label}</p>
-            ) : null}
+            <aside className="rounded-3xl bg-white p-5 shadow-[0_1px_0_rgba(15,23,42,0.04),0_18px_40px_-24px_rgba(37,99,235,0.4)] ring-1 ring-blue-950/10 sm:p-6 lg:sticky lg:top-6">
+              <h2 className="text-[1.65rem] font-semibold tracking-tight text-zinc-950 sm:text-2xl">
+                {isSale ? "Me interesa comprar" : "Me interesa rentar"}
+              </h2>
+              <p className="mt-2 text-base font-semibold leading-relaxed text-zinc-800 sm:text-sm">
+                {isSale
+                  ? "Pregunta precio, escrituración o visita."
+                  : "Tu mensaje llega directo a la inmobiliaria."}
+              </p>
+              {listing.contact_phone ? (
+                <div className="mt-5">
+                  <ListingWhatsAppButton
+                    phone={listing.contact_phone}
+                    title={listing.title}
+                    slug={listing.slug}
+                    offerType={offerType}
+                  />
+                </div>
+              ) : null}
+              <div className={listing.contact_phone ? "mt-6" : "mt-5"}>
+                {listing.contact_phone ? (
+                  <p className="mb-3 text-center text-sm font-semibold text-zinc-800">
+                    O déjanos tus datos y te contactamos
+                  </p>
+                ) : null}
+                <ListingInquiryForm slug={listing.slug} offerType={offerType} />
+              </div>
+            </aside>
           </div>
-        </div>
+        </main>
 
-        <section className="mt-8 rounded-3xl bg-white p-6 ring-1 ring-zinc-200 sm:p-8">
-          <h2 className="text-xl font-semibold text-zinc-950">
-            Contacto · {OFFER_TYPE_LABEL[offerType]}
-          </h2>
-          <p className="mt-2 text-sm text-zinc-600">
-            Publicado por {listing.agency_name || siteName()}.
-          </p>
-
-          {listing.contact_phone ? (
-            <div className="mt-6">
-              <ListingWhatsAppButton
-                phone={listing.contact_phone}
-                title={listing.title}
-                slug={listing.slug}
-                offerType={offerType}
-              />
-            </div>
-          ) : null}
-
-          <div className={listing.contact_phone ? "mt-8" : "mt-6"}>
-            <p className="mb-4 text-sm font-semibold text-zinc-800">
-              O déjanos tus datos y te contactamos
-            </p>
-            <ListingInquiryForm slug={listing.slug} offerType={offerType} />
-          </div>
-        </section>
-      </main>
-      <SiteFooter />
+        <SiteFooter />
+      </div>
     </div>
   );
 }

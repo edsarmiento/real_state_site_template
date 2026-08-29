@@ -152,6 +152,31 @@ export function listingPublicSpecs(listing: {
   return specs;
 }
 
+export function listingCardSpecLine(listing: {
+  property_type: string;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  built_area: string | null;
+  land_area?: string | null;
+}): string {
+  const parts: string[] = [];
+  const land = listing.property_type === "land";
+
+  if (!land && listing.bedrooms != null) {
+    parts.push(`${listing.bedrooms} rec.`);
+  }
+  if (!land && listing.bathrooms != null) {
+    parts.push(`${listing.bathrooms} ${listing.bathrooms === 1 ? "baño" : "baños"}`);
+  }
+  if (listing.land_area) {
+    parts.push(`${listing.land_area} m²`);
+  } else if (listing.built_area) {
+    parts.push(`${listing.built_area} m²`);
+  }
+
+  return parts.join(" · ");
+}
+
 export function parseApiFailureMessage(data: unknown): string {
   if (!data || typeof data !== "object") return "No se pudo completar la solicitud.";
   const obj = data as Record<string, unknown>;

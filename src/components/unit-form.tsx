@@ -41,6 +41,19 @@ function emptyForm(): FormState {
   };
 }
 
+function formFromUnit(u: Unit): FormState {
+  return {
+    name: u.name,
+    status: u.status,
+    bedrooms: u.bedrooms != null ? String(u.bedrooms) : "",
+    bathrooms: u.bathrooms != null ? String(u.bathrooms) : "",
+    builtArea: u.built_area != null ? String(u.built_area) : "",
+    floor: u.floor != null ? String(u.floor) : "",
+    furnished:
+      u.furnished === true ? "true" : u.furnished === false ? "false" : "",
+  };
+}
+
 function toPayload(
   f: FormState,
 ): Record<string, string | number | boolean | null> {
@@ -61,21 +74,31 @@ function toPayload(
   return p;
 }
 
-type Props = {
-  propertyId: number;
-  measurementSystem: MeasurementSystem;
-  defaultName?: string;
-};
+type Props =
+  | {
+      mode: "create";
+      propertyId: number;
+      measurementSystem: MeasurementSystem;
+      defaultName?: string;
+    }
+  | {
+      mode: "edit";
+      propertyId: number;
+      measurementSystem: MeasurementSystem;
+      unit: Unit;
+    };
 
-export function UnitForm({
-  propertyId,
-  measurementSystem,
-  defaultName = "",
-}: Props) {
+export function UnitForm(props: Props) {
   const router = useRouter();
+  const { mode, propertyId, measurementSystem } = props;
+  const unit = props.mode === "edit" ? props.unit : undefined;
+  const defaultName = props.mode === "create" ? props.defaultName : undefined;
   const initial = useMemo(
-    () => ({ ...emptyForm(), name: defaultName }),
-    [defaultName],
+    () =>
+      unit
+        ? formFromUnit(unit)
+        : { ...emptyForm(), name: defaultName ?? "" },
+    [unit, defaultName],
   );
   const [form, setForm] = useState<FormState>(initial);
   const [error, setError] = useState<string | null>(null);
@@ -100,8 +123,12 @@ export function UnitForm({
 
     setPending(true);
     try {
-      const res = await fetch(`/api/v1/properties/${propertyId}/units`, {
-        method: "POST",
+      const url =
+        mode === "create"
+          ? `/api/v1/properties/${propertyId}/units`
+          : `/api/v1/properties/${propertyId}/units/${props.unit.id}`;
+      const res = await fetch(url, {
+        method: mode === "create" ? "POST" : "PATCH",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
@@ -121,7 +148,11 @@ export function UnitForm({
         return;
       }
 
-      router.push("/listings/new");
+      if (mode === "create") {
+        router.push("/listings/new");
+      } else {
+        router.push(`/properties/${propertyId}?tab=units`);
+      }
       router.refresh();
     } finally {
       setPending(false);
@@ -209,13 +240,17 @@ export function UnitForm({
 
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={pending}>
-          {pending ? "Guardando…" : "Crear unidad y anunciar"}
+          {pending
+            ? "Guardando…"
+            : mode === "create"
+              ? "Crear unidad y anunciar"
+              : "Guardar cambios"}
         </Button>
         <Button
           type="button"
           variant="secondary"
           disabled={pending}
-          onClick={() => router.push("/properties")}
+          onClick={() => router.back()}
         >
           Cancelar
         </Button>

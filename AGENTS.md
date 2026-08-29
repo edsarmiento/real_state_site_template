@@ -17,8 +17,10 @@ Next.js para **un sitio por inmobiliaria**: catálogo público + admin lite en e
 | Catálogo `/` | CRM completo (contratos, cobros, dashboard) |
 | Ficha `/inmueble/[slug]` | Marketplace multi-inmobiliaria |
 | Login `/login` | Ops / multi-workspace |
-| `/listings` CRUD + fotos | Sidebar CRM |
+| `/listings` CRUD + fotos (reordenar portada) | Sidebar CRM |
 | `/listings/inquiries` | Portales inquilino / propietario |
+| `/properties` listado, ficha, editar | Gastos / propietarios CRM |
+| `/properties/[id]/units` crear y editar | |
 | `/account` mínimo | Resolución dominio→tenant (v1: env por deploy) |
 | Formulario + WhatsApp | |
 
@@ -34,6 +36,7 @@ Next.js para **un sitio por inmobiliaria**: catálogo público + admin lite en e
 | BFF staff | `src/app/api/v1/` |
 | Catálogo | `src/app/page.tsx` |
 | Admin anuncios | `src/app/(admin)/listings/` |
+| Admin propiedades | `src/app/(admin)/properties/` |
 
 ## Convenciones
 

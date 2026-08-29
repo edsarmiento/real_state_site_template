@@ -82,7 +82,14 @@ export default async function PropertiesPage() {
             <tbody className="divide-y divide-zinc-100">
               {list.map((p) => (
                 <tr key={p.id}>
-                  <td className="px-4 py-3 font-medium text-zinc-900">{p.name}</td>
+                  <td className="px-4 py-3 font-medium text-zinc-900">
+                    <Link
+                      href={`/properties/${p.id}`}
+                      className="hover:underline"
+                    >
+                      {p.name}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 text-zinc-700">
                     {propertyTypeLabel[p.property_type]}
                   </td>
@@ -92,10 +99,17 @@ export default async function PropertiesPage() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <Link
+                      href={`/properties/${p.id}?tab=units`}
+                      className="font-medium text-zinc-800 underline"
+                    >
+                      Unidades
+                    </Link>
+                    {" · "}
+                    <Link
                       href={`/properties/${p.id}/units/new`}
                       className="font-medium text-zinc-800 underline"
                     >
-                      Agregar unidad
+                      Agregar
                     </Link>
                   </td>
                 </tr>

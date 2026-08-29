@@ -45,6 +45,7 @@ export default async function NewUnitPage({ params }: PageProps) {
       </p>
       <Card className="mt-6 p-6">
         <UnitForm
+          mode="create"
           propertyId={property.id}
           measurementSystem={property.measurement_system}
           defaultName="Principal"
