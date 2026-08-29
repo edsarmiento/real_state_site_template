@@ -14,6 +14,7 @@ import {
   applyApiFormErrors,
   type ValidationErrors,
 } from "@/lib/validation";
+import { optionalFloat, optionalInt } from "@/lib/property-setup-payload";
 import { UNIT_STATUSES, type Unit } from "@/lib/unit-types";
 import { unitStatusLabel } from "@/lib/unit-labels";
 import type { MeasurementSystem } from "@/lib/property-types";
@@ -40,22 +41,6 @@ function emptyForm(): FormState {
   };
 }
 
-function optInt(s: string): number | null | undefined {
-  const t = s.trim();
-  if (!t) return undefined;
-  const n = parseInt(t, 10);
-  if (Number.isNaN(n)) return null;
-  return n;
-}
-
-function optFloat(s: string): number | null | undefined {
-  const t = s.trim();
-  if (!t) return undefined;
-  const n = Number(t);
-  if (!Number.isFinite(n)) return null;
-  return n;
-}
-
 function toPayload(
   f: FormState,
 ): Record<string, string | number | boolean | null> {
@@ -63,13 +48,13 @@ function toPayload(
     name: f.name.trim(),
     status: f.status,
   };
-  const bed = optInt(f.bedrooms);
+  const bed = optionalInt(f.bedrooms);
   if (bed !== undefined) p.bedrooms = bed;
-  const bath = optInt(f.bathrooms);
+  const bath = optionalInt(f.bathrooms);
   if (bath !== undefined) p.bathrooms = bath;
-  const built = optFloat(f.builtArea);
+  const built = optionalFloat(f.builtArea);
   if (built !== undefined) p.built_area = built;
-  const fl = optInt(f.floor);
+  const fl = optionalInt(f.floor);
   if (fl !== undefined) p.floor = fl;
   if (f.furnished === "true") p.furnished = true;
   else if (f.furnished === "false") p.furnished = false;

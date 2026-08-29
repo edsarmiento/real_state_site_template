@@ -10,30 +10,19 @@ import {
   TextField,
   ValidationErrorList,
 } from "@/components/ui";
-import {
-  DEFAULT_PROPERTY_COUNTRY,
-  PROPERTY_TYPES,
-  type Property,
-} from "@/lib/property-types";
+import { PROPERTY_TYPES, type Property } from "@/lib/property-types";
 import { propertyTypeLabel } from "@/lib/property-labels";
+import {
+  buildPropertyCreatePayload,
+  validatePropertySetupFields,
+  type PropertySetupFields,
+} from "@/lib/property-setup-payload";
 import {
   applyApiFormErrors,
   type ValidationErrors,
 } from "@/lib/validation";
 
-type FormState = {
-  name: string;
-  propertyType: string;
-  city: string;
-  stateOrRegion: string;
-  streetAddress: string;
-  bedrooms: string;
-  bathrooms: string;
-  builtArea: string;
-  landArea: string;
-};
-
-function emptyForm(): FormState {
+function emptyForm(): PropertySetupFields {
   return {
     name: "",
     propertyType: "house",
@@ -47,30 +36,17 @@ function emptyForm(): FormState {
   };
 }
 
-function optInt(s: string): number | null | undefined {
-  const t = s.trim();
-  if (!t) return undefined;
-  const n = parseInt(t, 10);
-  if (Number.isNaN(n)) return null;
-  return n;
-}
-
-function optFloat(s: string): number | null | undefined {
-  const t = s.trim();
-  if (!t) return undefined;
-  const n = Number(t);
-  if (!Number.isFinite(n)) return null;
-  return n;
-}
-
 export function PropertySetupForm() {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(emptyForm);
+  const [form, setForm] = useState<PropertySetupFields>(emptyForm);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<ValidationErrors | null>(null);
   const [pending, setPending] = useState(false);
 
-  function set<K extends keyof FormState>(key: K, value: FormState[K]) {
+  function set<K extends keyof PropertySetupFields>(
+    key: K,
+    value: PropertySetupFields[K],
+  ) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -79,30 +55,11 @@ export function PropertySetupForm() {
     setError(null);
     setFieldErrors(null);
 
-    if (!form.name.trim() || !form.city.trim() || !form.streetAddress.trim()) {
-      setError("Nombre, ciudad y dirección son obligatorios.");
+    const validationError = validatePropertySetupFields(form);
+    if (validationError) {
+      setError(validationError);
       return;
     }
-
-    const payload: Record<string, string | number | null> = {
-      name: form.name.trim(),
-      country: DEFAULT_PROPERTY_COUNTRY,
-      city: form.city.trim(),
-      street_address: form.streetAddress.trim(),
-      property_type: form.propertyType,
-      status: "active",
-      measurement_system: "metric",
-      state_or_region: form.stateOrRegion.trim() || null,
-    };
-
-    const bed = optInt(form.bedrooms);
-    if (bed !== undefined) payload.bedrooms = bed;
-    const bath = optInt(form.bathrooms);
-    if (bath !== undefined) payload.bathrooms = bath;
-    const built = optFloat(form.builtArea);
-    if (built !== undefined) payload.built_area = built;
-    const land = optFloat(form.landArea);
-    if (land !== undefined) payload.land_area = land;
 
     setPending(true);
     try {
@@ -112,7 +69,7 @@ export function PropertySetupForm() {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ property: payload }),
+        body: JSON.stringify({ property: buildPropertyCreatePayload(form) }),
       });
       const data = (await res.json().catch(() => ({}))) as unknown;
 

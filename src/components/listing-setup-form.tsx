@@ -10,34 +10,28 @@ import {
   TextField,
   ValidationErrorList,
 } from "@/components/ui";
-import {
-  DEFAULT_PROPERTY_COUNTRY,
-  PROPERTY_TYPES,
-  type Property,
-} from "@/lib/property-types";
+import { PROPERTY_TYPES, type Property } from "@/lib/property-types";
 import { propertyTypeLabel } from "@/lib/property-labels";
+import {
+  buildPropertyCreatePayload,
+  optionalFloat,
+  optionalInt,
+  validatePropertySetupFields,
+  type PropertySetupFields,
+} from "@/lib/property-setup-payload";
 import {
   applyApiFormErrors,
   type ValidationErrors,
 } from "@/lib/validation";
 import type { Unit } from "@/lib/unit-types";
 
-type FormState = {
-  propertyName: string;
-  propertyType: string;
-  city: string;
-  stateOrRegion: string;
-  streetAddress: string;
-  bedrooms: string;
-  bathrooms: string;
-  builtArea: string;
-  landArea: string;
+type FormState = PropertySetupFields & {
   unitName: string;
 };
 
 function emptyForm(): FormState {
   return {
-    propertyName: "",
+    name: "",
     propertyType: "house",
     city: "",
     stateOrRegion: "",
@@ -48,22 +42,6 @@ function emptyForm(): FormState {
     landArea: "",
     unitName: "Principal",
   };
-}
-
-function optInt(s: string): number | null | undefined {
-  const t = s.trim();
-  if (!t) return undefined;
-  const n = parseInt(t, 10);
-  if (Number.isNaN(n)) return null;
-  return n;
-}
-
-function optFloat(s: string): number | null | undefined {
-  const t = s.trim();
-  if (!t) return undefined;
-  const n = Number(t);
-  if (!Number.isFinite(n)) return null;
-  return n;
 }
 
 export function ListingSetupForm() {
@@ -82,12 +60,9 @@ export function ListingSetupForm() {
     setError(null);
     setFieldErrors(null);
 
-    if (
-      !form.propertyName.trim() ||
-      !form.city.trim() ||
-      !form.streetAddress.trim()
-    ) {
-      setError("Nombre, ciudad y dirección son obligatorios.");
+    const validationError = validatePropertySetupFields(form);
+    if (validationError) {
+      setError(validationError);
       return;
     }
     if (!form.unitName.trim()) {
@@ -95,28 +70,16 @@ export function ListingSetupForm() {
       return;
     }
 
-    const propertyPayload: Record<string, string | number | null> = {
-      name: form.propertyName.trim(),
-      country: DEFAULT_PROPERTY_COUNTRY,
-      city: form.city.trim(),
-      street_address: form.streetAddress.trim(),
-      property_type: form.propertyType,
-      status: "active",
-      measurement_system: "metric",
-      state_or_region: form.stateOrRegion.trim() || null,
-    };
-
-    const bed = optInt(form.bedrooms);
-    if (bed !== undefined) propertyPayload.bedrooms = bed;
-    const bath = optInt(form.bathrooms);
-    if (bath !== undefined) propertyPayload.bathrooms = bath;
-    const built = optFloat(form.builtArea);
-    if (built !== undefined) propertyPayload.built_area = built;
-    const land = optFloat(form.landArea);
-    if (land !== undefined) propertyPayload.land_area = land;
+    const bed = optionalInt(form.bedrooms);
+    const bath = optionalInt(form.bathrooms);
 
     setPending(true);
     try {
+      const propertyPayload = buildPropertyCreatePayload({
+        ...form,
+        name: form.name,
+      });
+
       const propertyRes = await fetch("/api/v1/properties", {
         method: "POST",
         headers: {
@@ -144,7 +107,8 @@ export function ListingSetupForm() {
       };
       if (bed !== undefined) unitBody.bedrooms = bed;
       if (bath !== undefined) unitBody.bathrooms = bath;
-      if (built !== undefined) unitBody.built_area = built;
+      const builtFloat = optionalFloat(form.builtArea);
+      if (builtFloat !== undefined) unitBody.built_area = builtFloat;
 
       const unitRes = await fetch(`/api/v1/properties/${property.id}/units`, {
         method: "POST",
@@ -163,7 +127,6 @@ export function ListingSetupForm() {
 
       const unit = unitData as Unit;
       if (!unit.id) {
-        setError("La propiedad se creó pero falló la unidad. Agrega una unidad manualmente.");
         router.push(`/properties/${property.id}/units/new`);
         return;
       }
@@ -186,8 +149,8 @@ export function ListingSetupForm() {
           label="Nombre"
           required
           hint="Ej. Casa Condesa, Edificio Centro."
-          value={form.propertyName}
-          onChange={(e) => set("propertyName", e.target.value)}
+          value={form.name}
+          onChange={(e) => set("name", e.target.value)}
         />
         <SelectField
           id="propertyType"

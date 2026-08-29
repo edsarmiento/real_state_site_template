@@ -125,7 +125,7 @@ export default async function ListingDetailPage({ params }: Props) {
             ) : null}
 
             {listing.description ? (
-              <p className="mt-8 whitespace-pre-wrap text-zinc-700">
+              <p className="mt-8 whitespace-pre-wrap text-justify text-zinc-700">
                 {listing.description}
               </p>
             ) : null}

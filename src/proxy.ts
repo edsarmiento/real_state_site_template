@@ -22,17 +22,14 @@ export async function proxy(request: NextRequest) {
   const token = request.cookies.get(AUTH_COOKIE)?.value;
 
   const isLoginPage = pathname === "/login";
-  const isConfirmEmailPage = pathname === "/confirm-email";
 
-  const isAuthPublicPage = isLoginPage || isConfirmEmailPage;
+  const isAuthPublicPage = isLoginPage;
 
   const isAuthApiPublic =
     pathname === "/api/auth/login" ||
     pathname.startsWith("/api/auth/login/") ||
     pathname === "/api/auth/logout" ||
-    pathname.startsWith("/api/auth/logout/") ||
-    pathname === "/api/auth/confirm-email" ||
-    pathname.startsWith("/api/auth/confirm-email/");
+    pathname.startsWith("/api/auth/logout/");
 
   const isPublicApi =
     pathname === "/api/public" || pathname.startsWith("/api/public/");
@@ -46,7 +43,7 @@ export async function proxy(request: NextRequest) {
       return clearAuthCookiesOn(nextWithPathname(request, pathname));
     }
 
-    if (token && !isConfirmEmailPage) {
+    if (token) {
       const user = await fetchCurrentUserWithToken(token);
       const membership = user ? findMembership(user.memberships) : undefined;
       if (
