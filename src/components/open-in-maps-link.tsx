@@ -12,6 +12,7 @@ type Props = {
   label?: string;
   showCoordinates?: boolean;
   linkText?: string;
+  className?: string;
 };
 
 export function OpenInMapsLink({
@@ -20,6 +21,7 @@ export function OpenInMapsLink({
   label,
   showCoordinates = true,
   linkText = "Abrir en el mapa",
+  className,
 }: Props) {
   const [href, setHref] = useState(() =>
     googleMapsSearchUrl(latitude, longitude),
@@ -48,7 +50,10 @@ export function OpenInMapsLink({
         {...(openInNewTab
           ? { target: "_blank", rel: "noopener noreferrer" }
           : {})}
-        className="text-base font-semibold text-blue-700 underline-offset-2 hover:underline sm:text-sm"
+        className={
+          className ??
+          "text-base font-semibold text-blue-700 underline-offset-2 hover:underline sm:text-sm"
+        }
       >
         {linkText}
       </a>

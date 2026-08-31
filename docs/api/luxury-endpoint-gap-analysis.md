@@ -4,7 +4,7 @@
 | --- | --- |
 | Título | Luxury endpoint gap analysis — `real_state_site_template` |
 | Estado | Draft |
-| Versión | 0.1 |
+| Versión | 0.2 |
 | Fecha | 2026-08-30 |
 | Rama | `docs/luxury-product-spec` |
 | Complemento | [`docs/architecture/luxury-layout-implementation.md`](../architecture/luxury-layout-implementation.md) |
@@ -413,6 +413,68 @@ P1. Evitar N+1 desde el front (no N GETs de ficha). Un array en el detalle **o**
 
 P1. Sin evidencia en este repo. No crear rutas “por si acaso”. Locations de filtro = `city` (+ `q` si se confirma).
 
+**Comprobado en el catálogo actual:** `src/app/page.tsx` envía a Rails únicamente `city`, `offer_type`, `property_type`, `bedrooms`, `limit`. Luxury enlaza ubicaciones **solo** con `?city=`. No se envían `zone`, `colony` ni `neighborhood`. Santa Fe, Playas, Otay o Zona Río **no** deben usarse como `city` si el backend no las resuelve como ciudad.
+
+**Proposed. No aprobado. No implementado.**
+
+```text
+GET /api/public/locations
+```
+
+Contrato sugerido:
+
+```json
+{
+  "data": [
+    {
+      "id": "string",
+      "slug": "string",
+      "name": "string",
+      "kind": "city|zone|neighborhood",
+      "image_url": "https://...",
+      "listings_count": 12,
+      "query": {
+        "city": "Tijuana",
+        "zone": "Santa Fe"
+      }
+    }
+  ]
+}
+```
+
+Pendiente de confirmar en backend (no afirmar que está aprobado):
+
+- filtros `zone` y `neighborhood` en `GET /api/public/listings`
+- counts reales por tenant (nunca inferir el total desde una página de 24)
+- orden configurable
+- imagen editorial
+- únicamente ubicaciones con publicaciones activas
+- contenido localizado (`name` / `shortDescription` por locale)
+
+Hasta ese endpoint, Luxury usa `SITE_LOCATIONS_JSON` (adapter en `getPublicSiteContent`) o ciudades únicas de los listings ya cargados.
+
+### 10.7 i18n y SEO bilingüe
+
+**Pending (listings API).** MVP Luxury: query `?lang=en`. Default `es`. Diccionario de interfaz en `src/lib/site-i18n.ts`.
+
+Luxury translates its interface. Listing-authored content remains in its source language until the listings API supports localized fields.
+
+No se traducen título, descripción, amenidades, colonia/desarrollo, dirección ni nombres propios. No hay reemplazos automáticos ni servicio externo. DTO, API y BFF no cambian en este pase.
+
+**P1:** localized pathnames `/en/...` y `hreflang`. El query param no es SEO internacional completo; `?lang=en` puede duplicar URLs. Canonical del home sin filtros permanece `/`.
+
+`<html lang>` global permanece `es` (layout compartido con default/admin).
+
+### 10.8 WhatsApp y redes (config front)
+
+**Comprobado:** `SITE_WHATSAPP_NUMBER` / `SITE_WHATSAPP_MESSAGE` en `getPublicSiteContent` → `https://wa.me/{digits}?text=`. Número inválido oculta CTAs. Footer Contacto (Luxury) pinta WhatsApp, `SITE_CONTACT_EMAIL` y teléfono si existen.
+
+**Comprobado:** `SITE_INSTAGRAM_URL`, `SITE_FACEBOOK_URL` con allowlist de hosts. Sin handle visible. No hay endpoint de site-config; sustituible por `GET /api/public/site-config` futuro.
+
+**Comprobado (Luxury):** inquiry de ficha POST a `POST /api/public/listings/[slug]/inquiries` (mismo BFF que default). Default usa `ListingInquiryForm`. El contrato del endpoint no cambia.
+
+**Comprobado (Luxury):** `SITE_TESTIMONIALS_JSON` opcional; vacío omite la sección. Parser retrocompatible: `quote` (string u objeto `{es,en}`), más `quoteEs` / `quoteEn` y opcional `roleEs` / `roleEn`. ES: `quoteEs ?? quote`. EN: `quoteEn ?? quote`. Sin texto resoluble se omite el item. Máximo 6. `preview: true` identifica la vista previa. No hay testimonios inventados en código.
+
 ---
 
 ## 11. Seguridad multi-tenant
@@ -498,7 +560,7 @@ Ninguno de estos exige, por sí solo, un recurso HTTP nuevo.
 
 ### P1
 
-Facets, featured, related, developments, zones, filtros baños/parking/m², mapa embed, i18n, favoritos, comparador.
+Facets, featured, related, developments, zones, filtros baños/parking/m², mapa embed, i18n path-based (`/en/...` + hreflang), favoritos, comparador, counts reales por ubicación, imágenes editoriales de locations.
 
 ### No requeridos para Luxury MVP
 
@@ -507,6 +569,29 @@ Facets, featured, related, developments, zones, filtros baños/parking/m², mapa
 - Marketplace / search global multi-cuenta.
 - `GET /api/public/listings` duplicado “luxury”.
 - Geocoding / Google Maps Platform (el link externo basta para P0 de mapa).
+
+---
+
+## 16. Formulario general de contacto — no implementado
+
+**Propuesto. No aprobado. No implementado.**
+
+El inquiry actual (`POST /api/public/listings/:slug/inquiries`, BFF `src/app/api/public/listings/[slug]/inquiries`) es **exclusivo de un anuncio**. Luxury no lo reutiliza para contacto general.
+
+| Campo | Estado |
+| --- | --- |
+| Endpoint propuesto | `POST /api/public/contact-inquiries` |
+| Implementado en este repo | No |
+| Aprobado | No |
+| Bloquea el catálogo | No |
+| Bloquea captura general por formulario | Sí |
+| Fallback actual | WhatsApp / llamada / correo / agenda **solo si** hay valores válidos en `getPublicSiteContent()`; si no, se invita a usar el formulario de la ficha |
+
+`contact.formEnabled` permanece en `false`. Los únicos modos aceptados son `hidden` y `preview`. `enabled` no está disponible: se resuelve a `hidden` con warning server-side (sin imprimir el valor crudo). `preview` muestra campos con submit deshabilitado; no hay success, persistencia ni adapter de envío. El formulario general no llama al BFF de inquiry de listing.
+
+Las rutas internas `/aviso-de-privacidad`, `/terminos` y `/cookies` son scaffolding con `robots: noindex, nofollow`. **Release blocker por tenant:** no publicar sin documentos o URLs legales aprobados. Un formulario general real no podrá habilitarse sin privacidad válida.
+
+Payload propuesto (sujeto a confirmación de backend): `name`, `phone`, `email?`, `operation?`, `location?`, `message`, `privacyAccepted`. Requiere rate limit, validación, privacidad y tenant scope server-side. El checkbox de privacidad no va preseleccionado y no puede habilitarse el envío sin aviso de privacidad y endpoint reales.
 
 ---
 

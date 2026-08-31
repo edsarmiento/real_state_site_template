@@ -1,5 +1,3 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { ListingInquiryForm } from "@/components/listing-inquiry-form";
 import { ListingOfferBadge } from "@/components/listing-offer-badge";
@@ -8,132 +6,16 @@ import { ListingWhatsAppButton } from "@/components/listing-whatsapp-button";
 import { OpenInMapsLink } from "@/components/open-in-maps-link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { publicApiFetch } from "@/lib/public-api-fetch";
 import {
   formatRentCents,
   listingPriceSuffix,
   listingPublicSpecs,
-  OFFER_TYPE_LABEL,
   parseOfferType,
-  type PublicListingDetail,
 } from "@/lib/listing-types";
 import { propertyTypeLabel } from "@/lib/property-labels";
 import type { PropertyType } from "@/lib/property-types";
-import { getPublicSiteContent } from "@/lib/public-site-content";
-import { getSessionContext } from "@/lib/session-context";
-import { listingPublicUrl } from "@/lib/site-config-env";
-import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
-import { fillTemplate, getDictionary, resolveRequestLocale } from "@/lib/site-i18n";
-import { LuxuryShell } from "@/themes/luxury/luxury-shell";
-import {
-  resolveSiteThemeFromConfig,
-  themeNameFromLayoutKey,
-} from "@/themes/resolve-site-theme";
-
-type Props = {
-  params: Promise<{ slug: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-};
-
-function param(v: string | string[] | undefined): string {
-  if (Array.isArray(v)) return v[0] ?? "";
-  return v ?? "";
-}
-
-function listingShareImage(
-  listing: PublicListingDetail,
-  siteOrigin: string,
-): string | null {
-  const raw =
-    listing.photos?.find((p) => p.url)?.url ?? listing.photo_url ?? null;
-  if (!raw) return null;
-  if (/^https?:\/\//i.test(raw)) return raw;
-  return new URL(raw.startsWith("/") ? raw : `/${raw}`, siteOrigin).href;
-}
-
-function listingShareDescription(listing: PublicListingDetail): string {
-  const offerType = parseOfferType(listing.offer_type);
-  const price = formatRentCents(listing.rent_cents, listing.currency);
-  const suffix = listingPriceSuffix(offerType);
-  const priceLabel = suffix ? `${price}${suffix}` : price;
-  const parts = [
-    `${OFFER_TYPE_LABEL[offerType]} · ${priceLabel}`,
-    listing.location_label || null,
-    listing.description?.trim() || null,
-  ].filter(Boolean);
-  return parts.join(" · ").slice(0, 200);
-}
-
-export async function generateMetadata({
-  params,
-  searchParams,
-}: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const lang = param((await searchParams).lang);
-  const config = await getResolvedSiteConfig();
-  const themeName = themeNameFromLayoutKey(config.layoutKey);
-  const path = `/inmueble/${encodeURIComponent(slug)}`;
-  const result = await publicApiFetch<PublicListingDetail>(
-    `/api/public/listings/${encodeURIComponent(slug)}`,
-  );
-
-  if (!result.ok) {
-    if (themeName === "luxury") {
-      const content = await getPublicSiteContent();
-      const locale = resolveRequestLocale(lang, content.locale);
-      return { title: getDictionary(locale).listing.metaFallback };
-    }
-    return { title: "Inmueble" };
-  }
-
-  const listing = result.data;
-  const title = listing.title;
-  const image = listingShareImage(listing, config.siteOrigin);
-  let description = listingShareDescription(listing);
-  let ogLocale = "es_MX";
-
-  if (themeName === "luxury") {
-    const content = await getPublicSiteContent();
-    const locale = resolveRequestLocale(lang, content.locale);
-    const dict = getDictionary(locale);
-    ogLocale = locale === "en" ? "en_US" : "es_MX";
-    const offerType = parseOfferType(listing.offer_type);
-    const price = formatRentCents(listing.rent_cents, listing.currency);
-    const suffix = offerType === "rent" ? dict.listing.perMonth : "";
-    const priceLabel = suffix ? `${price}${suffix}` : price;
-    const offerLabel =
-      offerType === "sale" ? dict.listing.sale : dict.listing.rent;
-    description = [
-      `${offerLabel} · ${priceLabel}`,
-      listing.location_label || null,
-      listing.description?.trim() || null,
-    ]
-      .filter(Boolean)
-      .join(" · ")
-      .slice(0, 200);
-  }
-
-  return {
-    title,
-    description,
-    alternates: { canonical: path },
-    openGraph: {
-      type: "website",
-      locale: ogLocale,
-      url: listingPublicUrl(slug, config.siteOrigin),
-      siteName: config.siteName,
-      title,
-      description,
-      ...(image ? { images: [{ url: image, alt: title }] } : {}),
-    },
-    twitter: {
-      card: image ? "summary_large_image" : "summary",
-      title,
-      description,
-      ...(image ? { images: [image] } : {}),
-    },
-  };
-}
+import { siteName } from "@/lib/site-config";
+import type { ListingDetailThemeProps } from "@/themes/theme-types";
 
 function specStyles(label: string) {
   const styles: Record<
@@ -242,52 +124,7 @@ function InfoCard({
   );
 }
 
-export default async function ListingDetailPage({
-  params,
-  searchParams,
-}: Props) {
-  const { slug } = await params;
-  const lang = param((await searchParams).lang);
-  const config = await getResolvedSiteConfig();
-  const theme = await resolveSiteThemeFromConfig();
-  const result = await publicApiFetch<PublicListingDetail>(
-    `/api/public/listings/${encodeURIComponent(slug)}`,
-  );
-
-  if (result.status === 404) notFound();
-  if (!result.ok) {
-    if (theme.name === "luxury") {
-      const content = await getPublicSiteContent();
-      const locale = resolveRequestLocale(lang, content.locale);
-      const dict = getDictionary(locale);
-      return (
-        <LuxuryShell lang={lang}>
-          <p className="luxury-state luxury-state--error">
-            {fillTemplate(dict.results.listingError, { status: result.status })}
-          </p>
-        </LuxuryShell>
-      );
-    }
-    return (
-      <div className="min-h-screen bg-[#f3f6fb] px-4 py-16 text-sm text-zinc-600">
-        No se pudo cargar el anuncio ({result.status}).
-      </div>
-    );
-  }
-
-  if (theme.name === "luxury") {
-    const session = await getSessionContext();
-    const ListingDetail = theme.ListingDetail;
-    return (
-      <ListingDetail
-        listing={result.data}
-        isAdmin={session?.isStaffUser === true}
-        lang={lang}
-      />
-    );
-  }
-
-  const listing = result.data;
+export async function DefaultListingDetail({ listing }: ListingDetailThemeProps) {
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const priceSuffix = listingPriceSuffix(offerType);
@@ -296,8 +133,7 @@ export default async function ListingDetailPage({
     propertyTypeLabel[listing.property_type as PropertyType] ??
     listing.property_type;
   const isSale = offerType === "sale";
-  const agency = listing.agency_name || config.siteName;
-  const listingUrl = listingPublicUrl(slug, config.siteOrigin);
+  const agency = listing.agency_name || siteName();
 
   return (
     <div className="relative min-h-screen bg-[#f3f6fb]">
@@ -400,8 +236,8 @@ export default async function ListingDetailPage({
                   <ListingWhatsAppButton
                     phone={listing.contact_phone}
                     title={listing.title}
+                    slug={listing.slug}
                     offerType={offerType}
-                    listingUrl={listingUrl}
                   />
                 </div>
               ) : null}

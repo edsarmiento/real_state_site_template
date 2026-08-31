@@ -84,3 +84,16 @@ npm start
 ```
 
 Puerto por defecto en dev/prod local: **3002** (el CRM front usa 3001).
+
+## Tema Luxury (layout `deo`)
+
+En producción el tema público se elige en **Ops → Configurar sitio** con `layout_key: deo` (mapea al tema Luxury en código). No uses `SITE_THEME` en Vercel.
+
+Variables opcionales solo para Luxury (fuentes, hero, contacto, i18n) — ver `docs/api/luxury-endpoint-gap-analysis.md` y `AGENTS.md`. Ejemplos:
+
+```bash
+SITE_HEADING_FONT=cormorant-garamond
+SITE_BODY_FONT=manrope
+NEXT_PUBLIC_SITE_HERO_IMAGE_URL=https://…
+```
+

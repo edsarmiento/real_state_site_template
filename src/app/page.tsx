@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { publicApiFetch } from "@/lib/public-api-fetch";
 import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
+import { getSessionContext } from "@/lib/session-context";
 import {
   parseCatalogOfferFilter,
   type CatalogOfferFilter,
@@ -14,6 +15,12 @@ import {
 } from "@/lib/listing-types";
 import { propertyTypeLabel } from "@/lib/property-labels";
 import type { PropertyType } from "@/lib/property-types";
+import { getPublicSiteContent } from "@/lib/public-site-content";
+import { getDictionary, resolveRequestLocale } from "@/lib/site-i18n";
+import {
+  resolveSiteThemeFromConfig,
+  themeNameFromLayoutKey,
+} from "@/themes/resolve-site-theme";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -43,8 +50,30 @@ export async function generateMetadata({
 }: {
   searchParams: SearchParams;
 }): Promise<Metadata> {
-  const oferta = parseCatalogOfferFilter(param((await searchParams).oferta));
+  const sp = await searchParams;
+  const oferta = parseCatalogOfferFilter(param(sp.oferta));
   const config = await getResolvedSiteConfig();
+  const themeName = themeNameFromLayoutKey(config.layoutKey);
+
+  if (themeName === "luxury") {
+    const content = await getPublicSiteContent();
+    const locale = resolveRequestLocale(param(sp.lang), content.locale);
+    const dict = getDictionary(locale);
+    const title =
+      oferta === "sale"
+        ? dict.seo.catalogSale
+        : oferta === "rent"
+          ? dict.seo.catalogRent
+          : dict.seo.catalogAll;
+    return {
+      title,
+      description: config.siteTagline,
+      ...(oferta === "all" && !param(sp.city)
+        ? { alternates: { canonical: "/" } }
+        : {}),
+    };
+  }
+
   if (oferta === "sale") {
     return {
       title: "Inmuebles en venta",
@@ -70,6 +99,7 @@ export default async function CatalogPage({
 }) {
   const sp = await searchParams;
   const config = await getResolvedSiteConfig();
+  const theme = await resolveSiteThemeFromConfig();
   const city = param(sp.city).trim();
   const oferta = parseCatalogOfferFilter(param(sp.oferta));
   const propertyType = param(sp.tipo).trim();
@@ -93,13 +123,36 @@ export default async function CatalogPage({
       ? result.data.listings
       : [];
   const total = result.ok ? (result.data.meta?.total ?? listings.length) : 0;
-  const isDefaultLayout = config.layoutKey === "default";
 
   const emptyKind =
     oferta === "sale" ? "en venta" : oferta === "rent" ? "en renta" : "";
   const typeLabel = propertyType
     ? (propertyTypeLabel[propertyType as PropertyType] ?? propertyType)
     : null;
+
+  if (theme.name === "luxury") {
+    const session = await getSessionContext();
+    const Catalog = theme.Catalog;
+    return (
+      <Catalog
+        oferta={oferta}
+        city={city}
+        propertyType={propertyType}
+        bedrooms={bedrooms}
+        listings={listings}
+        total={total}
+        heading={resultsHeading(oferta, city, total)}
+        emptyKind={emptyKind}
+        typeLabel={typeLabel}
+        catalogOk={result.ok}
+        catalogStatus={result.status}
+        isAdmin={session?.isStaffUser === true}
+        lang={param(sp.lang)}
+      />
+    );
+  }
+
+  const isDefaultLayout = config.layoutKey === "default";
 
   return (
     <div
