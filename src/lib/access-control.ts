@@ -1,5 +1,3 @@
-import type { Membership } from "@/lib/account-types";
-
 export const ADMIN_HOME_PATH = "/listings";
 
 const PORTAL_ROLES = new Set(["tenant_portal", "property_owner_portal"]);
@@ -16,7 +14,7 @@ export function isExternalPortalRole(role: string | undefined): boolean {
   return role != null && PORTAL_ROLES.has(role);
 }
 
-export function homePathForRole(_role?: string): string {
+export function homePathForRole(): string {
   return ADMIN_HOME_PATH;
 }
 

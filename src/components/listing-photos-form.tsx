@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Button,
@@ -54,20 +54,27 @@ function shiftPhoto(
   return movePhoto(photos, photoId, photos[target].id);
 }
 
+function photosSignature(photos: ListingPhoto[]): string {
+  return photos.map((p) => `${p.id}:${p.position}`).join("|");
+}
+
 export function ListingPhotosForm({ listingId, photos }: Props) {
   const router = useRouter();
   const styledLayout = useSiteLayoutStyled();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [reordering, setReordering] = useState(false);
+  const signature = photosSignature(photos);
   const [ordered, setOrdered] = useState(() => sortPhotos(photos));
+  const [prevSignature, setPrevSignature] = useState(signature);
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [dropTargetId, setDropTargetId] = useState<number | null>(null);
   const dragIdRef = useRef<number | null>(null);
 
-  useEffect(() => {
+  if (signature !== prevSignature) {
+    setPrevSignature(signature);
     setOrdered(sortPhotos(photos));
-  }, [photos]);
+  }
 
   const remaining = Math.max(0, MAX_PHOTOS - ordered.length);
   const atLimit = remaining === 0;

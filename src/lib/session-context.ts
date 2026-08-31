@@ -38,7 +38,7 @@ export const getSessionContext = cache(async function getSessionContext(): Promi
 
   const memberships = user.memberships;
   const accountId = jar.get(ACCOUNT_COOKIE)?.value ?? null;
-  const membership = findMembership(memberships, accountId);
+  const membership = findMembership(memberships);
   const role = membership?.role;
   const isPlatformOps = user.platform_ops === true;
 

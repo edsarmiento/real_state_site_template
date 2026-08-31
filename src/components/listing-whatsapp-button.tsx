@@ -3,6 +3,7 @@ type Props = {
   title: string;
   offerType?: "rent" | "sale";
   listingUrl: string;
+  className?: string;
 };
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -27,6 +28,7 @@ export function ListingWhatsAppButton({
   title,
   listingUrl,
   offerType = "rent",
+  className,
 }: Props) {
   const digits = phone.replace(/\D/g, "");
   if (!/^\d{10}$/.test(digits)) return null;
@@ -42,7 +44,12 @@ export function ListingWhatsAppButton({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3.5 text-base font-semibold text-white transition hover:bg-[#1ebe57] sm:text-sm"
+      className={[
+        "listing-whatsapp-button inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3.5 text-base font-semibold text-white transition hover:bg-[#1ebe57] sm:text-sm",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       <WhatsAppIcon className="h-5 w-5 shrink-0" />
       {label}

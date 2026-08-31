@@ -2,11 +2,38 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ListingPhoto } from "@/lib/listing-types";
+import { fillTemplate } from "@/lib/site-i18n";
+
+export type ListingGalleryLabels = {
+  empty: string;
+  carouselRole: string;
+  photosOf: string;
+  photoAlt: string;
+  prev: string;
+  next: string;
+  indicators: string;
+  goTo: string;
+  view: string;
+};
+
+const DEFAULT_GALLERY_LABELS: ListingGalleryLabels = {
+  empty: "Sin fotos",
+  carouselRole: "carrusel",
+  photosOf: "Fotos de {title}",
+  photoAlt: "{title} — foto {index} de {count}",
+  prev: "Foto anterior",
+  next: "Foto siguiente",
+  indicators: "Indicadores de foto",
+  goTo: "Ir a foto {index}",
+  view: "Ver foto {index}",
+};
 
 type Props = {
   title: string;
   photos: ListingPhoto[];
   fallbackUrl?: string | null;
+  className?: string;
+  labels?: ListingGalleryLabels;
 };
 
 function ChevronLeft({ className }: { className?: string }) {
@@ -43,10 +70,16 @@ function ChevronRight({ className }: { className?: string }) {
   );
 }
 
-export function ListingPhotoGallery({ title, photos, fallbackUrl }: Props) {
+export function ListingPhotoGallery({
+  title,
+  photos,
+  fallbackUrl,
+  className,
+  labels = DEFAULT_GALLERY_LABELS,
+}: Props) {
   const urls = photos
     .map((p) => p.url)
-    .filter((url): url is string => Boolean(url));
+    .filter((url): url is string => Boolean(url?.trim()));
   if (urls.length === 0 && fallbackUrl) urls.push(fallbackUrl);
 
   const count = urls.length;
@@ -81,23 +114,27 @@ export function ListingPhotoGallery({ title, photos, fallbackUrl }: Props) {
 
   const activeUrl = urls[activeIndex] ?? null;
 
+  const rootClass = ["listing-gallery", className].filter(Boolean).join(" ");
+
   if (!activeUrl) {
     return (
-      <div className="-mx-4 overflow-hidden bg-zinc-200 ring-1 ring-blue-950/10 sm:mx-0 sm:rounded-3xl">
-        <div className="flex aspect-[4/3] items-center justify-center text-base text-zinc-500 sm:aspect-[16/9] sm:text-sm">
-          Sin fotos
+      <div className={rootClass}>
+        <div className="listing-gallery__stage -mx-4 overflow-hidden bg-zinc-200 ring-1 ring-blue-950/10 sm:mx-0 sm:rounded-3xl">
+          <div className="flex aspect-[4/3] items-center justify-center text-base text-zinc-500 sm:aspect-[16/9] sm:text-sm">
+            {labels.empty}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className={rootClass}>
       <div
-        className="relative -mx-4 overflow-hidden bg-zinc-200 shadow-[0_24px_60px_-36px_rgba(37,99,235,0.55)] ring-1 ring-blue-950/10 sm:mx-0 sm:rounded-3xl"
+        className="listing-gallery__stage relative -mx-4 overflow-hidden bg-zinc-200 shadow-[0_24px_60px_-36px_rgba(37,99,235,0.55)] ring-1 ring-blue-950/10 sm:mx-0 sm:rounded-3xl"
         role="region"
-        aria-roledescription="carrusel"
-        aria-label={`Fotos de ${title}`}
+        aria-roledescription={labels.carouselRole}
+        aria-label={fillTemplate(labels.photosOf, { title })}
         onTouchStart={(e) => {
           touchStartX.current = e.changedTouches[0]?.clientX ?? null;
         }}
@@ -124,9 +161,17 @@ export function ListingPhotoGallery({ title, photos, fallbackUrl }: Props) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={url}
-                  alt={`${title} — foto ${index + 1} de ${count}`}
+                  alt={fillTemplate(labels.photoAlt, {
+                    title,
+                    index: index + 1,
+                    count,
+                  })}
                   className="h-full w-full object-cover"
                   draggable={false}
+                  onError={(event) => {
+                    event.currentTarget.style.visibility = "hidden";
+                    event.currentTarget.removeAttribute("src");
+                  }}
                 />
               </div>
             ))}
@@ -137,28 +182,28 @@ export function ListingPhotoGallery({ title, photos, fallbackUrl }: Props) {
               <button
                 type="button"
                 onClick={goPrev}
-                aria-label="Foto anterior"
-                className="absolute top-1/2 left-3 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-md ring-1 ring-black/5 transition hover:bg-white sm:h-10 sm:w-10"
+                aria-label={labels.prev}
+                className="listing-gallery__nav absolute top-1/2 left-3 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-md ring-1 ring-black/5 transition hover:bg-white sm:h-10 sm:w-10"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <button
                 type="button"
                 onClick={goNext}
-                aria-label="Foto siguiente"
-                className="absolute top-1/2 right-3 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-md ring-1 ring-black/5 transition hover:bg-white sm:h-10 sm:w-10"
+                aria-label={labels.next}
+                className="listing-gallery__nav absolute top-1/2 right-3 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-md ring-1 ring-black/5 transition hover:bg-white sm:h-10 sm:w-10"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
 
-              <div className="absolute right-3 bottom-3 rounded-full bg-black/55 px-3 py-1.5 text-sm font-medium text-white tabular-nums sm:text-xs">
+              <div className="listing-gallery__counter absolute right-3 bottom-3 rounded-full bg-black/55 px-3 py-1.5 text-sm font-medium text-white tabular-nums sm:text-xs">
                 {activeIndex + 1} / {count}
               </div>
 
               <div
                 className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5"
                 role="tablist"
-                aria-label="Indicadores de foto"
+                aria-label={labels.indicators}
               >
                 {urls.map((_, index) => {
                   const selected = index === activeIndex;
@@ -168,7 +213,9 @@ export function ListingPhotoGallery({ title, photos, fallbackUrl }: Props) {
                       type="button"
                       role="tab"
                       aria-selected={selected}
-                      aria-label={`Ir a foto ${index + 1}`}
+                      aria-label={fillTemplate(labels.goTo, {
+                        index: index + 1,
+                      })}
                       onClick={() => goTo(index)}
                       className={[
                         "h-2.5 rounded-full transition sm:h-2",
@@ -186,7 +233,7 @@ export function ListingPhotoGallery({ title, photos, fallbackUrl }: Props) {
       </div>
 
       {count > 1 ? (
-        <ul className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        <ul className="listing-gallery__thumbs mt-3 flex gap-2 overflow-x-auto pb-1">
           {urls.map((url, index) => {
             const selected = index === activeIndex;
             return (
@@ -194,17 +241,27 @@ export function ListingPhotoGallery({ title, photos, fallbackUrl }: Props) {
                 <button
                   type="button"
                   onClick={() => goTo(index)}
-                  aria-label={`Ver foto ${index + 1}`}
+                  aria-label={fillTemplate(labels.view, {
+                    index: index + 1,
+                  })}
                   aria-current={selected ? "true" : undefined}
                   className={[
                     "h-24 w-32 overflow-hidden rounded-xl bg-zinc-200 transition sm:h-20 sm:w-28",
                     selected
-                      ? "ring-2 ring-blue-600 ring-offset-2"
-                      : "ring-1 ring-blue-950/10 hover:ring-blue-600/40",
+                      ? "listing-gallery__thumb listing-gallery__thumb--active ring-2 ring-blue-600 ring-offset-2"
+                      : "listing-gallery__thumb ring-1 ring-blue-950/10 hover:ring-blue-600/40",
                   ].join(" ")}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt="" className="h-full w-full object-cover" />
+                  <img
+                    src={url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    onError={(event) => {
+                      event.currentTarget.style.visibility = "hidden";
+                      event.currentTarget.removeAttribute("src");
+                    }}
+                  />
                 </button>
               </li>
             );
