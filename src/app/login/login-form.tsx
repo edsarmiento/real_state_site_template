@@ -7,7 +7,15 @@ import { AuthPageShell } from "@/components/auth-page-shell";
 import { Button, ErrorBanner, PasswordField, TextField } from "@/components/ui";
 import { parseApiFailureMessage } from "@/lib/validation";
 
-export function LoginForm() {
+import type { SiteBranding } from "@/lib/site-config-types";
+
+export function LoginForm({
+  siteName,
+  siteTagline,
+  siteLogoUrl,
+  primaryColor,
+  showPoweredBy,
+}: SiteBranding) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authError = searchParams.get("auth");
@@ -63,6 +71,11 @@ export function LoginForm() {
     <AuthPageShell
       title="Iniciar sesión"
       description="Accede para administrar anuncios y leads."
+      siteName={siteName}
+      siteTagline={siteTagline}
+      siteLogoUrl={siteLogoUrl}
+      primaryColor={primaryColor}
+      showPoweredBy={showPoweredBy}
     >
       <form className="flex flex-col gap-4" onSubmit={onSubmit}>
         <TextField

@@ -19,16 +19,20 @@ import {
 } from "@/lib/listing-types";
 import { propertyTypeLabel } from "@/lib/property-labels";
 import type { PropertyType } from "@/lib/property-types";
-import { listingPublicUrl, siteName, siteOrigin } from "@/lib/site-config";
+import { listingPublicUrl } from "@/lib/site-config-env";
+import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 
 type Props = { params: Promise<{ slug: string }> };
 
-function listingShareImage(listing: PublicListingDetail): string | null {
+function listingShareImage(
+  listing: PublicListingDetail,
+  siteOrigin: string,
+): string | null {
   const raw =
     listing.photos?.find((p) => p.url)?.url ?? listing.photo_url ?? null;
   if (!raw) return null;
   if (/^https?:\/\//i.test(raw)) return raw;
-  return new URL(raw.startsWith("/") ? raw : `/${raw}`, siteOrigin()).href;
+  return new URL(raw.startsWith("/") ? raw : `/${raw}`, siteOrigin).href;
 }
 
 function listingShareDescription(listing: PublicListingDetail): string {
@@ -46,6 +50,7 @@ function listingShareDescription(listing: PublicListingDetail): string {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const config = await getResolvedSiteConfig();
   const path = `/inmueble/${encodeURIComponent(slug)}`;
   const result = await publicApiFetch<PublicListingDetail>(
     `/api/public/listings/${encodeURIComponent(slug)}`,
@@ -55,7 +60,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const listing = result.data;
   const title = listing.title;
   const description = listingShareDescription(listing);
-  const image = listingShareImage(listing);
+  const image = listingShareImage(listing, config.siteOrigin);
 
   return {
     title,
@@ -64,8 +69,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       type: "website",
       locale: "es_MX",
-      url: listingPublicUrl(slug),
-      siteName: siteName(),
+      url: listingPublicUrl(slug, config.siteOrigin),
+      siteName: config.siteName,
       title,
       description,
       ...(image ? { images: [{ url: image, alt: title }] } : {}),
@@ -188,6 +193,7 @@ function InfoCard({
 
 export default async function ListingDetailPage({ params }: Props) {
   const { slug } = await params;
+  const config = await getResolvedSiteConfig();
   const result = await publicApiFetch<PublicListingDetail>(
     `/api/public/listings/${encodeURIComponent(slug)}`,
   );
@@ -210,7 +216,8 @@ export default async function ListingDetailPage({ params }: Props) {
     propertyTypeLabel[listing.property_type as PropertyType] ??
     listing.property_type;
   const isSale = offerType === "sale";
-  const agency = listing.agency_name || siteName();
+  const agency = listing.agency_name || config.siteName;
+  const listingUrl = listingPublicUrl(slug, config.siteOrigin);
 
   return (
     <div className="relative min-h-screen bg-[#f3f6fb]">
@@ -313,8 +320,8 @@ export default async function ListingDetailPage({ params }: Props) {
                   <ListingWhatsAppButton
                     phone={listing.contact_phone}
                     title={listing.title}
-                    slug={listing.slug}
                     offerType={offerType}
+                    listingUrl={listingUrl}
                   />
                 </div>
               ) : null}

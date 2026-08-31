@@ -1,10 +1,8 @@
-import { listingPublicUrl } from "@/lib/site-config";
-
 type Props = {
   phone: string;
   title: string;
-  slug: string;
   offerType?: "rent" | "sale";
+  listingUrl: string;
 };
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -20,21 +18,20 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-export function listingWhatsAppMessage(title: string, slug: string): string {
-  const url = listingPublicUrl(slug);
-  return `Hola, me interesaría saber más información respecto a la publicación «${title}».\n\n${url}`;
+export function listingWhatsAppMessage(title: string, listingUrl: string): string {
+  return `Hola, me interesaría saber más información respecto a la publicación «${title}».\n\n${listingUrl}`;
 }
 
 export function ListingWhatsAppButton({
   phone,
   title,
-  slug,
+  listingUrl,
   offerType = "rent",
 }: Props) {
   const digits = phone.replace(/\D/g, "");
   if (!/^\d{10}$/.test(digits)) return null;
 
-  const href = `https://wa.me/52${digits}?text=${encodeURIComponent(listingWhatsAppMessage(title, slug))}`;
+  const href = `https://wa.me/52${digits}?text=${encodeURIComponent(listingWhatsAppMessage(title, listingUrl))}`;
   const label =
     offerType === "sale"
       ? "WhatsApp: me interesa comprar"

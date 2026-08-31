@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { apiBaseUrl } from "@/lib/api-url";
-import { accountId as workspaceAccountId } from "@/lib/site-config";
+import { accountId as workspaceAccountId } from "@/lib/site-config-env";
 import type { Membership } from "@/lib/account-types";
 
 function isExternalPortalRole(role: string): boolean {

@@ -1,9 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { siteLogoUrl, siteName, siteTagline } from "@/lib/site-config";
+import type { SiteBranding } from "@/lib/site-config-types";
 
-type Props = {
+type Props = SiteBranding & {
   title: string;
   description?: string;
   children: ReactNode;
@@ -15,9 +15,12 @@ export function AuthPageShell({
   description,
   children,
   className,
+  siteName,
+  siteTagline,
+  siteLogoUrl,
 }: Props) {
-  const logo = siteLogoUrl();
-  const name = siteName();
+  const logo = siteLogoUrl;
+  const name = siteName;
 
   return (
     <div
@@ -37,7 +40,7 @@ export function AuthPageShell({
               <span className="text-xl font-semibold tracking-tight">{name}</span>
             )}
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-zinc-200">
-              {siteTagline()}
+              {siteTagline}
             </p>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { apiBaseUrl } from "@/lib/api-url";
-import { accountId } from "@/lib/site-config";
+import { accountId } from "@/lib/site-config-env";
 import { getBearerAuthHeaders } from "@/lib/api-auth";
 
 export async function proxyResponse(upstream: Response): Promise<NextResponse> {

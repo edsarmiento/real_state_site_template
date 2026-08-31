@@ -1,4 +1,4 @@
-import { accountId } from "@/lib/site-config";
+import { accountId } from "@/lib/site-config-env";
 import { apiBaseUrl } from "@/lib/api-url";
 
 export type PublicApiResult<T> =

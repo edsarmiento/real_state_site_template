@@ -25,10 +25,12 @@ Requisitos:
 | `ACCOUNT_ID` | Sí | Workspace de la inmobiliaria |
 | `API_URL` | Sí (prod) | URL del Rails API |
 | `NEXT_PUBLIC_SITE_URL` | Sí (prod) | Origen público (dominio del cliente) |
-| `NEXT_PUBLIC_SITE_NAME` | Recomendada | Nombre en header y metadata |
-| `NEXT_PUBLIC_SITE_TAGLINE` | No | Subtítulo del catálogo |
-| `NEXT_PUBLIC_SITE_LOGO_URL` | No | Logo en header |
-| `NEXT_PUBLIC_SHOW_POWERED_BY` | No | `false` oculta «Tecnología Evenia» |
+| `NEXT_PUBLIC_SITE_NAME` | Fallback | Nombre en header y metadata (si no hay `SiteConfig` en API) |
+| `NEXT_PUBLIC_SITE_TAGLINE` | No | Subtítulo del catálogo (fallback) |
+| `NEXT_PUBLIC_SITE_LOGO_URL` | No | Logo en header (fallback) |
+| `NEXT_PUBLIC_SHOW_POWERED_BY` | No | `false` oculta «Tecnología Evenia» (fallback) |
+
+En producción, Ops puede configurar marca, layout y dominio público desde **Configurar sitio** (`/ops/accounts/:id/site`); el template lee esos valores del API sin redeploy (salvo `ACCOUNT_ID` y `API_URL`, que siguen siendo por deploy).
 
 El BFF inyecta `account_id` en `/api/public/*`. Las rutas staff (`/api/v1/*`) envían JWT + `X-Account-Id` fijado a `ACCOUNT_ID`.
 
@@ -65,7 +67,9 @@ src/
   app/api/v1/           BFF staff (JWT + X-Account-Id)
   components/           Header, forms, admin-shell
   lib/
-    site-config.ts      Branding + ACCOUNT_ID
+    resolved-site-config.ts  SiteConfig API + merge con env
+    site-config-env.ts       ACCOUNT_ID y fallbacks NEXT_PUBLIC_*
+    site-branding.ts         Helpers para props de marca
     api-auth.ts         JWT + header de workspace
     public-api-fetch.ts
   proxy.ts              Protege /listings, /account, /api/v1/*

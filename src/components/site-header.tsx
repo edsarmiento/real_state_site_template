@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { getSessionContext } from "@/lib/session-context";
-import { siteLogoUrl, siteName } from "@/lib/site-config";
+import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 
 export async function SiteHeader() {
-  const session = await getSessionContext();
-  const logo = siteLogoUrl();
-  const name = siteName();
+  const [session, config] = await Promise.all([
+    getSessionContext(),
+    getResolvedSiteConfig(),
+  ]);
+  const logo = config.siteLogoUrl;
+  const name = config.siteName;
   const isAdmin = session?.isStaffUser === true;
 
   return (

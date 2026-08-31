@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { showPoweredBy, siteName } from "@/lib/site-config";
+import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 
-export function SiteFooter() {
-  const name = siteName();
+export async function SiteFooter() {
+  const config = await getResolvedSiteConfig();
+  const name = config.siteName;
 
   return (
     <footer className="border-t border-zinc-200 bg-white">
@@ -11,7 +12,7 @@ export function SiteFooter() {
           {name} — catálogo de inmuebles. Los anuncios son publicados y
           atendidos directamente por la inmobiliaria.
         </p>
-        {showPoweredBy() ? (
+        {config.showPoweredBy ? (
           <p className="mt-4 text-xs text-zinc-500">
             Tecnología{" "}
             <Link

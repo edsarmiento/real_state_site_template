@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { siteName, siteLogoUrl } from "@/lib/site-config";
+import type { SiteBranding } from "@/lib/site-config-types";
 
 type NavItem = {
   href: string;
@@ -43,11 +43,17 @@ function navClass(active: boolean): string {
     : "rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900";
 }
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({
+  children,
+  siteName,
+  siteLogoUrl,
+}: {
+  children: React.ReactNode;
+} & Pick<SiteBranding, "siteName" | "siteLogoUrl">) {
   const pathname = usePathname();
   const router = useRouter();
-  const logo = siteLogoUrl();
-  const name = siteName();
+  const logo = siteLogoUrl;
+  const name = siteName;
 
   async function onLogout() {
     await fetch("/api/auth/logout", { method: "POST" });

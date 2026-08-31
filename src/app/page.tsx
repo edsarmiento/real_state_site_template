@@ -2,9 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { PublicCatalogSearch } from "@/components/public-catalog-search";
 import { PublicListingCard } from "@/components/public-listing-card";
+import { CatalogHero } from "@/components/layouts/catalog-hero";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { publicApiFetch } from "@/lib/public-api-fetch";
+import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import {
   parseCatalogOfferFilter,
   type CatalogOfferFilter,
@@ -12,7 +14,6 @@ import {
 } from "@/lib/listing-types";
 import { propertyTypeLabel } from "@/lib/property-labels";
 import type { PropertyType } from "@/lib/property-types";
-import { siteName, siteTagline } from "@/lib/site-config";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -43,14 +44,23 @@ export async function generateMetadata({
   searchParams: SearchParams;
 }): Promise<Metadata> {
   const oferta = parseCatalogOfferFilter(param((await searchParams).oferta));
-  const name = siteName();
+  const config = await getResolvedSiteConfig();
   if (oferta === "sale") {
-    return { title: "Inmuebles en venta", description: `${name} · venta` };
+    return {
+      title: "Inmuebles en venta",
+      description: `${config.siteName} · venta`,
+    };
   }
   if (oferta === "rent") {
-    return { title: "Inmuebles en renta", description: `${name} · rentas` };
+    return {
+      title: "Inmuebles en renta",
+      description: `${config.siteName} · rentas`,
+    };
   }
-  return { title: "Buscar inmuebles", description: siteTagline() };
+  return {
+    title: "Buscar inmuebles",
+    description: config.siteTagline,
+  };
 }
 
 export default async function CatalogPage({
@@ -59,6 +69,7 @@ export default async function CatalogPage({
   searchParams: SearchParams;
 }) {
   const sp = await searchParams;
+  const config = await getResolvedSiteConfig();
   const city = param(sp.city).trim();
   const oferta = parseCatalogOfferFilter(param(sp.oferta));
   const propertyType = param(sp.tipo).trim();
@@ -93,28 +104,22 @@ export default async function CatalogPage({
     <div className="relative min-h-screen bg-[#f3f6fb]">
       <SiteHeader />
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-950 pb-16 pt-10 text-white sm:pb-20 sm:pt-12">
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-200">
-              {siteName()}
-            </p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-              Encuentra tu próximo inmueble
-            </h1>
-            <p className="mt-4 max-w-xl text-base text-blue-100">{siteTagline()}</p>
-          </div>
-
-          <div className="mt-8 sm:mt-10">
-            <PublicCatalogSearch
-              oferta={oferta}
-              city={city}
-              propertyType={propertyType}
-              bedrooms={bedrooms}
-            />
-          </div>
-        </div>
-      </section>
+      <CatalogHero
+        layoutKey={config.layoutKey}
+        siteName={config.siteName}
+        siteTagline={config.siteTagline}
+        siteLogoUrl={config.siteLogoUrl}
+        primaryColor={config.primaryColor}
+        showPoweredBy={config.showPoweredBy}
+        search={
+          <PublicCatalogSearch
+            oferta={oferta}
+            city={city}
+            propertyType={propertyType}
+            bedrooms={bedrooms}
+          />
+        }
+      />
 
       <section className="relative -mt-6 mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex flex-col gap-4 rounded-2xl border border-blue-100 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
