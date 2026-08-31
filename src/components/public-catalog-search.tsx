@@ -25,6 +25,7 @@ type Props = {
   city: string;
   propertyType: string;
   bedrooms: string;
+  styledLayout?: boolean;
 };
 
 function catalogHref(
@@ -47,9 +48,22 @@ export function PublicCatalogSearch({
   city,
   propertyType,
   bedrooms,
+  styledLayout = true,
 }: Props) {
+  const focusField =
+    "rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-base outline-none focus:bg-white " +
+    (styledLayout
+      ? "focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+      : "focus:border-zinc-400 focus:ring-2 focus:ring-zinc-200");
+
   return (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-[0_24px_48px_-24px_rgba(15,23,42,0.35)] ring-1 ring-blue-950/10">
+    <div
+      className={`overflow-hidden rounded-2xl bg-white ${
+        styledLayout
+          ? "shadow-[0_24px_48px_-24px_rgba(15,23,42,0.35)] ring-1 ring-blue-950/10"
+          : "border border-zinc-200 shadow-sm"
+      }`}
+    >
       <nav className="flex border-b border-zinc-100" aria-label="Tipo de oferta">
         {OFFER_TABS.map((tab) => {
           const active = oferta === tab.id;
@@ -60,7 +74,9 @@ export function PublicCatalogSearch({
               className={[
                 "flex-1 px-4 py-3.5 text-center text-sm font-semibold transition sm:px-6",
                 active
-                  ? "border-b-2 border-blue-600 bg-blue-50/80 text-blue-800"
+                  ? styledLayout
+                    ? "border-b-2 border-blue-600 bg-blue-50/80 text-blue-800"
+                    : "border-b-2 border-zinc-900 bg-zinc-100 text-zinc-900"
                   : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900",
               ].join(" ")}
               aria-current={active ? "page" : undefined}
@@ -92,7 +108,7 @@ export function PublicCatalogSearch({
             name="city"
             defaultValue={city}
             placeholder="Ciudad o colonia"
-            className="rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-base outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+            className={focusField}
           />
         </label>
 
@@ -103,7 +119,7 @@ export function PublicCatalogSearch({
           <select
             name="tipo"
             defaultValue={propertyType}
-            className="rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-base outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+            className={focusField}
           >
             <option value="">Todos</option>
             {PROPERTY_TYPES.map((type) => (
@@ -121,7 +137,7 @@ export function PublicCatalogSearch({
           <select
             name="recamaras"
             defaultValue={bedrooms}
-            className="rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-base outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+            className={focusField}
           >
             {BEDROOM_OPTIONS.map((opt) => (
               <option key={opt.value || "any"} value={opt.value}>
@@ -134,7 +150,11 @@ export function PublicCatalogSearch({
         <div className="flex items-end sm:col-span-2 lg:col-span-1">
           <button
             type="submit"
-            className="w-full rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white hover:bg-blue-500"
+            className={`w-full rounded-xl px-6 py-3.5 text-sm font-semibold text-white ${
+              styledLayout
+                ? "bg-blue-600 hover:bg-blue-500"
+                : "bg-zinc-900 hover:bg-zinc-800"
+            }`}
           >
             Buscar
           </button>

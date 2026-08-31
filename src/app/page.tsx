@@ -93,6 +93,7 @@ export default async function CatalogPage({
       ? result.data.listings
       : [];
   const total = result.ok ? (result.data.meta?.total ?? listings.length) : 0;
+  const isDefaultLayout = config.layoutKey === "default";
 
   const emptyKind =
     oferta === "sale" ? "en venta" : oferta === "rent" ? "en renta" : "";
@@ -101,7 +102,9 @@ export default async function CatalogPage({
     : null;
 
   return (
-    <div className="relative min-h-screen bg-[#f3f6fb]">
+    <div
+      className={`relative min-h-screen ${isDefaultLayout ? "bg-zinc-50" : "bg-[#f3f6fb]"}`}
+    >
       <SiteHeader />
 
       <CatalogHero
@@ -117,12 +120,19 @@ export default async function CatalogPage({
             city={city}
             propertyType={propertyType}
             bedrooms={bedrooms}
+            styledLayout={!isDefaultLayout}
           />
         }
       />
 
-      <section className="relative -mt-6 mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex flex-col gap-4 rounded-2xl border border-blue-100 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <section
+        className={`relative mx-auto max-w-7xl px-4 sm:px-6 ${isDefaultLayout ? "pt-6" : "-mt-6"}`}
+      >
+        <div
+          className={`flex flex-col gap-4 rounded-2xl border bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6 ${
+            isDefaultLayout ? "border-zinc-200" : "border-blue-100"
+          }`}
+        >
           <p className="text-sm text-zinc-700">
             <span className="font-semibold text-zinc-950">¿Administras anuncios?</span>{" "}
             Accede al panel.
@@ -144,7 +154,11 @@ export default async function CatalogPage({
             <code className="text-xs">API_URL</code>.
           </p>
         ) : listings.length === 0 ? (
-          <div className="rounded-2xl bg-white px-6 py-12 text-center ring-1 ring-blue-950/10">
+          <div
+            className={`rounded-2xl bg-white px-6 py-12 text-center ${
+              isDefaultLayout ? "ring-1 ring-zinc-200" : "ring-1 ring-blue-950/10"
+            }`}
+          >
             <p className="text-lg font-semibold text-zinc-950">No encontramos inmuebles</p>
             <p className="mt-2 text-base text-zinc-600">
               No hay anuncios publicados{emptyKind ? ` ${emptyKind}` : ""}
@@ -154,7 +168,11 @@ export default async function CatalogPage({
             </p>
             <Link
               href="/"
-              className="mt-6 inline-flex rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-500"
+              className={`mt-6 inline-flex rounded-xl px-5 py-2.5 text-sm font-semibold text-white ${
+                isDefaultLayout
+                  ? "bg-zinc-900 hover:bg-zinc-800"
+                  : "bg-blue-600 hover:bg-blue-500"
+              }`}
             >
               Ver todos
             </Link>
@@ -177,7 +195,11 @@ export default async function CatalogPage({
                       ? "/"
                       : `/?oferta=${oferta === "sale" ? "venta" : "renta"}`
                   }
-                  className="text-sm font-semibold text-blue-700 hover:underline"
+                  className={
+                    isDefaultLayout
+                      ? "text-sm font-semibold text-zinc-800 hover:underline"
+                      : "text-sm font-semibold text-blue-700 hover:underline"
+                  }
                 >
                   Limpiar filtros
                 </Link>

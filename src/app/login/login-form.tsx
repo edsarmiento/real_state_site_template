@@ -15,7 +15,8 @@ export function LoginForm({
   siteLogoUrl,
   primaryColor,
   showPoweredBy,
-}: SiteBranding) {
+  styledLayout = true,
+}: SiteBranding & { styledLayout?: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authError = searchParams.get("auth");
@@ -76,6 +77,7 @@ export function LoginForm({
       siteLogoUrl={siteLogoUrl}
       primaryColor={primaryColor}
       showPoweredBy={showPoweredBy}
+      styledLayout={styledLayout}
     >
       <form className="flex flex-col gap-4" onSubmit={onSubmit}>
         <TextField

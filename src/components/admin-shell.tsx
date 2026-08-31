@@ -37,9 +37,15 @@ const NAV: NavItem[] = [
   },
 ];
 
-function navClass(active: boolean): string {
+function navClass(active: boolean, styledLayout: boolean): string {
+  if (styledLayout) {
+    return active
+      ? "rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white"
+      : "rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900";
+  }
+
   return active
-    ? "rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white"
+    ? "rounded-lg border border-zinc-300 bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900"
     : "rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900";
 }
 
@@ -47,8 +53,10 @@ export function AdminShell({
   children,
   siteName,
   siteLogoUrl,
+  styledLayout = true,
 }: {
   children: React.ReactNode;
+  styledLayout?: boolean;
 } & Pick<SiteBranding, "siteName" | "siteLogoUrl">) {
   const pathname = usePathname();
   const router = useRouter();
@@ -85,7 +93,7 @@ export function AdminShell({
               <Link
                 key={item.href}
                 href={item.href}
-                className={navClass(item.match(pathname))}
+                className={navClass(item.match(pathname), styledLayout)}
               >
                 {item.label}
               </Link>

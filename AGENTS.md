@@ -139,10 +139,12 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | Props de marca (client) | `src/lib/site-branding.ts` → `pickSiteBranding()` |
 | CSS `--site-primary` | `src/components/site-branding-styles.tsx` (en `app/layout.tsx`) |
 | Layouts de catálogo | `src/components/layouts/` |
+| Variante layout (styled vs estructura) | `src/lib/site-layout-variant.ts`, `src/components/site-layout-variant-provider.tsx` |
 | Header / footer público | `src/components/site-header.tsx`, `site-footer.tsx` |
 | Auth JWT + workspace | `src/lib/api-auth.ts`, `session-cookies.ts` |
 | Guards | `src/proxy.ts`, `src/lib/route-guards.ts` |
-| Admin shell | `src/components/admin-shell.tsx` (recibe `siteName` / `siteLogoUrl` del layout) |
+| Admin shell | `src/components/admin-shell.tsx` (`styledLayout` desde `(admin)/layout.tsx`) |
+| Login shell | `src/components/auth-page-shell.tsx` (`styledLayout` desde `login/page.tsx`) |
 | BFF público | `src/app/api/public/listings/` |
 | BFF staff | `src/app/api/v1/` |
 | Catálogo | `src/app/page.tsx` |
@@ -159,8 +161,8 @@ El catálogo (`/`) usa `CatalogHero`, que elige el componente según `layoutKey`
 
 | `layout_key` | Componente | Notas |
 |--------------|------------|-------|
-| `default` | `default-catalog-hero.tsx` | Hero azul genérico |
-| `deo` | `deo-catalog-hero.tsx` | Hero oscuro; acento con `var(--site-primary)` |
+| `default` | `default-catalog-hero.tsx` | Solo estructura (blanco/zinc); nombre + tagline del API; sin gradientes ni `--site-primary` |
+| `deo` | `deo-catalog-hero.tsx` | Hero con estilo; acento con `var(--site-primary)` |
 
 **Añadir un layout nuevo** (cambio coordinado API + template):
 
@@ -168,11 +170,30 @@ El catálogo (`/`) usa `CatalogHero`, que elige el componente según `layoutKey`
 2. **Template:** añadir en `SiteLayoutKey` (`site-config-types.ts`), en `LAYOUT_KEYS` (`resolved-site-config.ts`), crear `src/components/layouts/<nombre>-catalog-hero.tsx`, registrar en `catalog-hero.tsx`.
 3. Probar con `npm run build`; smoke en `/` con el `layout_key` guardado en Ops.
 
-Los layouts solo afectan **zonas públicas** que pasen por `CatalogHero` (hoy: home). Header/footer comparten branding pero no cambian de archivo por layout.
+Los layouts afectan el **catálogo** (`CatalogHero` en `/`), el **admin lite** (`/login`, `/listings`, …) y componentes que lean la variante. Header/footer comparten branding (nombre/logo) pero no cambian de archivo por layout.
+
+### `default` vs layouts con estilo
+
+| | `default` | `deo` (y futuros con estilo) |
+|---|-----------|------------------------------|
+| **Idea** | Solo estructura (blanco/zinc) | Marca visual (gradientes, acentos) |
+| **`--site-primary`** | No se inyecta | Sí, desde `branding.primary_color` |
+| **Catálogo** | Hero plano; buscador y CTAs en zinc | Hero con estilo; acentos azul/marca |
+| **Login** | Tarjeta blanca, sin banda oscura | Banda con gradiente en `AuthPageShell` |
+| **Admin** | Nav activo con borde zinc (no pill negro) | Nav activo `bg-zinc-900` |
+| **Client components** | `useSiteLayoutStyled()` → `false` | `true` |
+
+**Helpers:**
+
+- Servidor: `isStyledSiteLayout(layoutKey)` en `src/lib/site-layout-variant.ts`
+- Cliente: `SiteLayoutVariantProvider` + `useSiteLayoutStyled()` — montado en `app/(admin)/layout.tsx` y `app/login/page.tsx`
+- Server → client: prop `styledLayout` en `AdminShell`, `AuthPageShell`, `PublicCatalogSearch`, etc.
+
+Al añadir acentos de color en un componente compartido (público o admin), usar `styledLayout` / `useSiteLayoutStyled()` para que `default` siga neutro.
 
 ### Marca y color
 
-- `branding.primary_color` (#RRGGBB) → `--site-primary` en `:root` vía `SiteBrandingStyles`.
+- **Marca y color:** `branding.primary_color` solo aplica en layouts con estilo (`deo`, futuros). En `default` no se inyecta `--site-primary`.
 - En componentes, usar `var(--site-primary, #fallback)` para acentos dinámicos (ver `deo-catalog-hero.tsx`).
 - Tailwind fijo (gradientes, zinc, blue) está bien para estructura del layout; el color de marca va por CSS variable cuando deba ser configurable por Ops.
 - Logo y nombre: siempre desde `getResolvedSiteConfig()` o props `SiteBranding` — no leer `process.env.NEXT_PUBLIC_*` en UI.
@@ -183,6 +204,7 @@ Los layouts solo afectan **zonas públicas** que pasen por `CatalogHero` (hoy: h
 |--------|-----|
 | `getResolvedSiteConfig()` | Server Components (`page.tsx`, `layout.tsx`, `site-header`, etc.) |
 | `pickSiteBranding(config)` | Pasar marca a `"use client"` (`LoginForm`, `AdminShell`, `AuthPageShell`) |
+| `isStyledSiteLayout` / `styledLayout` | Server layouts y props a shells; `useSiteLayoutStyled()` en forms admin |
 | `site-config-env.ts` | Solo `ACCOUNT_ID`, BFF, URLs cuando no hay config resuelta |
 
 **No** importar `getResolvedSiteConfig` en client components.

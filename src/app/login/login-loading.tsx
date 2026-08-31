@@ -1,7 +1,9 @@
 import { AuthPageShell } from "@/components/auth-page-shell";
 import type { SiteBranding } from "@/lib/site-config-types";
 
-export function LoginLoading(props: SiteBranding) {
+export function LoginLoading(
+  props: SiteBranding & { styledLayout?: boolean },
+) {
   return (
     <AuthPageShell
       title="Iniciar sesión"

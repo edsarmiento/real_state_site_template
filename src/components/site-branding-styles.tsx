@@ -2,7 +2,7 @@ import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 
 export async function SiteBrandingStyles() {
   const config = await getResolvedSiteConfig();
-  if (!config.primaryColor) return null;
+  if (config.layoutKey === "default" || !config.primaryColor) return null;
 
   return (
     <style

@@ -9,6 +9,7 @@ import {
   UPLOAD_BUTTON_VARIANT,
   fileInputClassName,
 } from "@/components/ui";
+import { useSiteLayoutStyled } from "@/components/site-layout-variant-provider";
 import { notify, notifyApiResponseFailure } from "@/lib/notifications";
 import { parseApiFailureMessage } from "@/lib/validation";
 import type { ListingPhoto } from "@/lib/listing-types";
@@ -55,6 +56,7 @@ function shiftPhoto(
 
 export function ListingPhotosForm({ listingId, photos }: Props) {
   const router = useRouter();
+  const styledLayout = useSiteLayoutStyled();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [reordering, setReordering] = useState(false);
@@ -228,7 +230,9 @@ export function ListingPhotosForm({ listingId, photos }: Props) {
               canReorder && !busy ? "cursor-grab active:cursor-grabbing" : "",
               draggingId === p.id ? "opacity-40" : "",
               dropTargetId === p.id && draggingId !== p.id
-                ? "ring-2 ring-blue-500 ring-offset-2"
+                ? styledLayout
+                  ? "ring-2 ring-blue-500 ring-offset-2"
+                  : "ring-2 ring-zinc-500 ring-offset-2"
                 : "",
             ].join(" ")}
           >
@@ -243,7 +247,11 @@ export function ListingPhotosForm({ listingId, photos }: Props) {
                 {index + 1}
               </span>
               {index === 0 ? (
-                <span className="absolute bottom-1 left-1 rounded bg-blue-600/90 px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wide text-white">
+                <span
+                  className={`absolute bottom-1 left-1 rounded px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wide text-white ${
+                    styledLayout ? "bg-blue-600/90" : "bg-zinc-700"
+                  }`}
+                >
                   Portada
                 </span>
               ) : null}
