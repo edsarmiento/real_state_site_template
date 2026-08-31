@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import {
   googleMapsSearchUrl,
   mapsExternalUrl,
@@ -15,6 +15,22 @@ type Props = {
   className?: string;
 };
 
+function useMapsHref(
+  latitude: number,
+  longitude: number,
+  label?: string,
+): string {
+  return useSyncExternalStore(
+    () => () => {},
+    () =>
+      mapsExternalUrl(latitude, longitude, {
+        label,
+        userAgent: navigator.userAgent,
+      }),
+    () => googleMapsSearchUrl(latitude, longitude),
+  );
+}
+
 export function OpenInMapsLink({
   latitude,
   longitude,
@@ -23,19 +39,7 @@ export function OpenInMapsLink({
   linkText = "Abrir en el mapa",
   className,
 }: Props) {
-  const [href, setHref] = useState(() =>
-    googleMapsSearchUrl(latitude, longitude),
-  );
-
-  useEffect(() => {
-    setHref(
-      mapsExternalUrl(latitude, longitude, {
-        label,
-        userAgent: navigator.userAgent,
-      }),
-    );
-  }, [latitude, longitude, label]);
-
+  const href = useMapsHref(latitude, longitude, label);
   const openInNewTab = href.startsWith("http");
 
   return (

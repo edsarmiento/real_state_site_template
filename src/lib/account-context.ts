@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { apiBaseUrl } from "@/lib/api-url";
 import { accountId as workspaceAccountId } from "@/lib/site-config-env";
 import type { Membership } from "@/lib/account-types";
@@ -116,7 +115,6 @@ export function parseMemberships(data: unknown): Membership[] {
 /** White-label deploy: session is always scoped to ACCOUNT_ID from env. */
 export function findMembership(
   memberships: Membership[],
-  _accountIdCookie?: string | null,
 ): Membership | undefined {
   const id = workspaceAccountId();
   return memberships.find((m) => m.account.id === id && m.status !== "disabled");
@@ -127,10 +125,7 @@ export function pickDefaultAccountId(memberships: Membership[]): number | null {
   return membership?.account.id ?? null;
 }
 
-export function roleForAccount(
-  memberships: Membership[],
-  _accountId: number,
-): string | null {
+export function roleForAccount(memberships: Membership[]): string | null {
   return findMembership(memberships)?.role ?? null;
 }
 
