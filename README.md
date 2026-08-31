@@ -6,7 +6,7 @@ Plantilla **Next.js** para sitios white-label de una inmobiliaria: catálogo pú
 
 ```bash
 cp .env.example .env
-# Edita ACCOUNT_ID, NEXT_PUBLIC_SITE_*, API_URL
+# Edita ACCOUNT_ID y API_URL; guarda SiteConfig en Ops antes de probar marca/layout
 
 npm install
 npm run dev   # http://localhost:3002
@@ -15,6 +15,7 @@ npm run dev   # http://localhost:3002
 Requisitos:
 
 - API Rails en marcha (`real_state_api`, puerto 3000)
+- **`SiteConfig` guardado en Ops** para ese `ACCOUNT_ID` (marca, layout, URL pública)
 - Workspace con plan `listings` y anuncios **publicados**
 - `ACCOUNT_ID` = id numérico del `Account` en PostgreSQL
 
@@ -24,13 +25,8 @@ Requisitos:
 |----------|-------------|-------------|
 | `ACCOUNT_ID` | Sí | Workspace de la inmobiliaria |
 | `API_URL` | Sí (prod) | URL del Rails API |
-| `NEXT_PUBLIC_SITE_URL` | Sí (prod) | Origen público (dominio del cliente) |
-| `NEXT_PUBLIC_SITE_NAME` | Fallback | Nombre en header y metadata (si no hay `SiteConfig` en API) |
-| `NEXT_PUBLIC_SITE_TAGLINE` | No | Subtítulo del catálogo (fallback) |
-| `NEXT_PUBLIC_SITE_LOGO_URL` | No | Logo en header (fallback) |
-| `NEXT_PUBLIC_SHOW_POWERED_BY` | No | `false` oculta «Tecnología Evenia» (fallback) |
 
-En producción, Ops puede configurar marca, layout y dominio público desde **Configurar sitio** (`/ops/accounts/:id/site`); el template lee esos valores del API sin redeploy (salvo `ACCOUNT_ID` y `API_URL`, que siguen siendo por deploy).
+Marca, layout (`default` / `deo`), dominio canónico, logo, color y footer se configuran en **Ops → Configurar sitio** (`/ops/accounts/:id/site`) y el template los lee del API (`GET /api/public/site_config`). **No** duplicar esos valores en Vercel.
 
 El BFF inyecta `account_id` en `/api/public/*`. Las rutas staff (`/api/v1/*`) envían JWT + `X-Account-Id` fijado a `ACCOUNT_ID`.
 
@@ -50,8 +46,8 @@ El header público muestra «Acceder» o «Administrar» según la sesión. No h
 ## Nuevo cliente (checklist)
 
 1. Ops: invitar owner con `plan: listings` → anotar `Account` id
-2. Duplicar este repo / proyecto en Vercel o Railway
-3. Configurar env (`ACCOUNT_ID`, dominio, marca)
+2. Ops: **Configurar sitio** (marca, layout, URL pública) y guardar
+3. Nuevo proyecto Vercel → root `real_state_site_template`, env solo `ACCOUNT_ID` + `API_URL`
 4. DNS del cliente → deploy
 5. Agregar dominio a `FRONTEND_ORIGINS` en el API si el browser llama al API directamente (con BFF no suele hacer falta)
 6. Smoke: `/`, `/inmueble/:slug`, formulario, WhatsApp, `/login`, `/listings`

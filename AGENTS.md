@@ -123,6 +123,8 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | **Env** (`NEXT_PUBLIC_SITE_*`, `NEXT_PUBLIC_PRIMARY_COLOR`) | Sin registro, fetch fallido, o campos vacíos en `branding` |
 | **Deploy** (`ACCOUNT_ID`, `API_URL`) | Siempre por proyecto Vercel; no viene del API |
 
+**Política de deploy:** guardar `SiteConfig` en Ops antes de desplegar. En Vercel solo `ACCOUNT_ID` + `API_URL`; no duplicar marca en env.
+
 **Campos relevantes:** `layout_key`, `public_url` (origen para metadata, WhatsApp, links), `branding` (`site_name`, `tagline`, `logo_url`, `primary_color`, `show_powered_by`).
 
 **Sin redeploy** al cambiar marca/layout/dominio en Ops. **Sí redeploy** si cambia `ACCOUNT_ID` o `API_URL`.
