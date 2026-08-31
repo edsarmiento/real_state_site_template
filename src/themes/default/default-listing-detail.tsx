@@ -14,7 +14,8 @@ import {
 } from "@/lib/listing-types";
 import { propertyTypeLabel } from "@/lib/property-labels";
 import type { PropertyType } from "@/lib/property-types";
-import { siteName } from "@/lib/site-config";
+import { listingPublicUrl } from "@/lib/site-config-env";
+import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import type { ListingDetailThemeProps } from "@/themes/theme-types";
 
 function specStyles(label: string) {
@@ -125,6 +126,8 @@ function InfoCard({
 }
 
 export async function DefaultListingDetail({ listing }: ListingDetailThemeProps) {
+  const config = await getResolvedSiteConfig();
+  const listingUrl = listingPublicUrl(listing.slug, config.siteOrigin);
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const priceSuffix = listingPriceSuffix(offerType);
@@ -133,7 +136,7 @@ export async function DefaultListingDetail({ listing }: ListingDetailThemeProps)
     propertyTypeLabel[listing.property_type as PropertyType] ??
     listing.property_type;
   const isSale = offerType === "sale";
-  const agency = listing.agency_name || siteName();
+  const agency = listing.agency_name || config.siteName;
 
   return (
     <div className="relative min-h-screen bg-[#f3f6fb]">
@@ -236,7 +239,7 @@ export async function DefaultListingDetail({ listing }: ListingDetailThemeProps)
                   <ListingWhatsAppButton
                     phone={listing.contact_phone}
                     title={listing.title}
-                    slug={listing.slug}
+                    listingUrl={listingUrl}
                     offerType={offerType}
                   />
                 </div>

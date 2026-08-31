@@ -1,5 +1,5 @@
 import { legalPlaceholderMetadata } from "@/lib/legal-placeholder";
-import { resolveSiteTheme } from "@/themes/resolve-site-theme";
+import { resolveSiteThemeFromConfig } from "@/themes/resolve-site-theme";
 import { DefaultLegalPage } from "@/themes/default/default-legal-page";
 import { LuxuryLegalPage } from "@/themes/luxury/luxury-legal-page";
 
@@ -17,7 +17,7 @@ export default async function PrivacyNoticePage({
 }: {
   searchParams: SearchParams;
 }) {
-  const theme = resolveSiteTheme();
+  const theme = await resolveSiteThemeFromConfig();
   const lang = param((await searchParams).lang);
   if (theme.name === "luxury") {
     return <LuxuryLegalPage kind="privacy" lang={lang} />;
