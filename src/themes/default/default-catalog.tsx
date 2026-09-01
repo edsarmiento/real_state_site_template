@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { CatalogHero } from "@/components/layouts/catalog-hero";
 import { PublicCatalogSearch } from "@/components/public-catalog-search";
 import { PublicListingCard } from "@/components/public-listing-card";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { siteName, siteTagline } from "@/lib/site-config";
+import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import type { CatalogThemeProps } from "@/themes/theme-types";
 
 export async function DefaultCatalog({
@@ -18,42 +19,39 @@ export async function DefaultCatalog({
   catalogOk,
   catalogStatus,
 }: CatalogThemeProps) {
+  const config = await getResolvedSiteConfig();
+
   return (
-    <div className="relative min-h-screen bg-[#f3f6fb]">
+    <div className="relative min-h-screen bg-zinc-50">
       <SiteHeader />
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-950 pb-16 pt-10 text-white sm:pb-20 sm:pt-12">
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-200">
-              {siteName()}
-            </p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-              Encuentra tu próximo inmueble
-            </h1>
-            <p className="mt-4 max-w-xl text-base text-blue-100">{siteTagline()}</p>
-          </div>
+      <CatalogHero
+        layoutKey="default"
+        siteName={config.siteName}
+        siteTagline={config.siteTagline}
+        siteLogoUrl={config.siteLogoUrl}
+        primaryColor={config.primaryColor}
+        showPoweredBy={config.showPoweredBy}
+        search={
+          <PublicCatalogSearch
+            oferta={oferta}
+            city={city}
+            propertyType={propertyType}
+            bedrooms={bedrooms}
+            styledLayout={false}
+          />
+        }
+      />
 
-          <div className="mt-8 sm:mt-10">
-            <PublicCatalogSearch
-              oferta={oferta}
-              city={city}
-              propertyType={propertyType}
-              bedrooms={bedrooms}
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="relative -mt-6 mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex flex-col gap-4 rounded-2xl border border-blue-100 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <section className="relative mx-auto max-w-7xl px-4 pt-6 sm:px-6">
+        <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="text-sm text-zinc-700">
             <span className="font-semibold text-zinc-950">¿Administras anuncios?</span>{" "}
             Accede al panel.
           </p>
           <Link
             href="/login"
-            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
+            className="inline-flex shrink-0 items-center justify-center rounded-lg border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-50"
           >
             Administrar
           </Link>
@@ -63,12 +61,11 @@ export async function DefaultCatalog({
       <main className="mx-auto max-w-7xl px-4 pb-16 pt-10 sm:px-6 sm:pt-12">
         {!catalogOk ? (
           <p className="text-sm text-zinc-600">
-            No se pudo cargar el catálogo ({catalogStatus}). Revisa{" "}
-            <code className="text-xs">ACCOUNT_ID</code> y{" "}
-            <code className="text-xs">API_URL</code>.
+            No se pudo cargar el catálogo ({catalogStatus}). Revisa la
+            configuración del sitio.
           </p>
         ) : listings.length === 0 ? (
-          <div className="rounded-2xl bg-white px-6 py-12 text-center ring-1 ring-blue-950/10">
+          <div className="rounded-xl border border-zinc-200 bg-white px-6 py-12 text-center">
             <p className="text-lg font-semibold text-zinc-950">No encontramos inmuebles</p>
             <p className="mt-2 text-base text-zinc-600">
               No hay anuncios publicados{emptyKind ? ` ${emptyKind}` : ""}
@@ -78,7 +75,7 @@ export async function DefaultCatalog({
             </p>
             <Link
               href="/"
-              className="mt-6 inline-flex rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-500"
+              className="mt-6 inline-flex rounded-lg border border-zinc-300 bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
             >
               Ver todos
             </Link>
@@ -101,7 +98,7 @@ export async function DefaultCatalog({
                       ? "/"
                       : `/?oferta=${oferta === "sale" ? "venta" : "renta"}`
                   }
-                  className="text-sm font-semibold text-blue-700 hover:underline"
+                  className="text-sm font-semibold text-zinc-800 hover:underline"
                 >
                   Limpiar filtros
                 </Link>
@@ -111,7 +108,7 @@ export async function DefaultCatalog({
             <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {listings.map((listing) => (
                 <li key={listing.slug} className="min-w-0">
-                  <PublicListingCard listing={listing} />
+                  <PublicListingCard listing={listing} styledLayout={false} />
                 </li>
               ))}
             </ul>

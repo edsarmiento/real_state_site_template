@@ -15,7 +15,7 @@ export async function DefaultLegalPage({ kind }: { kind: Kind }) {
   const { legal } = await getPublicSiteContent();
 
   return (
-    <div className="min-h-screen bg-[#f3f6fb]">
+    <div className="min-h-screen bg-zinc-50">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
@@ -30,7 +30,10 @@ export async function DefaultLegalPage({ kind }: { kind: Kind }) {
           la inmobiliaria antes del release.
         </p>
         <p className="mt-8">
-          <Link href="/" className="font-semibold text-blue-700 hover:underline">
+          <Link
+            href="/"
+            className="font-semibold text-zinc-900 underline-offset-2 hover:underline"
+          >
             Volver al catálogo
           </Link>
         </p>

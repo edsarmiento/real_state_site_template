@@ -34,6 +34,7 @@ type Props = {
   fallbackUrl?: string | null;
   className?: string;
   labels?: ListingGalleryLabels;
+  styledLayout?: boolean;
 };
 
 function ChevronLeft({ className }: { className?: string }) {
@@ -76,6 +77,7 @@ export function ListingPhotoGallery({
   fallbackUrl,
   className,
   labels = DEFAULT_GALLERY_LABELS,
+  styledLayout = true,
 }: Props) {
   const urls = photos
     .map((p) => p.url)
@@ -116,10 +118,23 @@ export function ListingPhotoGallery({
 
   const rootClass = ["listing-gallery", className].filter(Boolean).join(" ");
 
+  const stageRing = styledLayout ? "ring-blue-950/10" : "ring-zinc-200";
+  const stageShadow = styledLayout
+    ? "shadow-[0_24px_60px_-36px_rgba(37,99,235,0.55)]"
+    : "shadow-sm";
+  const thumbActive = styledLayout
+    ? "ring-2 ring-blue-600 ring-offset-2"
+    : "ring-2 ring-zinc-900 ring-offset-2";
+  const thumbIdle = styledLayout
+    ? "ring-1 ring-blue-950/10 hover:ring-blue-600/40"
+    : "ring-1 ring-zinc-200 hover:ring-zinc-400";
+
   if (!activeUrl) {
     return (
       <div className={rootClass}>
-        <div className="listing-gallery__stage -mx-4 overflow-hidden bg-zinc-200 ring-1 ring-blue-950/10 sm:mx-0 sm:rounded-3xl">
+        <div
+          className={`listing-gallery__stage -mx-4 overflow-hidden bg-zinc-200 ring-1 sm:mx-0 sm:rounded-3xl ${stageRing}`}
+        >
           <div className="flex aspect-[4/3] items-center justify-center text-base text-zinc-500 sm:aspect-[16/9] sm:text-sm">
             {labels.empty}
           </div>
@@ -131,7 +146,7 @@ export function ListingPhotoGallery({
   return (
     <div className={rootClass}>
       <div
-        className="listing-gallery__stage relative -mx-4 overflow-hidden bg-zinc-200 shadow-[0_24px_60px_-36px_rgba(37,99,235,0.55)] ring-1 ring-blue-950/10 sm:mx-0 sm:rounded-3xl"
+        className={`listing-gallery__stage relative -mx-4 overflow-hidden bg-zinc-200 ring-1 sm:mx-0 sm:rounded-3xl ${stageRing} ${stageShadow}`}
         role="region"
         aria-roledescription={labels.carouselRole}
         aria-label={fillTemplate(labels.photosOf, { title })}
@@ -248,8 +263,8 @@ export function ListingPhotoGallery({
                   className={[
                     "h-24 w-32 overflow-hidden rounded-xl bg-zinc-200 transition sm:h-20 sm:w-28",
                     selected
-                      ? "listing-gallery__thumb listing-gallery__thumb--active ring-2 ring-blue-600 ring-offset-2"
-                      : "listing-gallery__thumb ring-1 ring-blue-950/10 hover:ring-blue-600/40",
+                      ? `listing-gallery__thumb listing-gallery__thumb--active ${thumbActive}`
+                      : `listing-gallery__thumb ${thumbIdle}`,
                   ].join(" ")}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}

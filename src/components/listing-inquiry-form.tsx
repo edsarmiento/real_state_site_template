@@ -10,6 +10,7 @@ import {
 type Props = {
   slug: string;
   offerType?: ListingOfferType | string | null;
+  styledLayout?: boolean;
 };
 
 const PHONE_DIGITS = /^\d{10}$/;
@@ -18,7 +19,11 @@ function onlyPhoneDigits(value: string): string {
   return value.replace(/\D/g, "").slice(0, 10);
 }
 
-export function ListingInquiryForm({ slug, offerType }: Props) {
+export function ListingInquiryForm({
+  slug,
+  offerType,
+  styledLayout = true,
+}: Props) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -68,9 +73,19 @@ export function ListingInquiryForm({ slug, offerType }: Props) {
     }
   }
 
+  const fieldFocus = styledLayout
+    ? "focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+    : "focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20";
+  const submitClass = styledLayout
+    ? "bg-blue-700 hover:bg-blue-600"
+    : "bg-zinc-900 hover:bg-zinc-800";
+  const successClass = styledLayout
+    ? "bg-emerald-50 text-emerald-900 ring-emerald-200"
+    : "bg-zinc-100 text-zinc-900 ring-zinc-200";
+
   if (sent) {
     return (
-      <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-900 ring-1 ring-emerald-200">
+      <p className={`rounded-xl px-4 py-3 text-sm ring-1 ${successClass}`}>
         Tu mensaje fue enviado. La inmobiliaria se pondrá en contacto contigo.
       </p>
     );
@@ -91,7 +106,7 @@ export function ListingInquiryForm({ slug, offerType }: Props) {
           id="name"
           name="name"
           required
-          className="w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+          className={`w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none ${fieldFocus}`}
         />
       </div>
       <div>
@@ -105,7 +120,7 @@ export function ListingInquiryForm({ slug, offerType }: Props) {
           required
           value={phone}
           onChange={onPhoneChange}
-          className="w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+          className={`w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none ${fieldFocus}`}
         />
       </div>
       <div>
@@ -122,13 +137,13 @@ export function ListingInquiryForm({ slug, offerType }: Props) {
               ? "Me interesa este inmueble en venta…"
               : "Me interesa rentar este inmueble…"
           }
-          className="w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+          className={`w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none ${fieldFocus}`}
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60"
+        className={`w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition disabled:opacity-60 ${submitClass}`}
       >
         {pending ? "Enviando…" : "Enviar mensaje"}
       </button>

@@ -12,9 +12,10 @@ import type { PropertyType } from "@/lib/property-types";
 
 type Props = {
   listing: PublicListingCard;
+  styledLayout?: boolean;
 };
 
-export function PublicListingCard({ listing }: Props) {
+export function PublicListingCard({ listing, styledLayout = true }: Props) {
   const offerType = parseOfferType(listing.offer_type);
   const suffix = listingPriceSuffix(offerType);
   const typeLabel =
@@ -22,10 +23,18 @@ export function PublicListingCard({ listing }: Props) {
     listing.property_type;
   const specLine = listingCardSpecLine(listing);
 
+  const cardRing = styledLayout
+    ? "ring-blue-950/10 hover:ring-blue-600/25"
+    : "ring-zinc-200 hover:ring-zinc-300";
+  const priceClass = styledLayout ? "text-blue-700" : "text-zinc-950";
+  const titleHover = styledLayout
+    ? "group-hover:text-blue-800"
+    : "group-hover:text-zinc-700";
+
   return (
     <Link
       href={`/inmueble/${listing.slug}`}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-blue-950/10 transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-blue-600/25"
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 transition hover:-translate-y-0.5 hover:shadow-lg ${cardRing}`}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
         {listing.photo_url ? (
@@ -40,17 +49,21 @@ export function PublicListingCard({ listing }: Props) {
             Sin foto
           </div>
         )}
-        <ListingOfferBadge offerType={offerType} className="absolute left-3 top-3" />
+        <ListingOfferBadge
+          offerType={offerType}
+          styledLayout={styledLayout}
+          className="absolute left-3 top-3"
+        />
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <p className="text-xl font-semibold tabular-nums text-blue-700">
+        <p className={`text-xl font-semibold tabular-nums ${priceClass}`}>
           {formatRentCents(listing.rent_cents, listing.currency)}
           {suffix ? (
             <span className="ml-1 text-sm font-medium text-zinc-500">{suffix}</span>
           ) : null}
         </p>
-        <p className="line-clamp-2 font-semibold leading-snug text-zinc-950 group-hover:text-blue-800">
+        <p className={`line-clamp-2 font-semibold leading-snug text-zinc-950 ${titleHover}`}>
           {listing.title}
         </p>
         <p className="line-clamp-1 text-sm text-zinc-600">{listing.location_label}</p>
