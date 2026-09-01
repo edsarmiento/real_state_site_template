@@ -1,4 +1,7 @@
+"use client";
+
 import { OFFER_TYPE_LABEL, type ListingOfferType } from "@/lib/listing-types";
+import { useSiteLayoutStyled } from "@/components/site-layout-variant-provider";
 
 type Props = {
   offerType: ListingOfferType;
@@ -9,10 +12,12 @@ type Props = {
 export function ListingOfferBadge({
   offerType,
   className = "",
-  styledLayout = true,
+  styledLayout,
 }: Props) {
+  const contextStyled = useSiteLayoutStyled();
+  const styled = styledLayout ?? contextStyled;
   const sale = offerType === "sale";
-  const tone = styledLayout
+  const tone = styled
     ? sale
       ? "bg-emerald-700"
       : "bg-blue-700"

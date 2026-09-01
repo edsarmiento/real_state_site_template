@@ -40,8 +40,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const config = await getResolvedSiteConfig();
+
   return (
-    <html lang="es" className={`${geistSans.variable} h-full antialiased`}>
+    <html
+      lang="es"
+      className={`${geistSans.variable} h-full antialiased`}
+      data-site-layout={config.layoutKey}
+    >
       <head>
         <SiteBrandingStyles />
       </head>

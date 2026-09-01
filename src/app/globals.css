@@ -1,7 +1,10 @@
 @import "tailwindcss";
 
+/* Solo aplica utilidades `dark:` con clase `.dark` explícita (no por OS). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #f3f6fb;
+  --background: #fafafa;
   --foreground: #171717;
   color-scheme: light;
 }
