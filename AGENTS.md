@@ -129,6 +129,8 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 
 **Sin redeploy** al cambiar marca/layout/dominio en Ops. **Sí redeploy** si cambia `ACCOUNT_ID` o `API_URL`.
 
+**Themes públicos:** `layout_key` en Ops activa un **theme** en `src/themes/` (ver sección [Themes públicos, layouts y estilos](#themes-públicos-layouts-y-estilos)). Para crear una plantilla nueva, seguir el [playbook](#nueva-plantilla-pública--playbook-para-agentes).
+
 ## Archivos clave
 
 | Área | Ubicación |
@@ -147,67 +149,205 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | Login shell | `src/components/auth-page-shell.tsx` (`styledLayout` desde `login/page.tsx`) |
 | BFF público | `src/app/api/public/listings/` |
 | BFF staff | `src/app/api/v1/` |
-| Catálogo | `src/app/page.tsx` |
+| Catálogo (ruta) | `src/app/page.tsx` — fetch + delega al theme |
+| Ficha (ruta) | `src/app/inmueble/[slug]/page.tsx` — fetch + delega al theme |
+| **Theme registry** | `src/themes/theme-registry.ts` |
+| Mapeo `layout_key` → theme | `src/themes/resolve-site-theme.ts` |
+| Contrato de props por theme | `src/themes/theme-types.ts` |
+| Tema default (catálogo + ficha) | `src/themes/default/` |
+| Tema Luxury (piloto `deo`) | `src/themes/luxury/` |
+| Contenido marketing del tema | `src/lib/public-site-content.ts` (lee `getResolvedSiteConfig` + env `SITE_*`) |
+| i18n público (Luxury) | `src/lib/site-i18n.ts` |
+| Páginas legales | `src/app/terminos/`, `cookies/`, `aviso-de-privacidad/` + `*-legal-page.tsx` por theme |
 | Admin anuncios | `src/app/(admin)/listings/` |
 | Admin propiedades | `src/app/(admin)/properties/` |
 
 `src/lib/site-config.ts` solo reexporta helpers legacy; **no** añadir lógica nueva ahí.
 
-## Layouts y estilos
+## Themes públicos, layouts y estilos
 
-### Layouts (`layout_key`)
+Hay **dos capas** que no confundir:
 
-El catálogo (`/`) usa `CatalogHero`, que elige el componente según `layoutKey`:
+| Capa | Dónde vive | Qué decide |
+|------|------------|------------|
+| **`layout_key`** (Ops / API) | `SiteConfig.layout_key` | Qué plantilla activa el deploy (`default`, `deo`, futuros…) |
+| **`SiteThemeName`** (código) | `src/themes/*` | Implementación React: catálogo, ficha, chrome propio |
 
-| `layout_key` | Componente | Notas |
-|--------------|------------|-------|
-| `default` | `default-catalog-hero.tsx` | Solo estructura (blanco/zinc); nombre + tagline del API; sin gradientes ni `--site-primary` |
-| `deo` | `deo-catalog-hero.tsx` | Hero con estilo; acento con `var(--site-primary)` |
+### Flujo de resolución
 
-**Añadir un layout nuevo** (cambio coordinado API + template):
+```
+Ops guarda layout_key
+        ↓
+getResolvedSiteConfig()
+        ↓
+themeNameFromLayoutKey(layout_key)   ← src/themes/resolve-site-theme.ts
+        ↓
+THEME_REGISTRY[name]                 ← src/themes/theme-registry.ts
+        ↓
+theme.Catalog / theme.ListingDetail
+```
 
-1. **API:** añadir clave en `SiteConfig::LAYOUT_KEYS` y validación; actualizar `BUSINESS_RULES.md`; Ops UI si hace falta opción en el select.
-2. **Template:** añadir en `SiteLayoutKey` (`site-config-types.ts`), en `LAYOUT_KEYS` (`resolved-site-config.ts`), crear `src/components/layouts/<nombre>-catalog-hero.tsx`, registrar en `catalog-hero.tsx`.
-3. Probar con `npm run build`; smoke en `/` con el `layout_key` guardado en Ops.
+Las rutas `src/app/page.tsx` e `src/app/inmueble/[slug]/page.tsx` **solo** hacen fetch de datos y metadata; **delegan** el markup al theme. No duplicar JSX de catálogo/ficha en `app/`.
 
-Los layouts afectan el **catálogo** (`CatalogHero` en `/`), el **admin lite** (`/login`, `/listings`, …) y componentes que lean la variante. Header/footer comparten branding (nombre/logo) pero no cambian de archivo por layout.
+### Mapeo actual (`layout_key` → theme)
 
-### `default` vs layouts con estilo
+| `layout_key` (Ops/API) | Theme en código | Superficies |
+|------------------------|-----------------|-------------|
+| `default` | `default` | `DefaultCatalog`, `DefaultListingDetail` — hero vía `CatalogHero` + `default-catalog-hero` |
+| `deo` | `luxury` | `LuxuryCatalog`, `LuxuryListingDetail` — shell/header/footer en `src/themes/luxury/` |
 
-| | `default` | `deo` (y futuros con estilo) |
-|---|-----------|------------------------------|
-| **Idea** | Solo estructura (blanco/zinc) | Marca visual (gradientes, acentos) |
-| **`--site-primary`** | No se inyecta | Sí, desde `branding.primary_color` |
-| **Catálogo** | Hero plano; buscador y CTAs en zinc | Hero con estilo; acentos azul/marca |
-| **Login** | Tarjeta blanca, sin banda oscura | Banda con gradiente en `AuthPageShell` |
-| **Admin** | Nav activo con borde zinc (no pill negro) | Nav activo `bg-zinc-900` |
-| **Client components** | `useSiteLayoutStyled()` → `false` | `true` |
+Regla en código: `themeNameFromLayoutKey()` — `deo` y `luxury` → tema `luxury`; todo lo demás → `default`.
 
-**Helpers:**
+**Legacy:** `deo-catalog-hero.tsx` es de la Fase 3; con `layout_key: deo` **no** se usa (Luxury reemplaza el catálogo). No crear plantillas nuevas solo como hero.
 
-- Servidor: `isStyledSiteLayout(layoutKey)` en `src/lib/site-layout-variant.ts`
-- Cliente: `SiteLayoutVariantProvider` + `useSiteLayoutStyled()` — montado en `app/(admin)/layout.tsx` y `app/login/page.tsx`
-- Server → client: prop `styledLayout` en `AdminShell`, `AuthPageShell`, `PublicCatalogSearch`, etc.
+### Fuentes de configuración por theme
 
-Al añadir acentos de color en un componente compartido (público o admin), usar `styledLayout` / `useSiteLayoutStyled()` para que `default` siga neutro.
+| Dato | Fuente primaria | Fallback / extra |
+|------|-----------------|------------------|
+| Nombre, tagline, logo, color primario, `public_url` | **SiteConfig** (Ops) → `getResolvedSiteConfig()` | Env `NEXT_PUBLIC_*` si API vacío |
+| Hero, about, contacto, testimonios, ubicaciones, fuentes, motion | Env `SITE_*` / `NEXT_PUBLIC_SITE_*` | Defaults en `public-site-content.ts` |
+| Listings, inquiries, fotos | API público | — |
+| Vercel obligatorio | `ACCOUNT_ID`, `API_URL` | — |
 
-### Marca y color
+`getPublicSiteContent()` parte de `getResolvedSiteConfig()` para **brand** y mergea env para marketing (hoy sobre todo Luxury). **No** usar `site-config.ts` ni `NEXT_PUBLIC_SITE_NAME` en UI.
 
-- **Marca y color:** `branding.primary_color` solo aplica en layouts con estilo (`deo`, futuros). En `default` no se inyecta `--site-primary`.
-- En componentes, usar `var(--site-primary, #fallback)` para acentos dinámicos (ver `deo-catalog-hero.tsx`).
-- Tailwind fijo (gradientes, zinc, blue) está bien para estructura del layout; el color de marca va por CSS variable cuando deba ser configurable por Ops.
-- Logo y nombre: siempre desde `getResolvedSiteConfig()` o props `SiteBranding` — no leer `process.env.NEXT_PUBLIC_*` en UI.
+### Tema `default` (estructura)
+
+- Catálogo: `DefaultCatalog` → `CatalogHero` (solo `layout_key: default` en producción hoy).
+- Ficha: `DefaultListingDetail` — galería, specs, inquiry, WhatsApp con `listingPublicUrl` desde `config.siteOrigin`.
+- Sin i18n de theme; copy en español.
+- **`layout_key: default`:** sin `--site-primary`; paleta zinc/blanco.
+
+### Tema `luxury` (plantilla premium, piloto `deo`)
+
+- `src/themes/luxury/` — catálogo con secciones, ficha, header/footer, i18n (`site-i18n.ts`).
+- CSS: `[data-site-theme="luxury"]`, variables `--luxury-*` (`luxuryThemeCssVars()` en `globals.css`).
+- Legales: `LuxuryLegalPage` cuando `resolveSiteThemeFromConfig().name === "luxury"`.
+- Gaps API: [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md).
+
+### Admin / login vs theme público
+
+El theme público **no** redefine el admin. Acentos en login y `/listings`:
+
+| | `layout_key: default` | `layout_key: deo` (styled) |
+|---|----------------------|----------------------------|
+| **`--site-primary`** | No inyectado | Sí, desde `branding.primary_color` |
+| **Login** | Tarjeta neutra | Banda con gradiente en `AuthPageShell` |
+| **Admin nav** | Borde zinc | Pill `bg-zinc-900` |
+| **Client** | `useSiteLayoutStyled()` → `false` | `true` |
+
+Helpers: `isStyledSiteLayout(layoutKey)`, `SiteLayoutVariantProvider`, `useSiteLayoutStyled()`.
+
+### Marca y color (todos los themes)
+
+- Logo y nombre: `getResolvedSiteConfig()` o `pickSiteBranding()` en client.
+- Acentos: `var(--site-primary, #fallback)` en styled; Luxury también `--luxury-*`.
+- Tailwind para estructura; color de marca por variables cuando Ops lo controla.
 
 ### Server vs client
 
 | Patrón | Uso |
 |--------|-----|
-| `getResolvedSiteConfig()` | Server Components (`page.tsx`, `layout.tsx`, `site-header`, etc.) |
-| `pickSiteBranding(config)` | Pasar marca a `"use client"` (`LoginForm`, `AdminShell`, `AuthPageShell`) |
-| `isStyledSiteLayout` / `styledLayout` | Server layouts y props a shells; `useSiteLayoutStyled()` en forms admin |
-| `site-config-env.ts` | Solo `ACCOUNT_ID`, BFF, URLs cuando no hay config resuelta |
+| `getResolvedSiteConfig()` | Server Components |
+| `resolveSiteThemeFromConfig()` | Elegir theme (legales, etc.) |
+| `getPublicSiteContent()` | Copy/marketing del theme (server) |
+| `pickSiteBranding(config)` | Marca en `"use client"` |
+| `site-config-env.ts` | `ACCOUNT_ID`, `listingPublicUrl` — solo servidor |
 
 **No** importar `getResolvedSiteConfig` en client components.
+
+---
+
+## Nueva plantilla pública — playbook para agentes
+
+Usa este flujo cuando pidan **una plantilla nueva** (visual distinta de default/Luxury). **Preguntar diseño** al humano y codificar según el checklist.
+
+### 1. Preguntas al usuario (diseño y producto)
+
+**Identidad**
+- Nombre del theme en código y `layout_key` en Ops (mapeo en `themeNameFromLayoutKey`).
+- ¿Solo español o i18n?
+
+**Marca (prioridad Ops)**
+- Color primario, acento, superficie; logo; tipografías; `show_powered_by`.
+
+**Catálogo `/`**
+- Hero (imagen, título, subtítulo, CTAs); secciones extra; estilo de cards; barra admin.
+
+**Ficha `/inmueble/[slug]`**
+- Galería, inquiry sticky, WhatsApp; campos a destacar (`PublicListingDetail` en `listing-types.ts`).
+
+**Legales**
+- Shell del theme o placeholder; URLs externas vs páginas internas.
+
+**Admin/login**
+- ¿`layout_key` styled afecta admin o admin siempre neutro?
+
+**API**
+- ¿Campos nuevos? → API + [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md).
+
+### 2. Checklist técnico (orden)
+
+**API + Ops** (si `layout_key` nuevo):
+
+1. `SiteConfig::LAYOUT_KEYS` en `real_state_api/app/models/site_config.rb`.
+2. Specs + `BUSINESS_RULES.md` §SiteConfig.
+3. Select en Ops (`real_state_frontend`).
+
+**Template:**
+
+1. `SiteLayoutKey` → `site-config-types.ts`.
+2. `LAYOUT_KEYS` → `resolved-site-config.ts`.
+3. `SiteThemeName` → `theme-types.ts` (si theme nuevo).
+4. Mapeo → `themeNameFromLayoutKey()`.
+5. `src/themes/<nombre>/` con `<nombre>-catalog.tsx`, `<nombre>-listing-detail.tsx`, shell/header/footer.
+6. Registro → `theme-registry.ts`.
+7. Legales → ramas en `terminos/`, `cookies/`, `aviso-de-privacidad/` o factory.
+8. CSS → `[data-site-theme="<nombre>"]` en `globals.css`; variables desde config.
+9. Marketing → extender `getPublicSiteContent()` o `<nombre>-content.ts` leyendo **primero** `getResolvedSiteConfig()`.
+10. `npm run build` + `npm run lint`.
+11. Smoke: Ops `layout_key` → `/`, ficha, legales, login.
+
+### 3. Estructura de carpetas
+
+```
+src/themes/<nombre>/
+  <nombre>-catalog.tsx
+  <nombre>-listing-detail.tsx
+  <nombre>-shell.tsx
+  <nombre>-header.tsx
+  <nombre>-footer.tsx
+  …
+```
+
+Sin fetch de listings en el theme — props desde `page.tsx`. Tipos: `PublicListingCard`, `PublicListingDetail`.
+
+### 4. Contrato (`theme-types.ts`)
+
+```ts
+{ name, Catalog: (CatalogThemeProps) => ReactNode, ListingDetail: (ListingDetailThemeProps) => ReactNode }
+```
+
+Reutilizar `PublicCatalogSearch`, `ListingInquiryForm`, `ListingWhatsAppButton` cuando aplique.
+
+### 5. Verificación antes de merge
+
+- [ ] `layout_key` en API y Ops.
+- [ ] Sin JSX duplicado en `app/page.tsx` / `inmueble/[slug]/page.tsx`.
+- [ ] Branding desde SiteConfig; Vercel solo `ACCOUNT_ID` + `API_URL`.
+- [ ] Sin `site-config.ts` legacy ni exports muertos.
+- [ ] `npm run build` y `npm run lint`.
+
+### 6. Documentación
+
+| Doc | Uso |
+|-----|-----|
+| Este `AGENTS.md` | Arquitectura y playbook |
+| [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md) | Gaps API, env `SITE_*` |
+| [`docs/architecture/luxury-layout-implementation.md`](docs/architecture/luxury-layout-implementation.md) | Contexto histórico — no fuente del registry actual |
+| [`README.md`](README.md) | Deploy Vercel |
+
+---
 
 ## Buenas prácticas de código
 
@@ -287,16 +427,17 @@ Reutilizar helpers existentes antes de copiar lógica:
 | Errores API | `parseApiFailureMessage`, `notifyApiResponseFailure` | Strings de error custom por formulario |
 | Tipos | `src/lib/*-types.ts` | Interfaces inline repetidas en varios archivos |
 | Labels UI | `src/lib/*-labels.ts` | Mapas `{ draft: "Borrador" }` copiados en componentes |
-| Layout keys | `SiteLayoutKey`, `LAYOUT_KEYS` en `resolved-site-config.ts` | Strings `"deo"` / `"default"` sueltos |
+| Layout keys / themes | `SiteLayoutKey`, `LAYOUT_KEYS`, `theme-registry.ts`, `themeNameFromLayoutKey()` | Strings sueltos; JSX duplicado en `app/page.tsx` |
 
 **Cuándo extraer:** si la misma lógica aparece **2+ veces** con el mismo significado (p. ej. armar URL pública, mapear branding, validar teléfono). **No** crear util de una línea solo “por si acaso”.
 
-**Cuándo no forzar DRY:** rutas BFF de una línea (`return proxyToApi(...)`) están bien repetidas; layouts con markup distinto (`default-catalog-hero` vs `deo-catalog-hero`) no deben fusionarse en un mega-componente con flags.
+**Cuándo no forzar DRY:** rutas BFF de una línea; themes con markup distinto (`default` vs `luxury`) no fusionar en un mega-componente con flags — usar `theme-registry`.
 
 #### Code smells a evitar
 
 | Smell | Señal | Corrección |
 |-------|-------|------------|
+| **Theme bypass** | Markup de catálogo/ficha inline en `app/page.tsx` | Delegar a `theme.Catalog` / `theme.ListingDetail` |
 | **Lógica en el lugar equivocado** | Validar estado de anuncio o permisos en React | Mover al API; el front solo muestra `message` / `errors` |
 | **Env en client** | `"use client"` + `process.env.NEXT_PUBLIC_SITE_NAME` | Props desde server con `pickSiteBranding` |
 | **Fetch en client innecesario** | `useEffect` + `fetch` para datos que puede cargar el `page.tsx` | Server Component + props |
@@ -337,7 +478,7 @@ Si eliminas un campo de branding o layout en el API, borrar también del templat
 | Filtrar listings por cuenta en el cliente | Confiar en scope del API + `account_id` en servidor |
 | Llamar Rails desde el browser | BFF o `publicApiFetch` en SSR |
 | Duplicar reglas de anuncios / SiteConfig | Leer `BUSINESS_RULES.md` y el API |
-| Nuevo layout solo en front | Coordinar `layout_key` en API + Ops + template |
+| Nuevo layout solo en front | Coordinar `layout_key` en API + Ops + `theme-registry` |
 | `getResolvedSiteConfig` en `"use client"` | Props desde server parent |
 | Commits con secretos en `.env` | Solo `.env.example` documentado |
 | Util/helper de 1 uso “por limpieza” | Inline hasta segunda repetición |
@@ -368,7 +509,7 @@ npm run lint
 
 ## Extender la plantilla
 
-- **Página contacto:** nueva ruta bajo `src/app/contacto/`.
-- **Más secciones públicas con layout:** reutilizar `CatalogHero` o extraer bloques compartidos en `src/components/layouts/`.
-- **Nuevo campo de branding:** añadir en API (`SiteConfig` + presenter + Ops form), luego en `site-config-types.ts`, `mergeApiPayload`, `envSiteConfig` si aplica, y componentes que lo consuman.
-- **Deploy Vercel:** checklist manual en Ops (Fase 4 pendiente); ver `README.md`.
+- **Nueva plantilla pública (theme):** seguir [Nueva plantilla pública — playbook para agentes](#nueva-plantilla-pública--playbook-para-agentes).
+- **Página contacto:** nueva ruta bajo `src/app/contacto/`; si es parte del theme, integrar en `src/themes/<nombre>/`.
+- **Nuevo campo de branding:** API (`SiteConfig` + presenter + Ops form) → `site-config-types.ts` → `mergeApiPayload` → `getPublicSiteContent().brand` si Luxury/marketing lo usa.
+- **Deploy Vercel:** checklist manual en Ops; ver `README.md` (solo `ACCOUNT_ID` + `API_URL`).
