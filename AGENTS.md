@@ -125,7 +125,7 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 
 **Política de deploy:** guardar `SiteConfig` en Ops antes de desplegar. En Vercel solo `ACCOUNT_ID` + `API_URL`; no duplicar marca en env.
 
-**Campos relevantes:** `layout_key`, `public_url` (origen para metadata, WhatsApp, links), `branding` (`site_name`, `tagline`, `logo_url`, `primary_color`, `show_powered_by`).
+**Campos relevantes:** `layout_key`, `public_url` (origen para metadata, WhatsApp, links), `branding` (`site_name`, `tagline`, `logo_url`, `primary_color`, `show_powered_by`, `default_locale`, `supported_locales`, `show_locale_switcher`), y `locale` en la respuesta JSON (`default_locale`, `supported_locales`, `show_locale_switcher`).
 
 **Sin redeploy** al cambiar marca/layout/dominio en Ops. **Sí redeploy** si cambia `ACCOUNT_ID` o `API_URL`.
 
@@ -143,6 +143,8 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | Layouts de catálogo | `src/components/layouts/` |
 | Variante layout (styled vs estructura) | `src/lib/site-layout-variant.ts`, `src/components/site-layout-variant-provider.tsx` |
 | Header / footer público | `src/components/site-header.tsx`, `site-footer.tsx` |
+| i18n + locale (todos los themes) | `src/lib/site-i18n.ts`, `src/lib/site-ui.ts` (`getSiteUi`) |
+| Selector ES \| EN | `src/components/locale-switcher-base.tsx`, `site-locale-switcher.tsx`; Luxury: `luxury-locale-switcher.tsx` |
 | Auth JWT + workspace | `src/lib/api-auth.ts`, `session-cookies.ts` |
 | Guards | `src/proxy.ts`, `src/lib/route-guards.ts` |
 | Admin shell | `src/components/admin-shell.tsx` (`styledLayout` desde `(admin)/layout.tsx`) |
@@ -157,7 +159,6 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | Tema default (catálogo + ficha) | `src/themes/default/` |
 | Tema Luxury (piloto `deo`) | `src/themes/luxury/` |
 | Contenido marketing del tema | `src/lib/public-site-content.ts` (lee `getResolvedSiteConfig` + env `SITE_*`) |
-| i18n público (Luxury) | `src/lib/site-i18n.ts` |
 | Páginas legales | `src/app/terminos/`, `cookies/`, `aviso-de-privacidad/` + `*-legal-page.tsx` por theme |
 | Admin anuncios | `src/app/(admin)/listings/` |
 | Admin propiedades | `src/app/(admin)/properties/` |
@@ -205,22 +206,41 @@ Regla en código: `themeNameFromLayoutKey()` — `deo` y `luxury` → tema `luxu
 | Dato | Fuente primaria | Fallback / extra |
 |------|-----------------|------------------|
 | Nombre, tagline, logo, color primario, `public_url` | **SiteConfig** (Ops) → `getResolvedSiteConfig()` | Env `NEXT_PUBLIC_*` si API vacío |
+| Idiomas (`default_locale`, `supported_locales`, `show_locale_switcher`) | **SiteConfig** (Ops) → `config.locale` | Env `SITE_DEFAULT_LOCALE`, `SITE_SUPPORTED_LOCALES`, `SITE_SHOW_LOCALE_SWITCHER` |
 | Hero, about, contacto, testimonios, ubicaciones, fuentes, motion | Env `SITE_*` / `NEXT_PUBLIC_SITE_*` | Defaults en `public-site-content.ts` |
 | Listings, inquiries, fotos | API público | — |
 | Vercel obligatorio | `ACCOUNT_ID`, `API_URL` | — |
 
-`getPublicSiteContent()` parte de `getResolvedSiteConfig()` para **brand** y mergea env para marketing (hoy sobre todo Luxury). **No** usar `site-config.ts` ni `NEXT_PUBLIC_SITE_NAME` en UI.
+`getPublicSiteContent()` parte de `getResolvedSiteConfig()` para **brand** y **locale**, y mergea env para marketing (hoy sobre todo Luxury). **No** usar `site-config.ts` ni `NEXT_PUBLIC_SITE_NAME` en UI.
+
+### i18n (todos los themes públicos)
+
+Ops controla tres cosas **independientes**:
+
+| Campo Ops | Efecto |
+|-----------|--------|
+| `supported_locales` | Idiomas que el sitio puede servir (ES, EN o ambos) |
+| `default_locale` | Idioma por defecto (`html lang`, sin `?lang=`) |
+| `show_locale_switcher` | Si se muestra el botón ES \| EN en header (Luxury incluido) |
+
+Reglas en template:
+
+- `resolveRequestLocale(?lang, config.locale)` elige idioma activo; fallback inválido → `default_locale`.
+- El selector solo se renderiza si `show_locale_switcher === true` **y** hay ≥2 idiomas en `supported_locales` (`locale-switcher-base.tsx`).
+- Diccionarios: `getDictionary(locale)` en `site-i18n.ts`. Server: `getSiteUi(lang)` o `getLuxuryUi(lang)`.
+- `?lang=en` / `?lang=es` en URLs cuando el idioma está en `supported_locales` (con o sin selector visible).
 
 ### Tema `default` (estructura)
 
 - Catálogo: `DefaultCatalog` → `CatalogHero` (solo `layout_key: default` en producción hoy).
 - Ficha: `DefaultListingDetail` — galería, specs, inquiry, WhatsApp con `listingPublicUrl` desde `config.siteOrigin`.
-- Sin i18n de theme; copy en español.
+- i18n vía `getSiteUi` + `site-i18n.ts` (mismo contrato que Luxury para locale).
 - **`layout_key: default`:** sin `--site-primary`; paleta zinc/blanco.
 
 ### Tema `luxury` (plantilla premium, piloto `deo`)
 
-- `src/themes/luxury/` — catálogo con secciones, ficha, header/footer, i18n (`site-i18n.ts`).
+- `src/themes/luxury/` — catálogo con secciones, ficha, header/footer propios.
+- i18n: mismo `site-i18n.ts` que default; `getLuxuryUi(lang)` para copy + locale.
 - CSS: `[data-site-theme="luxury"]`, variables `--luxury-*` (`luxuryThemeCssVars()` en `globals.css`).
 - Legales: `LuxuryLegalPage` cuando `resolveSiteThemeFromConfig().name === "luxury"`.
 - Gaps API: [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md).
@@ -251,6 +271,7 @@ Helpers: `isStyledSiteLayout(layoutKey)`, `SiteLayoutVariantProvider`, `useSiteL
 | `getResolvedSiteConfig()` | Server Components |
 | `resolveSiteThemeFromConfig()` | Elegir theme (legales, etc.) |
 | `getPublicSiteContent()` | Copy/marketing del theme (server) |
+| `getSiteUi(lang)` / `getLuxuryUi(lang)` | Locale + diccionario en Server Components |
 | `pickSiteBranding(config)` | Marca en `"use client"` |
 | `site-config-env.ts` | `ACCOUNT_ID`, `listingPublicUrl` — solo servidor |
 
@@ -266,7 +287,7 @@ Usa este flujo cuando pidan **una plantilla nueva** (visual distinta de default/
 
 **Identidad**
 - Nombre del theme en código y `layout_key` en Ops (mapeo en `themeNameFromLayoutKey`).
-- ¿Solo español o i18n?
+- Idiomas: `supported_locales`, `default_locale` y si el visitante ve selector (`show_locale_switcher`) — todo desde Ops, no inferir en código.
 
 **Marca (prioridad Ops)**
 - Color primario, acento, superficie; logo; tipografías; `show_powered_by`.
@@ -426,7 +447,8 @@ Reutilizar helpers existentes antes de copiar lógica:
 | BFF staff | `proxyToApi`, `readJsonBody`, `proxyResponse` | Lógica de auth/header en cada `route.ts` |
 | Errores API | `parseApiFailureMessage`, `notifyApiResponseFailure` | Strings de error custom por formulario |
 | Tipos | `src/lib/*-types.ts` | Interfaces inline repetidas en varios archivos |
-| Labels UI | `src/lib/*-labels.ts` | Mapas `{ draft: "Borrador" }` copiados en componentes |
+| Labels UI | `src/lib/*-labels.ts`, `localizedPropertyTypeLabel` | Mapas `{ draft: "Borrador" }` copiados en componentes |
+| Locale / i18n | `site-i18n.ts`, `getSiteUi`, `locale-switcher-base` | Lógica duplicada de `?lang=` o selector por theme |
 | Layout keys / themes | `SiteLayoutKey`, `LAYOUT_KEYS`, `theme-registry.ts`, `themeNameFromLayoutKey()` | Strings sueltos; JSX duplicado en `app/page.tsx` |
 
 **Cuándo extraer:** si la misma lógica aparece **2+ veces** con el mismo significado (p. ej. armar URL pública, mapear branding, validar teléfono). **No** crear util de una línea solo “por si acaso”.
@@ -511,5 +533,5 @@ npm run lint
 
 - **Nueva plantilla pública (theme):** seguir [Nueva plantilla pública — playbook para agentes](#nueva-plantilla-pública--playbook-para-agentes).
 - **Página contacto:** nueva ruta bajo `src/app/contacto/`; si es parte del theme, integrar en `src/themes/<nombre>/`.
-- **Nuevo campo de branding:** API (`SiteConfig` + presenter + Ops form) → `site-config-types.ts` → `mergeApiPayload` → `getPublicSiteContent().brand` si Luxury/marketing lo usa.
+- **Nuevo campo de branding:** API (`SiteConfig` + presenter + Ops form) → `site-config-types.ts` → `mergeApiPayload` / `localeFromApi` → componentes que lo consuman (`getPublicSiteContent().brand`, `config.locale`, etc.).
 - **Deploy Vercel:** checklist manual en Ops; ver `README.md` (solo `ACCOUNT_ID` + `API_URL`).
