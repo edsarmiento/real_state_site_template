@@ -1,3 +1,5 @@
+import type { SiteDictionary } from "@/lib/site-i18n";
+
 export type ListingStatus = "draft" | "published" | "paused";
 export type ListingOfferType = "rent" | "sale";
 export type CatalogOfferFilter = ListingOfferType | "all";
@@ -123,8 +125,6 @@ export function listingPriceSuffix(offerType: ListingOfferType): string | null {
 
 export type ListingSpec = { label: string; value: string };
 
-import type { SiteDictionary } from "@/lib/site-i18n";
-
 export function listingPublicSpecsLocalized(
   listing: {
     property_type: string;
@@ -167,35 +167,6 @@ export function listingPublicSpecsLocalized(
       label: dict.listing.specs.land,
       value: `${listing.built_area} m²`,
     });
-  }
-
-  return specs;
-}
-
-export function listingPublicSpecs(listing: {
-  property_type: string;
-  bedrooms: number | null;
-  bathrooms: number | null;
-  built_area: string | null;
-  land_area?: string | null;
-}): ListingSpec[] {
-  const specs: ListingSpec[] = [];
-  const land = listing.property_type === "land";
-
-  if (!land && listing.bedrooms != null) {
-    specs.push({ label: "Recámaras", value: String(listing.bedrooms) });
-  }
-  if (!land && listing.bathrooms != null) {
-    specs.push({ label: "Baños", value: String(listing.bathrooms) });
-  }
-  if (listing.land_area) {
-    specs.push({ label: "Terreno", value: `${listing.land_area} m²` });
-  }
-  if (listing.built_area && !land) {
-    specs.push({ label: "Construcción", value: `${listing.built_area} m²` });
-  }
-  if (land && listing.built_area && !listing.land_area) {
-    specs.push({ label: "Terreno", value: `${listing.built_area} m²` });
   }
 
   return specs;

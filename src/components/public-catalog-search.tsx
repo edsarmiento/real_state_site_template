@@ -3,7 +3,8 @@ import {
   catalogOfferQueryValue,
   type CatalogOfferFilter,
 } from "@/lib/listing-types";
-import { PROPERTY_TYPES, type PropertyType } from "@/lib/property-types";
+import { PROPERTY_TYPES } from "@/lib/property-types";
+import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import {
   localizedHref,
   type SiteDictionary,
@@ -39,20 +40,6 @@ function catalogHref(
     return localizedHref(path, locale, null, defaultLocale);
   }
   return path;
-}
-
-function propertyLabel(dict: SiteDictionary | undefined, type: PropertyType) {
-  if (dict) return dict.propertyTypes[type];
-  const fallback: Record<PropertyType, string> = {
-    house: "Casa",
-    apartment: "Apartamento",
-    warehouse: "Almacén",
-    land: "Terreno",
-    office: "Oficina",
-    retail: "Local comercial",
-    other: "Otro",
-  };
-  return fallback[type];
 }
 
 export function PublicCatalogSearch({
@@ -180,7 +167,7 @@ export function PublicCatalogSearch({
             <option value="">{dict?.search.allTypes ?? "Todos"}</option>
             {PROPERTY_TYPES.map((type) => (
               <option key={type} value={type}>
-                {propertyLabel(dict, type)}
+                {localizedPropertyTypeLabel(dict, type)}
               </option>
             ))}
           </select>

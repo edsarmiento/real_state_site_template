@@ -7,12 +7,12 @@ import {
   parseOfferType,
   type PublicListingCard,
 } from "@/lib/listing-types";
+import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import {
   localizedHref,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
-import type { PropertyType } from "@/lib/property-types";
 
 type Props = {
   listing: PublicListingCard;
@@ -21,16 +21,6 @@ type Props = {
   locale?: SiteLocale;
   defaultLocale?: SiteLocale;
 };
-
-function propertyLabel(
-  dict: SiteDictionary | undefined,
-  type: string,
-): string {
-  if (dict && type in dict.propertyTypes) {
-    return dict.propertyTypes[type as PropertyType];
-  }
-  return type;
-}
 
 export function PublicListingCard({
   listing,
@@ -42,7 +32,7 @@ export function PublicListingCard({
   const offerType = parseOfferType(listing.offer_type);
   const suffix =
     offerType === "rent" ? (dict?.listing.perMonth ?? listingPriceSuffix(offerType)) : null;
-  const typeLabel = propertyLabel(dict, listing.property_type);
+  const typeLabel = localizedPropertyTypeLabel(dict, listing.property_type);
   const specLine = listingCardSpecLine(listing);
   const href =
     locale && defaultLocale

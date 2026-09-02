@@ -308,7 +308,7 @@ export function resolveRequestLocale(
   if (isSiteLocale(normalized) && config.supportedLocales.includes(normalized)) {
     return normalized;
   }
-  return "es";
+  return config.defaultLocale;
 }
 
 type QueryValue = string | undefined | null;

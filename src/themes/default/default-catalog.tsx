@@ -21,6 +21,12 @@ export async function DefaultCatalog({
   lang,
 }: CatalogThemeProps) {
   const ui = await getSiteUi(lang);
+  const emptyKind =
+    oferta === "sale"
+      ? ui.dict.results.emptySale
+      : oferta === "rent"
+        ? ui.dict.results.emptyRent
+        : "";
   const clearHref =
     oferta === "all"
       ? localizedHref("/", ui.locale, null, ui.defaultLocale)
@@ -85,12 +91,7 @@ export async function DefaultCatalog({
             </p>
             <p className="mt-2 text-base text-zinc-600">
               {ui.dict.results.emptyCopy}
-  const emptyKind =
-    oferta === "sale"
-      ? ` ${ui.dict.results.emptySale}`
-      : oferta === "rent"
-        ? ` ${ui.dict.results.emptyRent}`
-        : "";
+              {emptyKind ? ` ${emptyKind}` : ""}
               {city
                 ? ` ${fillTemplate(ui.dict.results.inPlace, { city: `«${city}»` })}`
                 : ""}
