@@ -284,6 +284,8 @@ Helpers: `isStyledSiteLayout(layoutKey)`, `SiteLayoutVariantProvider`, `useSiteL
 
 Usa este flujo cuando pidan **una plantilla nueva** (visual distinta de default/Luxury). **Preguntar diseño** al humano y codificar según el checklist.
 
+**Handoff a un dev/agente:** copia [`docs/new-theme-agent-prompt.template.txt`](docs/new-theme-agent-prompt.template.txt), reemplaza los marcadores `<slug>`, `<ThemeName>`, etc. y guárdalo como `docs/<slug>-theme-agent-prompt.txt`. El template es el brief concreto; este `AGENTS.md` son las reglas permanentes del repo.
+
 ### 1. Preguntas al usuario (diseño y producto)
 
 **Identidad**
@@ -364,7 +366,8 @@ Reutilizar `PublicCatalogSearch`, `ListingInquiryForm`, `ListingWhatsAppButton` 
 
 | Doc | Uso |
 |-----|-----|
-| Este `AGENTS.md` | Arquitectura y playbook |
+| Este `AGENTS.md` | Arquitectura y playbook (reglas permanentes) |
+| [`docs/new-theme-agent-prompt.template.txt`](docs/new-theme-agent-prompt.template.txt) | Plantilla de brief por theme; copiar y rellenar `<slug>` / `<ThemeName>` |
 | [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md) | Gaps API, env `SITE_*` |
 | [`docs/architecture/luxury-layout-implementation.md`](docs/architecture/luxury-layout-implementation.md) | Contexto histórico — no fuente del registry actual |
 | [`README.md`](README.md) | Deploy Vercel |

@@ -1,0 +1,154 @@
+Handoff: implementar theme <THEME_LABEL> en real_state_site_template
+=====================================================================
+
+Antes de usar este archivo:
+  1. Copialo a docs/<slug>-theme-agent-prompt.txt (ej. docs/beige-theme-agent-prompt.txt).
+  2. Reemplaza todos los marcadores <...> abajo.
+  3. Completa la seccion "Pre-requisitos API + Ops" segun el estado real del monorepo.
+  4. Pegale el .txt al agente o desarrollador.
+
+Reglas permanentes del repo: real_state_site_template/AGENTS.md (playbook "Nueva plantilla").
+Este archivo es solo el brief concreto de ESTA plantilla.
+
+
+Variables (reemplazar)
+----------------------
+
+  <slug>              layout_key en API/Ops, minusculas (ej. beige)
+  <THEME_NAME>        nombre en codigo / SiteThemeName (ej. beige; puede diferir del layout_key)
+  <ThemeName>         PascalCase para componentes (ej. Beige)
+  <THEME_LABEL>       etiqueta humana (ej. Beige — catalogo calido)
+  <REFERENCE_THEME>   theme a copiar estructura: default | luxury
+  <STYLED_LAYOUT>     true | false — usar styledLayout en search/cards/forms compartidos
+  <PALETTE_NOTES>     notas de diseno (colores, tipografia, hero, etc.)
+
+
+Pre-requisitos API + Ops (completar antes del handoff)
+------------------------------------------------------
+
+  [ ] real_state_api: SiteConfig::LAYOUT_KEYS incluye "<slug>"
+  [ ] real_state_api: specs + BUSINESS_RULES.md §SiteConfig
+  [ ] real_state_frontend: OpsSiteConfigLayout + opcion en LAYOUT_OPTIONS
+
+Si algo falta, hacerlo primero o incluirlo en el alcance del agente.
+
+
+Contexto
+--------
+
+Monorepo Real State. Trabaja SOLO en:
+
+  real_state_site_template/  (Next.js App Router, puerto dev 3002)
+
+1 deploy = 1 inmobiliaria (ACCOUNT_ID + API_URL). Marca, layout, idiomas y dominio
+vienen de SiteConfig via GET /api/public/site_config?account_id=.
+
+Objetivo: cuando Ops guarde layout_key: "<slug>", el template renderiza el theme
+<THEME_NAME> en / y /inmueble/[slug].
+
+Lee:
+  - real_state_site_template/AGENTS.md
+  - real_state_api/BUSINESS_RULES.md — SiteConfig
+
+
+Arquitectura (no romper)
+------------------------
+
+  src/app/page.tsx -> resolveSiteThemeFromConfig() -> theme.Catalog
+  src/app/inmueble/[slug]/page.tsx -> theme.ListingDetail
+
+Contrato: src/themes/theme-types.ts (CatalogThemeProps, ListingDetailThemeProps).
+
+Reglas:
+  - Server Components; sin fetch de listings dentro del theme.
+  - i18n: getSiteUi(lang) + site-i18n.ts.
+  - Marca: getSiteUi().config (SiteConfig via getResolvedSiteConfig).
+  - Reutilizar componentes compartidos; no duplicar dominio.
+
+
+Alcance v1 — theme <ThemeName>
+------------------------------
+
+Referencia de estructura: src/themes/<REFERENCE_THEME>/
+
+Identidad visual:
+  <PALETTE_NOTES>
+
+styledLayout en componentes compartidos: <STYLED_LAYOUT>
+
+
+Minimo obligatorio en src/themes/<slug>/
+----------------------------------------
+
+  <slug>-catalog.tsx           OBLIGATORIO — pagina /
+  <slug>-listing-detail.tsx    OBLIGATORIO — pagina /inmueble/[slug]
+
+Recomendado:
+  <slug>-legal-page.tsx        legales con el mismo shell
+  <slug>-catalog-hero.tsx      solo si el hero no va inline en catalog
+
+Catalog debe incluir:
+  - SiteHeader / SiteFooter (prop lang)
+  - Hero con siteName, siteTagline (getSiteUi)
+  - PublicCatalogSearch + PublicListingCard (styledLayout segun <STYLED_LAYOUT>)
+  - Empty state / error catalogo (ui.dict.results.*)
+  - Barra admin -> /login
+  - Wrapper: data-site-theme="<slug>"
+
+Listing detail debe incluir:
+  - Paridad funcional con default-listing-detail (galeria, specs, inquiry, WhatsApp, maps)
+  - listingUrl con ui.config.siteOrigin
+
+
+Cableado obligatorio (template)
+-------------------------------
+
+  1. theme-types.ts          — "<THEME_NAME>" en SiteThemeName
+  2. theme-registry.ts       — entrada <THEME_NAME>: { Catalog, ListingDetail }
+  3. resolve-site-theme.ts   — layout_key "<slug>" -> "<THEME_NAME>" en themeNameFromLayoutKey()
+  4. site-config-types.ts    — "<slug>" en SiteLayoutKey
+  5. resolved-site-config.ts — "<slug>" en LAYOUT_KEYS
+
+Recomendado:
+  6. Legales: aviso-de-privacidad, terminos, cookies — rama theme.name === "<THEME_NAME>"
+  7. AGENTS.md — fila en tabla layout_key -> theme
+
+NO modificar app/page.tsx ni app/inmueble/[slug]/page.tsx (salvo bug).
+NO usar site-config.ts legacy. NO fetch al Rails desde el browser.
+
+
+i18n (desde Ops)
+----------------
+
+  getSiteUi(lang); selector ES|EN si show_locale_switcher; localizedHref().
+
+
+Admin / login
+-------------
+
+  isStyledSiteLayout(): layout_key !== "default" -> acentos de marca en admin/login.
+
+
+Verificacion
+------------
+
+  npm run build && npm run lint
+
+Smoke:
+  1. Ops: layout "<THEME_LABEL>" -> guardar
+  2. /, /inmueble/:slug, legales, /login
+
+
+Fuera de alcance (salvo pedido explicito)
+-----------------------------------------
+
+  Nuevos campos SiteConfig, marketing env tipo Luxury, deploy Vercel.
+
+
+Entregable
+----------
+
+  - src/themes/<slug>/ completo
+  - Registry + mapeo
+  - build verde
+  - Nota: paleta + que reutiliza de <REFERENCE_THEME>
