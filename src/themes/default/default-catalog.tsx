@@ -4,7 +4,8 @@ import { PublicCatalogSearch } from "@/components/public-catalog-search";
 import { PublicListingCard } from "@/components/public-listing-card";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
+import { fillTemplate, localizedHref } from "@/lib/site-i18n";
+import { getSiteUi } from "@/lib/site-ui";
 import type { CatalogThemeProps } from "@/themes/theme-types";
 
 export async function DefaultCatalog({
@@ -14,24 +15,33 @@ export async function DefaultCatalog({
   bedrooms,
   listings,
   heading,
-  emptyKind,
   typeLabel,
   catalogOk,
   catalogStatus,
+  lang,
 }: CatalogThemeProps) {
-  const config = await getResolvedSiteConfig();
+  const ui = await getSiteUi(lang);
+  const clearHref =
+    oferta === "all"
+      ? localizedHref("/", ui.locale, null, ui.defaultLocale)
+      : localizedHref(
+          `/?oferta=${oferta === "sale" ? "venta" : "renta"}`,
+          ui.locale,
+          null,
+          ui.defaultLocale,
+        );
 
   return (
     <div className="relative min-h-screen bg-zinc-50">
-      <SiteHeader />
+      <SiteHeader lang={lang} />
 
       <CatalogHero
         layoutKey="default"
-        siteName={config.siteName}
-        siteTagline={config.siteTagline}
-        siteLogoUrl={config.siteLogoUrl}
-        primaryColor={config.primaryColor}
-        showPoweredBy={config.showPoweredBy}
+        siteName={ui.config.siteName}
+        siteTagline={ui.config.siteTagline}
+        siteLogoUrl={ui.config.siteLogoUrl}
+        primaryColor={ui.config.primaryColor}
+        showPoweredBy={ui.config.showPoweredBy}
         search={
           <PublicCatalogSearch
             oferta={oferta}
@@ -39,6 +49,9 @@ export async function DefaultCatalog({
             propertyType={propertyType}
             bedrooms={bedrooms}
             styledLayout={false}
+            dict={ui.dict}
+            locale={ui.locale}
+            defaultLocale={ui.defaultLocale}
           />
         }
       />
@@ -46,14 +59,16 @@ export async function DefaultCatalog({
       <section className="relative mx-auto max-w-7xl px-4 pt-6 sm:px-6">
         <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="text-sm text-zinc-700">
-            <span className="font-semibold text-zinc-950">¿Administras anuncios?</span>{" "}
-            Accede al panel.
+            <span className="font-semibold text-zinc-950">
+              {ui.dict.admin.catalogPrompt}
+            </span>{" "}
+            {ui.dict.admin.catalogPromptAction}
           </p>
           <Link
             href="/login"
             className="inline-flex shrink-0 items-center justify-center rounded-lg border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-50"
           >
-            Administrar
+            {ui.dict.admin.manage}
           </Link>
         </div>
       </section>
@@ -61,23 +76,35 @@ export async function DefaultCatalog({
       <main className="mx-auto max-w-7xl px-4 pb-16 pt-10 sm:px-6 sm:pt-12">
         {!catalogOk ? (
           <p className="text-sm text-zinc-600">
-            No se pudo cargar el catálogo ({catalogStatus}). Revisa la
-            configuración del sitio.
+            {fillTemplate(ui.dict.results.catalogError, { status: catalogStatus })}
           </p>
         ) : listings.length === 0 ? (
           <div className="rounded-xl border border-zinc-200 bg-white px-6 py-12 text-center">
-            <p className="text-lg font-semibold text-zinc-950">No encontramos inmuebles</p>
+            <p className="text-lg font-semibold text-zinc-950">
+              {ui.dict.results.emptyTitle}
+            </p>
             <p className="mt-2 text-base text-zinc-600">
-              No hay anuncios publicados{emptyKind ? ` ${emptyKind}` : ""}
-              {city ? ` en «${city}»` : ""}
+              {ui.dict.results.emptyCopy}
+  const emptyKind =
+    oferta === "sale"
+      ? ` ${ui.dict.results.emptySale}`
+      : oferta === "rent"
+        ? ` ${ui.dict.results.emptyRent}`
+        : "";
+              {city
+                ? ` ${fillTemplate(ui.dict.results.inPlace, { city: `«${city}»` })}`
+                : ""}
               {typeLabel ? ` · ${typeLabel}` : ""}
-              {bedrooms ? ` · ${bedrooms}+ recámaras` : ""}.
+              {bedrooms
+                ? ` · ${fillTemplate(ui.dict.results.bedroomsFilter, { count: bedrooms })}`
+                : ""}
+              .
             </p>
             <Link
-              href="/"
+              href={localizedHref("/", ui.locale, null, ui.defaultLocale)}
               className="mt-6 inline-flex rounded-lg border border-zinc-300 bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
             >
-              Ver todos
+              {ui.dict.results.viewAll}
             </Link>
           </div>
         ) : (
@@ -85,7 +112,7 @@ export async function DefaultCatalog({
             <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
-                  Resultados
+                  {ui.dict.results.kicker}
                 </p>
                 <h2 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl">
                   {heading}
@@ -93,14 +120,10 @@ export async function DefaultCatalog({
               </div>
               {(propertyType || bedrooms || city) && (
                 <Link
-                  href={
-                    oferta === "all"
-                      ? "/"
-                      : `/?oferta=${oferta === "sale" ? "venta" : "renta"}`
-                  }
+                  href={clearHref}
                   className="text-sm font-semibold text-zinc-800 hover:underline"
                 >
-                  Limpiar filtros
+                  {ui.dict.results.clearFilters}
                 </Link>
               )}
             </div>
@@ -108,7 +131,13 @@ export async function DefaultCatalog({
             <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {listings.map((listing) => (
                 <li key={listing.slug} className="min-w-0">
-                  <PublicListingCard listing={listing} styledLayout={false} />
+                  <PublicListingCard
+                    listing={listing}
+                    styledLayout={false}
+                    dict={ui.dict}
+                    locale={ui.locale}
+                    defaultLocale={ui.defaultLocale}
+                  />
                 </li>
               ))}
             </ul>
@@ -116,7 +145,7 @@ export async function DefaultCatalog({
         )}
       </main>
 
-      <SiteFooter />
+      <SiteFooter lang={lang} />
     </div>
   );
 }

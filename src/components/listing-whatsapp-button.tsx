@@ -1,9 +1,14 @@
+import { fillTemplate } from "@/lib/site-i18n";
+
 type Props = {
   phone: string;
   title: string;
   offerType?: "rent" | "sale";
   listingUrl: string;
   className?: string;
+  saleLabel?: string;
+  rentLabel?: string;
+  messageTemplate?: string;
 };
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -29,15 +34,22 @@ export function ListingWhatsAppButton({
   listingUrl,
   offerType = "rent",
   className,
+  saleLabel,
+  rentLabel,
+  messageTemplate,
 }: Props) {
   const digits = phone.replace(/\D/g, "");
   if (!/^\d{10}$/.test(digits)) return null;
 
-  const href = `https://wa.me/52${digits}?text=${encodeURIComponent(listingWhatsAppMessage(title, listingUrl))}`;
+  const message =
+    messageTemplate != null
+      ? fillTemplate(messageTemplate, { title, url: listingUrl })
+      : listingWhatsAppMessage(title, listingUrl);
+  const href = `https://wa.me/52${digits}?text=${encodeURIComponent(message)}`;
   const label =
     offerType === "sale"
-      ? "WhatsApp: me interesa comprar"
-      : "WhatsApp: me interesa rentar";
+      ? (saleLabel ?? "WhatsApp: me interesa comprar")
+      : (rentLabel ?? "WhatsApp: me interesa rentar");
 
   return (
     <a

@@ -1,14 +1,20 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { SiteLocaleSwitcher } from "@/components/site-locale-switcher";
 import { getSessionContext } from "@/lib/session-context";
-import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
+import { getSiteUi } from "@/lib/site-ui";
 
-export async function SiteHeader() {
-  const [session, config] = await Promise.all([
+type Props = {
+  lang?: string;
+};
+
+export async function SiteHeader({ lang }: Props) {
+  const [session, ui] = await Promise.all([
     getSessionContext(),
-    getResolvedSiteConfig(),
+    getSiteUi(lang),
   ]);
-  const logo = config.siteLogoUrl;
-  const name = config.siteName;
+  const logo = ui.config.siteLogoUrl;
+  const name = ui.config.siteName;
   const isAdmin = session?.isStaffUser === true;
 
   return (
@@ -29,21 +35,31 @@ export async function SiteHeader() {
           )}
         </Link>
 
-        {isAdmin ? (
-          <Link
-            href="/listings"
-            className="shrink-0 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
-          >
-            Administrar
-          </Link>
-        ) : (
-          <Link
-            href="/login"
-            className="shrink-0 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
-          >
-            Acceder
-          </Link>
-        )}
+        <div className="flex shrink-0 items-center gap-3">
+          <Suspense fallback={null}>
+            <SiteLocaleSwitcher
+              locale={ui.locale}
+              defaultLocale={ui.defaultLocale}
+              supportedLocales={ui.localeConfig.supportedLocales}
+              dict={ui.dict}
+            />
+          </Suspense>
+          {isAdmin ? (
+            <Link
+              href="/listings"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+            >
+              {ui.dict.admin.manage}
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+            >
+              {ui.dict.admin.signIn}
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );

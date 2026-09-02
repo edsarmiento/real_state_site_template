@@ -6,6 +6,7 @@ import type {
   SiteConfigApiPayload,
   SiteLayoutKey,
 } from "@/lib/site-config-types";
+import { parseSiteLocaleConfig, type SiteLocaleConfig } from "@/lib/site-i18n";
 
 const LAYOUT_KEYS: SiteLayoutKey[] = ["default", "deo"];
 
@@ -15,6 +16,28 @@ function normalizeLayoutKey(raw: string | undefined | null): SiteLayoutKey {
     return value as SiteLayoutKey;
   }
   return "default";
+}
+
+function localeFromApi(
+  api: SiteConfigApiPayload,
+  env: ResolvedSiteConfig,
+): SiteLocaleConfig {
+  if (api.locale?.supported_locales?.length) {
+    return parseSiteLocaleConfig(
+      api.locale.default_locale,
+      api.locale.supported_locales.join(","),
+    );
+  }
+
+  const branding = api.branding ?? {};
+  if (branding.supported_locales?.length) {
+    return parseSiteLocaleConfig(
+      branding.default_locale,
+      branding.supported_locales.join(","),
+    );
+  }
+
+  return env.locale;
 }
 
 function mergeApiPayload(
@@ -32,6 +55,7 @@ function mergeApiPayload(
     primaryColor: branding.primary_color?.trim() || env.primaryColor,
     showPoweredBy: branding.show_powered_by ?? env.showPoweredBy,
     siteOrigin: api.public_url?.trim() || env.siteOrigin,
+    locale: localeFromApi(api, env),
     source: "api",
   };
 }

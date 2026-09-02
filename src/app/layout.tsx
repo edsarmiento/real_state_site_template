@@ -44,7 +44,7 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="es"
+      lang={config.locale.defaultLocale}
       className={`${geistSans.variable} h-full antialiased`}
       data-site-layout={config.layoutKey}
     >

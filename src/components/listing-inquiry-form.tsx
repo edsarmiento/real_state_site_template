@@ -6,11 +6,13 @@ import {
   parseApiFailureMessage,
   type ListingOfferType,
 } from "@/lib/listing-types";
+import type { SiteDictionary } from "@/lib/site-i18n";
 
 type Props = {
   slug: string;
   offerType?: ListingOfferType | string | null;
   styledLayout?: boolean;
+  copy?: SiteDictionary["inquiry"];
 };
 
 const PHONE_DIGITS = /^\d{10}$/;
@@ -23,6 +25,7 @@ export function ListingInquiryForm({
   slug,
   offerType,
   styledLayout = true,
+  copy,
 }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -39,7 +42,7 @@ export function ListingInquiryForm({
     const fd = new FormData(e.currentTarget);
     const phoneDigits = onlyPhoneDigits(String(fd.get("phone") || phone));
     if (!PHONE_DIGITS.test(phoneDigits)) {
-      setError("El teléfono debe tener exactamente 10 dígitos.");
+      setError(copy?.phoneError ?? "El teléfono debe tener exactamente 10 dígitos.");
       return;
     }
 
@@ -86,7 +89,8 @@ export function ListingInquiryForm({
   if (sent) {
     return (
       <p className={`rounded-xl px-4 py-3 text-sm ring-1 ${successClass}`}>
-        Tu mensaje fue enviado. La inmobiliaria se pondrá en contacto contigo.
+        {copy?.success ??
+          "Tu mensaje fue enviado. La inmobiliaria se pondrá en contacto contigo."}
       </p>
     );
   }
@@ -100,7 +104,7 @@ export function ListingInquiryForm({
       ) : null}
       <div>
         <label htmlFor="name" className="mb-1 block text-sm font-medium text-zinc-700">
-          Nombre
+          {copy?.name ?? "Nombre"}
         </label>
         <input
           id="name"
@@ -111,7 +115,7 @@ export function ListingInquiryForm({
       </div>
       <div>
         <label htmlFor="phone" className="mb-1 block text-sm font-medium text-zinc-700">
-          Teléfono (10 dígitos)
+          {copy?.phone ?? "Teléfono (10 dígitos)"}
         </label>
         <input
           id="phone"
@@ -125,7 +129,7 @@ export function ListingInquiryForm({
       </div>
       <div>
         <label htmlFor="message" className="mb-1 block text-sm font-medium text-zinc-700">
-          Mensaje
+          {copy?.message ?? "Mensaje"}
         </label>
         <textarea
           id="message"
@@ -134,8 +138,8 @@ export function ListingInquiryForm({
           rows={4}
           placeholder={
             isSale
-              ? "Me interesa este inmueble en venta…"
-              : "Me interesa rentar este inmueble…"
+              ? (copy?.placeholderSale ?? "Me interesa este inmueble en venta…")
+              : (copy?.placeholderRent ?? "Me interesa rentar este inmueble…")
           }
           className={`w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none ${fieldFocus}`}
         />
@@ -145,7 +149,7 @@ export function ListingInquiryForm({
         disabled={pending}
         className={`w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition disabled:opacity-60 ${submitClass}`}
       >
-        {pending ? "Enviando…" : "Enviar mensaje"}
+        {pending ? (copy?.sending ?? "Enviando…") : (copy?.send ?? "Enviar mensaje")}
       </button>
     </form>
   );

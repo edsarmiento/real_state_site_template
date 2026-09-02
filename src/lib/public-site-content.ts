@@ -10,15 +10,9 @@ import {
   resolveSiteTypography,
   type TypographyConfig,
 } from "@/lib/site-fonts";
-import {
-  parseSiteLocaleConfig,
-  type SiteLocaleConfig,
-} from "@/lib/site-i18n";
-import {
-  showPoweredBy,
-  siteName,
-  siteTagline,
-} from "@/lib/site-config";
+import type { SiteLocaleConfig } from "@/lib/site-i18n";
+import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
+import type { ResolvedSiteConfig } from "@/lib/site-config-types";
 import type { PublicListingCard } from "@/lib/listing-types";
 
 export type SiteLink = {
@@ -737,9 +731,9 @@ function resolveMotionPreset(raw: string | undefined): MotionPreset {
   return "subtle";
 }
 
-function buildPublicSiteContent(): PublicSiteContent {
-  const name = siteName();
-  const tagline = siteTagline();
+function buildPublicSiteContent(config: ResolvedSiteConfig): PublicSiteContent {
+  const name = config.siteName;
+  const tagline = config.siteTagline;
   const typography = resolveSiteTypography();
   const whatsappNumber = parseWhatsAppNumber(process.env.SITE_WHATSAPP_NUMBER);
   const whatsappMessage = envText(
@@ -759,10 +753,8 @@ function buildPublicSiteContent(): PublicSiteContent {
     brand: {
       name,
       tagline,
-      logoUrl:
-        parsePublicHttpUrl(process.env.NEXT_PUBLIC_SITE_LOGO_URL) ??
-        parsePublicHttpUrl(process.env.SITE_LOGO_URL),
-      primaryColor: parseCssHexColor(process.env.NEXT_PUBLIC_PRIMARY_COLOR),
+      logoUrl: config.siteLogoUrl,
+      primaryColor: config.primaryColor,
       secondaryColor: parseCssHexColor(process.env.SITE_SECONDARY_COLOR),
       accentColor: parseCssHexColor(process.env.SITE_ACCENT_COLOR),
       surfaceColor: parseCssHexColor(process.env.SITE_SURFACE_COLOR),
@@ -864,7 +856,7 @@ function buildPublicSiteContent(): PublicSiteContent {
         DEFAULT_FOOTER_DESCRIPTION,
       ),
       copyright: `© ${new Date().getFullYear()} ${name}`,
-      showPoweredBy: showPoweredBy(),
+      showPoweredBy: config.showPoweredBy,
     },
     finalCta: {
       title: envText(process.env.SITE_FINAL_CTA_TITLE, DEFAULT_FINAL_CTA_TITLE),
@@ -893,21 +885,20 @@ function buildPublicSiteContent(): PublicSiteContent {
         ? buildWhatsAppHref(whatsappNumber, whatsappMessage)
         : null,
     },
-    locale: parseSiteLocaleConfig(
-      process.env.SITE_DEFAULT_LOCALE,
-      process.env.SITE_SUPPORTED_LOCALES,
-    ),
+    locale: config.locale,
   };
 }
 
 /**
  * Public marketing/content contract for themed surfaces.
- * MVP: env + site-config + generic defaults.
- * Future: replace the body with GET /api/public/site-config without changing Luxury UI.
- * Never expose ACCOUNT_ID, API_URL, JWT, or other secrets.
+ * Brand, locale and footer flags come from SiteConfig (Ops).
+ * Extended luxury sections still use env until exposed in Ops.
  */
 export const getPublicSiteContent = cache(
-  async (): Promise<PublicSiteContent> => buildPublicSiteContent(),
+  async (): Promise<PublicSiteContent> => {
+    const config = await getResolvedSiteConfig();
+    return buildPublicSiteContent(config);
+  },
 );
 
 export type LuxuryThemeCssVars = {

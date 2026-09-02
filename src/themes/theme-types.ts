@@ -15,7 +15,7 @@ export type CatalogThemeProps = {
   listings: PublicListingCard[];
   total: number;
   heading: string;
-  emptyKind: string;
+  emptyKind?: string;
   typeLabel: string | null;
   catalogOk: boolean;
   catalogStatus: number;

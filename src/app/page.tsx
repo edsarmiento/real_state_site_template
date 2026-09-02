@@ -7,10 +7,9 @@ import {
   type CatalogOfferFilter,
   type PublicListingCard as PublicListingCardType,
 } from "@/lib/listing-types";
-import { propertyTypeLabel } from "@/lib/property-labels";
 import type { PropertyType } from "@/lib/property-types";
 import { getPublicSiteContent } from "@/lib/public-site-content";
-import { getDictionary, resolveRequestLocale } from "@/lib/site-i18n";
+import { getDictionary, fillTemplate, resolveRequestLocale } from "@/lib/site-i18n";
 import {
   resolveSiteThemeFromConfig,
   themeNameFromLayoutKey,
@@ -27,15 +26,21 @@ function resultsHeading(
   oferta: CatalogOfferFilter,
   city: string,
   total: number,
+  dict: ReturnType<typeof getDictionary>,
 ): string {
-  const count = total === 1 ? "1 inmueble" : `${total} inmuebles`;
+  const count =
+    total === 1
+      ? dict.results.one
+      : fillTemplate(dict.results.many, { count: total });
   const kind =
     oferta === "sale"
-      ? "en venta"
+      ? dict.results.forSale
       : oferta === "rent"
-        ? "en renta"
-        : "disponibles";
-  const place = city ? ` en ${city}` : "";
+        ? dict.results.forRent
+        : dict.results.available;
+  const place = city
+    ? fillTemplate(dict.results.inPlace, { city })
+    : "";
   return `${count} ${kind}${place}`;
 }
 
@@ -68,20 +73,17 @@ export async function generateMetadata({
     };
   }
 
-  if (oferta === "sale") {
-    return {
-      title: "Inmuebles en venta",
-      description: `${config.siteName} · venta`,
-    };
-  }
-  if (oferta === "rent") {
-    return {
-      title: "Inmuebles en renta",
-      description: `${config.siteName} · rentas`,
-    };
-  }
+  const locale = resolveRequestLocale(param(sp.lang), config.locale);
+  const dict = getDictionary(locale);
+  const title =
+    oferta === "sale"
+      ? dict.seo.catalogSale
+      : oferta === "rent"
+        ? dict.seo.catalogRent
+        : dict.seo.catalogAll;
+
   return {
-    title: "Buscar inmuebles",
+    title,
     description: config.siteTagline,
   };
 }
@@ -92,6 +94,7 @@ export default async function CatalogPage({
   searchParams: SearchParams;
 }) {
   const sp = await searchParams;
+  const config = await getResolvedSiteConfig();
   const theme = await resolveSiteThemeFromConfig();
   const city = param(sp.city).trim();
   const oferta = parseCatalogOfferFilter(param(sp.oferta));
@@ -117,14 +120,16 @@ export default async function CatalogPage({
       : [];
   const total = result.ok ? (result.data.meta?.total ?? listings.length) : 0;
 
-  const emptyKind =
-    oferta === "sale" ? "en venta" : oferta === "rent" ? " en renta" : "";
   const typeLabel = propertyType
-    ? (propertyTypeLabel[propertyType as PropertyType] ?? propertyType)
+    ? (getDictionary(
+        resolveRequestLocale(param(sp.lang), config.locale),
+      ).propertyTypes[propertyType as PropertyType] ?? propertyType)
     : null;
 
   const session = await getSessionContext();
   const Catalog = theme.Catalog;
+  const locale = resolveRequestLocale(param(sp.lang), config.locale);
+  const dict = getDictionary(locale);
 
   return (
     <Catalog
@@ -134,8 +139,7 @@ export default async function CatalogPage({
       bedrooms={bedrooms}
       listings={listings}
       total={total}
-      heading={resultsHeading(oferta, city, total)}
-      emptyKind={emptyKind}
+      heading={resultsHeading(oferta, city, total, dict)}
       typeLabel={typeLabel}
       catalogOk={result.ok}
       catalogStatus={result.status}

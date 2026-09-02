@@ -8,14 +8,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import {
   formatRentCents,
-  listingPriceSuffix,
-  listingPublicSpecs,
+  listingPublicSpecsLocalized,
   parseOfferType,
 } from "@/lib/listing-types";
-import { propertyTypeLabel } from "@/lib/property-labels";
 import type { PropertyType } from "@/lib/property-types";
-import { listingPublicUrl } from "@/lib/site-config-env";
-import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
+import { getSiteUi } from "@/lib/site-ui";
 import type { ListingDetailThemeProps } from "@/themes/theme-types";
 
 function Spec({ label, value }: { label: string; value: string }) {
@@ -44,22 +41,27 @@ function InfoCard({ title, children }: { title: string; children: ReactNode }) {
 
 export async function DefaultListingDetail({
   listing,
+  lang,
 }: ListingDetailThemeProps) {
-  const config = await getResolvedSiteConfig();
-  const listingUrl = listingPublicUrl(listing.slug, config.siteOrigin);
+  const ui = await getSiteUi(lang);
+  const listingUrl = new URL(
+    `/inmueble/${encodeURIComponent(listing.slug)}`,
+    ui.config.siteOrigin,
+  ).href;
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
-  const priceSuffix = listingPriceSuffix(offerType);
-  const specs = listingPublicSpecs(listing);
+  const priceSuffix =
+    offerType === "rent" ? ui.dict.listing.perMonth : null;
+  const specs = listingPublicSpecsLocalized(listing, ui.dict);
   const typeLabel =
-    propertyTypeLabel[listing.property_type as PropertyType] ??
+    ui.dict.propertyTypes[listing.property_type as PropertyType] ??
     listing.property_type;
   const isSale = offerType === "sale";
-  const agency = listing.agency_name || config.siteName;
+  const agency = listing.agency_name || ui.config.siteName;
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <SiteHeader />
+      <SiteHeader lang={lang} />
 
       <main className="mx-auto max-w-5xl px-4 pb-20 pt-6 sm:px-6 sm:pt-8">
         <ListingPhotoGallery
@@ -72,7 +74,12 @@ export async function DefaultListingDetail({
         <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <article>
             <div className="flex flex-wrap items-center gap-2">
-              <ListingOfferBadge offerType={offerType} styledLayout={false} />
+              <ListingOfferBadge
+                offerType={offerType}
+                styledLayout={false}
+                saleLabel={ui.dict.listing.sale}
+                rentLabel={ui.dict.listing.rent}
+              />
               <span className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
                 {typeLabel}
               </span>
@@ -100,7 +107,7 @@ export async function DefaultListingDetail({
             </dl>
 
             {listing.description ? (
-              <InfoCard title="Descripción">
+              <InfoCard title={ui.dict.listing.description}>
                 <p className="whitespace-pre-wrap text-base leading-relaxed">
                   {listing.description}
                 </p>
@@ -109,7 +116,7 @@ export async function DefaultListingDetail({
 
             {listing.address_label ||
             (listing.latitude != null && listing.longitude != null) ? (
-              <InfoCard title="Ubicación">
+              <InfoCard title={ui.dict.listing.location}>
                 {listing.address_label ? (
                   <p className="text-base leading-relaxed">{listing.address_label}</p>
                 ) : null}
@@ -120,7 +127,7 @@ export async function DefaultListingDetail({
                       longitude={listing.longitude}
                       label={listing.title}
                       showCoordinates={false}
-                      linkText="Ver en el mapa"
+                      linkText={ui.dict.listing.viewMap}
                       className="text-sm font-semibold text-zinc-800 underline-offset-2 hover:underline"
                     />
                   </div>
@@ -129,19 +136,19 @@ export async function DefaultListingDetail({
             ) : null}
 
             <p className="mt-10 text-sm text-zinc-500">
-              Anunciado por{" "}
+              {ui.dict.listing.listedBy}{" "}
               <span className="font-semibold text-zinc-900">{agency}</span>
             </p>
           </article>
 
           <aside className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6 lg:sticky lg:top-6">
             <h2 className="text-xl font-semibold tracking-tight text-zinc-950 sm:text-2xl">
-              {isSale ? "Me interesa comprar" : "Me interesa rentar"}
+              {isSale ? ui.dict.listing.inquireSale : ui.dict.listing.inquireRent}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-zinc-600">
               {isSale
-                ? "Pregunta precio, escrituración o visita."
-                : "Tu mensaje llega directo a la inmobiliaria."}
+                ? ui.dict.listing.inquireSaleCopy
+                : ui.dict.listing.inquireRentCopy}
             </p>
             {listing.contact_phone ? (
               <div className="mt-5">
@@ -150,26 +157,30 @@ export async function DefaultListingDetail({
                   title={listing.title}
                   listingUrl={listingUrl}
                   offerType={offerType}
+                  saleLabel={ui.dict.inquiry.whatsappSale}
+                  rentLabel={ui.dict.inquiry.whatsappRent}
+                  messageTemplate={ui.dict.inquiry.whatsappMessage}
                 />
               </div>
             ) : null}
             <div className={listing.contact_phone ? "mt-6" : "mt-5"}>
               {listing.contact_phone ? (
                 <p className="mb-3 text-center text-sm font-medium text-zinc-700">
-                  O déjanos tus datos y te contactamos
+                  {ui.dict.listing.orLeaveDetails}
                 </p>
               ) : null}
               <ListingInquiryForm
                 slug={listing.slug}
                 offerType={offerType}
                 styledLayout={false}
+                copy={ui.dict.inquiry}
               />
             </div>
           </aside>
         </div>
       </main>
 
-      <SiteFooter />
+      <SiteFooter lang={lang} />
     </div>
   );
 }

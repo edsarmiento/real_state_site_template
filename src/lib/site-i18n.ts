@@ -246,6 +246,12 @@ export type SiteDictionary = {
     title: string;
     description: string;
   };
+  admin: {
+    signIn: string;
+    manage: string;
+    catalogPrompt: string;
+    catalogPromptAction: string;
+  };
   seo: {
     catalogAll: string;
     catalogSale: string;
@@ -648,6 +654,12 @@ const dictionaries = {
       title: "¿Listo para ver tu próximo inmueble?",
       description: "Consultas de renta y venta con {name}. Elige el canal que prefieras.",
     },
+    admin: {
+      signIn: "Acceder",
+      manage: "Administrar",
+      catalogPrompt: "¿Administras anuncios?",
+      catalogPromptAction: "Accede al panel.",
+    },
     seo: {
       catalogAll: "Buscar inmuebles",
       catalogSale: "Inmuebles en venta",
@@ -906,6 +918,12 @@ const dictionaries = {
     finalCta: {
       title: "Ready to see your next property?",
       description: "Rental and sale inquiries with {name}. Choose the channel you prefer.",
+    },
+    admin: {
+      signIn: "Sign in",
+      manage: "Manage",
+      catalogPrompt: "Managing listings?",
+      catalogPromptAction: "Open the admin panel.",
     },
     seo: {
       catalogAll: "Search properties",

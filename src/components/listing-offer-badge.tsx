@@ -7,12 +7,16 @@ type Props = {
   offerType: ListingOfferType;
   className?: string;
   styledLayout?: boolean;
+  saleLabel?: string;
+  rentLabel?: string;
 };
 
 export function ListingOfferBadge({
   offerType,
   className = "",
   styledLayout,
+  saleLabel,
+  rentLabel,
 }: Props) {
   const contextStyled = useSiteLayoutStyled();
   const styled = styledLayout ?? contextStyled;
@@ -33,7 +37,9 @@ export function ListingOfferBadge({
         className,
       ].join(" ")}
     >
-      {OFFER_TYPE_LABEL[offerType]}
+      {offerType === "sale"
+        ? (saleLabel ?? OFFER_TYPE_LABEL.sale)
+        : (rentLabel ?? OFFER_TYPE_LABEL.rent)}
     </span>
   );
 }

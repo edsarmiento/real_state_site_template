@@ -123,6 +123,55 @@ export function listingPriceSuffix(offerType: ListingOfferType): string | null {
 
 export type ListingSpec = { label: string; value: string };
 
+import type { SiteDictionary } from "@/lib/site-i18n";
+
+export function listingPublicSpecsLocalized(
+  listing: {
+    property_type: string;
+    bedrooms: number | null;
+    bathrooms: number | null;
+    built_area: string | null;
+    land_area?: string | null;
+  },
+  dict: SiteDictionary,
+): ListingSpec[] {
+  const specs: ListingSpec[] = [];
+  const land = listing.property_type === "land";
+
+  if (!land && listing.bedrooms != null) {
+    specs.push({
+      label: dict.listing.specs.bedrooms,
+      value: String(listing.bedrooms),
+    });
+  }
+  if (!land && listing.bathrooms != null) {
+    specs.push({
+      label: dict.listing.specs.bathrooms,
+      value: String(listing.bathrooms),
+    });
+  }
+  if (listing.land_area) {
+    specs.push({
+      label: dict.listing.specs.land,
+      value: `${listing.land_area} m²`,
+    });
+  }
+  if (listing.built_area && !land) {
+    specs.push({
+      label: dict.listing.specs.built,
+      value: `${listing.built_area} m²`,
+    });
+  }
+  if (land && listing.built_area && !listing.land_area) {
+    specs.push({
+      label: dict.listing.specs.land,
+      value: `${listing.built_area} m²`,
+    });
+  }
+
+  return specs;
+}
+
 export function listingPublicSpecs(listing: {
   property_type: string;
   bedrooms: number | null;

@@ -1,3 +1,5 @@
+import type { SiteLocaleConfig } from "@/lib/site-i18n";
+
 export type SiteLayoutKey = "default" | "deo";
 
 export type SiteConfigBranding = {
@@ -6,6 +8,8 @@ export type SiteConfigBranding = {
   logo_url: string | null;
   primary_color: string | null;
   show_powered_by: boolean;
+  default_locale?: string;
+  supported_locales?: string[];
 };
 
 /** JSON from GET /api/public/site_config */
@@ -15,6 +19,10 @@ export type SiteConfigApiPayload = {
   public_url: string | null;
   status: string;
   branding: SiteConfigBranding;
+  locale?: {
+    default_locale: string;
+    supported_locales: string[];
+  };
   persisted: boolean;
 };
 
@@ -27,6 +35,7 @@ export type ResolvedSiteConfig = {
   primaryColor: string | null;
   showPoweredBy: boolean;
   siteOrigin: string;
+  locale: SiteLocaleConfig;
   /** Whether values came from the API or env fallbacks only. */
   source: "api" | "env";
 };

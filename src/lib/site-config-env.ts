@@ -1,4 +1,5 @@
 import type { ResolvedSiteConfig } from "@/lib/site-config-types";
+import { parseSiteLocaleConfig } from "@/lib/site-i18n";
 
 const DEFAULT_SITE_NAME = "Inmobiliaria";
 const DEFAULT_SITE_TAGLINE =
@@ -51,6 +52,10 @@ export function envSiteConfig(): ResolvedSiteConfig {
     primaryColor: primaryFromEnv,
     showPoweredBy: process.env.NEXT_PUBLIC_SHOW_POWERED_BY !== "false",
     siteOrigin: envSiteOrigin(),
+    locale: parseSiteLocaleConfig(
+      process.env.SITE_DEFAULT_LOCALE,
+      process.env.SITE_SUPPORTED_LOCALES ?? "es",
+    ),
     source: "env",
   };
 }

@@ -7,21 +7,52 @@ import {
   parseOfferType,
   type PublicListingCard,
 } from "@/lib/listing-types";
-import { propertyTypeLabel } from "@/lib/property-labels";
+import {
+  localizedHref,
+  type SiteDictionary,
+  type SiteLocale,
+} from "@/lib/site-i18n";
 import type { PropertyType } from "@/lib/property-types";
 
 type Props = {
   listing: PublicListingCard;
   styledLayout?: boolean;
+  dict?: SiteDictionary;
+  locale?: SiteLocale;
+  defaultLocale?: SiteLocale;
 };
 
-export function PublicListingCard({ listing, styledLayout = true }: Props) {
+function propertyLabel(
+  dict: SiteDictionary | undefined,
+  type: string,
+): string {
+  if (dict && type in dict.propertyTypes) {
+    return dict.propertyTypes[type as PropertyType];
+  }
+  return type;
+}
+
+export function PublicListingCard({
+  listing,
+  styledLayout = true,
+  dict,
+  locale,
+  defaultLocale,
+}: Props) {
   const offerType = parseOfferType(listing.offer_type);
-  const suffix = listingPriceSuffix(offerType);
-  const typeLabel =
-    propertyTypeLabel[listing.property_type as PropertyType] ??
-    listing.property_type;
+  const suffix =
+    offerType === "rent" ? (dict?.listing.perMonth ?? listingPriceSuffix(offerType)) : null;
+  const typeLabel = propertyLabel(dict, listing.property_type);
   const specLine = listingCardSpecLine(listing);
+  const href =
+    locale && defaultLocale
+      ? localizedHref(
+          `/inmueble/${listing.slug}`,
+          locale,
+          null,
+          defaultLocale,
+        )
+      : `/inmueble/${listing.slug}`;
 
   const cardRing = styledLayout
     ? "ring-blue-950/10 hover:ring-blue-600/25"
@@ -33,7 +64,7 @@ export function PublicListingCard({ listing, styledLayout = true }: Props) {
 
   return (
     <Link
-      href={`/inmueble/${listing.slug}`}
+      href={href}
       className={`group flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 transition hover:-translate-y-0.5 hover:shadow-lg ${cardRing}`}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
@@ -46,13 +77,15 @@ export function PublicListingCard({ listing, styledLayout = true }: Props) {
           />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-zinc-400">
-            Sin foto
+            {dict?.listing.noPhoto ?? "Sin foto"}
           </div>
         )}
         <ListingOfferBadge
           offerType={offerType}
           styledLayout={styledLayout}
           className="absolute left-3 top-3"
+          saleLabel={dict?.listing.sale}
+          rentLabel={dict?.listing.rent}
         />
       </div>
 
