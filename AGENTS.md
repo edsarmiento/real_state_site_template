@@ -215,13 +215,14 @@ Regla en código: `themeNameFromLayoutKey()` — `deo` y `luxury` → tema `luxu
 
 ### i18n (todos los themes públicos)
 
-Ops controla tres cosas **independientes**:
+Ops controla dos cosas en la UI (el API deriva `supported_locales`):
 
 | Campo Ops | Efecto |
 |-----------|--------|
-| `supported_locales` | Idiomas que el sitio puede servir (ES, EN o ambos) |
-| `default_locale` | Idioma por defecto (`html lang`, sin `?lang=`) |
-| `show_locale_switcher` | Si se muestra el botón ES \| EN en header (Luxury incluido) |
+| `show_locale_switcher` | Si el visitante ve el selector ES \| EN |
+| `default_locale` | Idioma por defecto; si el selector está apagado, es el **único** idioma del sitio |
+
+Con selector activo → `supported_locales` = `["es","en"]`. Sin selector → `supported_locales` = `[default_locale]`.
 
 Reglas en template:
 
