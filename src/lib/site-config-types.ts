@@ -10,6 +10,7 @@ export type SiteConfigBranding = {
   show_powered_by: boolean;
   default_locale?: string;
   supported_locales?: string[];
+  show_locale_switcher?: boolean;
 };
 
 /** JSON from GET /api/public/site_config */
@@ -22,6 +23,7 @@ export type SiteConfigApiPayload = {
   locale?: {
     default_locale: string;
     supported_locales: string[];
+    show_locale_switcher?: boolean;
   };
   persisted: boolean;
 };

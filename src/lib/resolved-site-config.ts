@@ -22,18 +22,23 @@ function localeFromApi(
   api: SiteConfigApiPayload,
   env: ResolvedSiteConfig,
 ): SiteLocaleConfig {
+  const branding = api.branding ?? ({} as SiteConfigApiPayload["branding"]);
+  const showSwitcher =
+    api.locale?.show_locale_switcher ?? branding.show_locale_switcher;
+
   if (api.locale?.supported_locales?.length) {
     return parseSiteLocaleConfig(
       api.locale.default_locale,
       api.locale.supported_locales.join(","),
+      showSwitcher,
     );
   }
 
-  const branding = api.branding ?? {};
   if (branding.supported_locales?.length) {
     return parseSiteLocaleConfig(
       branding.default_locale,
       branding.supported_locales.join(","),
+      showSwitcher,
     );
   }
 

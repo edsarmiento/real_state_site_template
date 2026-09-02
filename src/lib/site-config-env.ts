@@ -55,6 +55,7 @@ export function envSiteConfig(): ResolvedSiteConfig {
     locale: parseSiteLocaleConfig(
       process.env.SITE_DEFAULT_LOCALE,
       process.env.SITE_SUPPORTED_LOCALES ?? "es",
+      process.env.SITE_SHOW_LOCALE_SWITCHER,
     ),
     source: "env",
   };

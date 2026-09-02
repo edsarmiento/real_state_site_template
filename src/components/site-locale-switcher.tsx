@@ -7,6 +7,7 @@ type Props = {
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   supportedLocales: SiteLocale[];
+  showLocaleSwitcher: boolean;
   dict: SiteDictionary;
   className?: string;
 };
@@ -15,6 +16,7 @@ export function SiteLocaleSwitcher({
   locale,
   defaultLocale,
   supportedLocales,
+  showLocaleSwitcher,
   dict,
   className = "",
 }: Props) {
@@ -23,6 +25,7 @@ export function SiteLocaleSwitcher({
       locale={locale}
       defaultLocale={defaultLocale}
       supportedLocales={supportedLocales}
+      showLocaleSwitcher={showLocaleSwitcher}
       label={dict.localeSwitcher.label}
       optionLabel={(option) => dict.localeSwitcher[option]}
       optionAriaLabel={(option) => dict.localeSwitcher[`${option}Name`]}

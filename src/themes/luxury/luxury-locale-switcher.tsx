@@ -7,6 +7,7 @@ type Props = {
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   supportedLocales: SiteLocale[];
+  showLocaleSwitcher: boolean;
   label: string;
   optionNames: Record<SiteLocale, string>;
 };
@@ -15,6 +16,7 @@ export function LuxuryLocaleSwitcher({
   locale,
   defaultLocale,
   supportedLocales,
+  showLocaleSwitcher,
   label,
   optionNames,
 }: Props) {
@@ -23,6 +25,7 @@ export function LuxuryLocaleSwitcher({
       locale={locale}
       defaultLocale={defaultLocale}
       supportedLocales={supportedLocales}
+      showLocaleSwitcher={showLocaleSwitcher}
       label={label}
       optionLabel={(option) => option.toUpperCase()}
       optionAriaLabel={(option) => optionNames[option]}

@@ -41,6 +41,7 @@ export async function SiteHeader({ lang }: Props) {
               locale={ui.locale}
               defaultLocale={ui.defaultLocale}
               supportedLocales={ui.localeConfig.supportedLocales}
+              showLocaleSwitcher={ui.localeConfig.showLocaleSwitcher}
               dict={ui.dict}
             />
           </Suspense>

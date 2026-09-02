@@ -7,6 +7,7 @@ export type LocaleSwitcherBaseProps = {
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   supportedLocales: SiteLocale[];
+  showLocaleSwitcher: boolean;
   label: string;
   optionLabel: (locale: SiteLocale) => string;
   optionAriaLabel: (locale: SiteLocale) => string;
@@ -18,6 +19,7 @@ export function LocaleSwitcherBase({
   locale,
   defaultLocale,
   supportedLocales,
+  showLocaleSwitcher,
   label,
   optionLabel,
   optionAriaLabel,
@@ -28,7 +30,7 @@ export function LocaleSwitcherBase({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  if (supportedLocales.length < 2) return null;
+  if (!showLocaleSwitcher || supportedLocales.length < 2) return null;
 
   function select(next: SiteLocale) {
     if (next === locale) return;

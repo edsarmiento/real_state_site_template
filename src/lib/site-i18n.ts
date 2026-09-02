@@ -4,6 +4,7 @@ export type SiteLocale = (typeof SITE_LOCALES)[number];
 export type SiteLocaleConfig = {
   defaultLocale: SiteLocale;
   supportedLocales: SiteLocale[];
+  showLocaleSwitcher: boolean;
 };
 
 export type SiteDictionary = {
@@ -263,10 +264,17 @@ export function isSiteLocale(value: string): value is SiteLocale {
   return value === "es" || value === "en";
 }
 
+export function parseShowLocaleSwitcher(raw: unknown): boolean {
+  if (raw === true || raw === "true" || raw === "1") return true;
+  return false;
+}
+
 export function parseSiteLocaleConfig(
   defaultRaw: string | undefined,
   supportedRaw: string | undefined,
+  showSwitcherRaw?: unknown,
 ): SiteLocaleConfig {
+  const showLocaleSwitcher = parseShowLocaleSwitcher(showSwitcherRaw);
   const parsed = (supportedRaw ?? "es,en")
     .split(",")
     .map((part) => part.trim().toLowerCase())
@@ -283,18 +291,20 @@ export function parseSiteLocaleConfig(
     return {
       defaultLocale: supportedLocales.includes("es") ? "es" : supportedLocales[0],
       supportedLocales,
+      showLocaleSwitcher,
     };
   }
   if (
     isSiteLocale(normalizedDefault) &&
     supportedLocales.includes(normalizedDefault)
   ) {
-    return { defaultLocale: normalizedDefault, supportedLocales };
+    return { defaultLocale: normalizedDefault, supportedLocales, showLocaleSwitcher };
   }
   console.warn("[site-content] Unknown SITE_DEFAULT_LOCALE; using es.");
   return {
     defaultLocale: supportedLocales.includes("es") ? "es" : supportedLocales[0],
     supportedLocales,
+    showLocaleSwitcher,
   };
 }
 

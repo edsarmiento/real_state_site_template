@@ -28,6 +28,7 @@ export async function LuxuryHeader({ lang }: Props) {
     locale,
     defaultLocale,
     supportedLocales: content.locale.supportedLocales,
+    showLocaleSwitcher: content.locale.showLocaleSwitcher,
     label: dict.localeSwitcher.label,
     optionNames: {
       es: dict.localeSwitcher.esName,
