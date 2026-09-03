@@ -1,4 +1,4 @@
-import { DEFAULT_PROPERTY_COUNTRY } from "@/lib/property-types";
+import { DEFAULT_PROPERTY_COUNTRY, isLandPropertyType } from "@/lib/property-types";
 
 export const BATHROOMS_FIELD_HINT =
   "Texto libre (ej. 1, 1/2, 1 1/2).";
@@ -59,13 +59,18 @@ export function buildPropertyCreatePayload(
   };
 
   const bed = optionalInt(fields.bedrooms);
-  if (bed !== undefined) payload.bedrooms = bed;
   const bath = optionalBathroomLabel(fields.bathrooms);
-  if (bath !== undefined) payload.bathrooms = bath;
   const built = optionalFloat(fields.builtArea);
-  if (built !== undefined) payload.built_area = built;
   const land = optionalFloat(fields.landArea);
-  if (land !== undefined) payload.land_area = land;
+
+  if (isLandPropertyType(fields.propertyType)) {
+    if (land !== undefined) payload.land_area = land;
+  } else {
+    if (bed !== undefined) payload.bedrooms = bed;
+    if (bath !== undefined) payload.bathrooms = bath;
+    if (built !== undefined) payload.built_area = built;
+    if (land !== undefined) payload.land_area = land;
+  }
 
   return payload;
 }

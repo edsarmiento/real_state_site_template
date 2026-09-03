@@ -10,6 +10,10 @@ export const PROPERTY_TYPES = [
 
 export type PropertyType = (typeof PROPERTY_TYPES)[number];
 
+export function isLandPropertyType(type: string): boolean {
+  return type === "land";
+}
+
 export const PROPERTY_STATUSES = ["draft", "active", "archived"] as const;
 export type PropertyStatus = (typeof PROPERTY_STATUSES)[number];
 

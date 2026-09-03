@@ -7,6 +7,7 @@ import {
   MEASUREMENT_SYSTEMS,
   PROPERTY_STATUSES,
   PROPERTY_TYPES,
+  isLandPropertyType,
   type Property,
 } from "@/lib/property-types";
 import {
@@ -119,25 +120,33 @@ function toPayload(f: FormState): Record<string, string | number | null> {
     longitude: lng === undefined ? null : lng,
   };
 
-  for (const [key, raw] of [
-    ["built_area", f.built_area],
-    ["land_area", f.land_area],
-  ] as const) {
-    const v = optionalFloat(raw);
-    if (v !== undefined) p[key] = v;
-  }
+  const built = optionalFloat(f.built_area);
+  const landArea = optionalFloat(f.land_area);
 
-  for (const [key, raw] of [
-    ["bedrooms", f.bedrooms],
-    ["parking_spaces", f.parking_spaces],
-    ["floors", f.floors],
-    ["year_built", f.year_built],
-  ] as const) {
-    const v = optionalInt(raw);
-    if (v !== undefined) p[key] = v;
-  }
+  if (isLandPropertyType(f.property_type)) {
+    p.land_area = landArea === undefined ? null : landArea;
+    p.built_area = null;
+    p.bedrooms = null;
+    p.bathrooms = null;
+    p.parking_spaces = null;
+    p.floors = null;
+    p.year_built = null;
+  } else {
+    if (built !== undefined) p.built_area = built;
+    if (landArea !== undefined) p.land_area = landArea;
 
-  p.bathrooms = normalizeBathroomLabel(f.bathrooms);
+    for (const [key, raw] of [
+      ["bedrooms", f.bedrooms],
+      ["parking_spaces", f.parking_spaces],
+      ["floors", f.floors],
+      ["year_built", f.year_built],
+    ] as const) {
+      const v = optionalInt(raw);
+      if (v !== undefined) p[key] = v;
+    }
+
+    p.bathrooms = normalizeBathroomLabel(f.bathrooms);
+  }
 
   return p;
 }
@@ -160,6 +169,24 @@ export function PropertyForm(props: Props) {
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function setPropertyType(value: string) {
+    setForm((prev) => {
+      if (!isLandPropertyType(value)) {
+        return { ...prev, property_type: value };
+      }
+      return {
+        ...prev,
+        property_type: value,
+        built_area: "",
+        bedrooms: "",
+        bathrooms: "",
+        parking_spaces: "",
+        floors: "",
+        year_built: "",
+      };
+    });
   }
 
   async function onSubmit(e: FormEvent) {
@@ -242,7 +269,7 @@ export function PropertyForm(props: Props) {
             id="property_type"
             label="Tipo"
             value={form.property_type}
-            onChange={(e) => set("property_type", e.target.value)}
+            onChange={(e) => setPropertyType(e.target.value)}
           >
             {PROPERTY_TYPES.map((t) => (
               <option key={t} value={t}>
@@ -332,40 +359,8 @@ export function PropertyForm(props: Props) {
         </div>
       </Section>
 
-      <Section legend="Características">
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          <TextField
-            id="bedrooms"
-            label="Recámaras"
-            inputMode="numeric"
-            value={form.bedrooms}
-            onChange={(e) =>
-              set("bedrooms", e.target.value.replace(/\D/g, "").slice(0, 3))
-            }
-          />
-          <TextField
-            id="bathrooms"
-            label="Baños"
-            hint={BATHROOMS_FIELD_HINT}
-            value={form.bathrooms}
-            onChange={(e) => set("bathrooms", e.target.value)}
-          />
-          <TextField
-            id="parking_spaces"
-            label="Estacionamientos"
-            inputMode="numeric"
-            value={form.parking_spaces}
-            onChange={(e) =>
-              set("parking_spaces", e.target.value.replace(/\D/g, "").slice(0, 3))
-            }
-          />
-          <TextField
-            id="built_area"
-            label="Superficie construida"
-            inputMode="decimal"
-            value={form.built_area}
-            onChange={(e) => set("built_area", e.target.value)}
-          />
+      <Section legend={isLandPropertyType(form.property_type) ? "Superficie del terreno" : "Características"}>
+        {isLandPropertyType(form.property_type) ? (
           <TextField
             id="land_area"
             label="Terreno"
@@ -373,25 +368,67 @@ export function PropertyForm(props: Props) {
             value={form.land_area}
             onChange={(e) => set("land_area", e.target.value)}
           />
-          <TextField
-            id="floors"
-            label="Plantas"
-            inputMode="numeric"
-            value={form.floors}
-            onChange={(e) =>
-              set("floors", e.target.value.replace(/\D/g, "").slice(0, 3))
-            }
-          />
-          <TextField
-            id="year_built"
-            label="Año de construcción"
-            inputMode="numeric"
-            value={form.year_built}
-            onChange={(e) =>
-              set("year_built", e.target.value.replace(/\D/g, "").slice(0, 4))
-            }
-          />
-        </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            <TextField
+              id="bedrooms"
+              label="Recámaras"
+              inputMode="numeric"
+              value={form.bedrooms}
+              onChange={(e) =>
+                set("bedrooms", e.target.value.replace(/\D/g, "").slice(0, 3))
+              }
+            />
+            <TextField
+              id="bathrooms"
+              label="Baños"
+              hint={BATHROOMS_FIELD_HINT}
+              value={form.bathrooms}
+              onChange={(e) => set("bathrooms", e.target.value)}
+            />
+            <TextField
+              id="parking_spaces"
+              label="Estacionamientos"
+              inputMode="numeric"
+              value={form.parking_spaces}
+              onChange={(e) =>
+                set("parking_spaces", e.target.value.replace(/\D/g, "").slice(0, 3))
+              }
+            />
+            <TextField
+              id="built_area"
+              label="Superficie construida"
+              inputMode="decimal"
+              value={form.built_area}
+              onChange={(e) => set("built_area", e.target.value)}
+            />
+            <TextField
+              id="land_area"
+              label="Terreno"
+              inputMode="decimal"
+              value={form.land_area}
+              onChange={(e) => set("land_area", e.target.value)}
+            />
+            <TextField
+              id="floors"
+              label="Plantas"
+              inputMode="numeric"
+              value={form.floors}
+              onChange={(e) =>
+                set("floors", e.target.value.replace(/\D/g, "").slice(0, 3))
+              }
+            />
+            <TextField
+              id="year_built"
+              label="Año de construcción"
+              inputMode="numeric"
+              value={form.year_built}
+              onChange={(e) =>
+                set("year_built", e.target.value.replace(/\D/g, "").slice(0, 4))
+              }
+            />
+          </div>
+        )}
       </Section>
 
       <div className="flex flex-wrap gap-3">

@@ -10,7 +10,7 @@ import {
   TextField,
   ValidationErrorList,
 } from "@/components/ui";
-import { PROPERTY_TYPES, type Property } from "@/lib/property-types";
+import { PROPERTY_TYPES, isLandPropertyType, type Property } from "@/lib/property-types";
 import { propertyTypeLabel } from "@/lib/property-labels";
 import {
   buildPropertyCreatePayload,
@@ -57,6 +57,21 @@ export function ListingSetupForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  function setPropertyType(value: string) {
+    setForm((prev) => {
+      if (!isLandPropertyType(value)) {
+        return { ...prev, propertyType: value };
+      }
+      return {
+        ...prev,
+        propertyType: value,
+        bedrooms: "",
+        bathrooms: "",
+        builtArea: "",
+      };
+    });
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -72,8 +87,9 @@ export function ListingSetupForm() {
       return;
     }
 
-    const bed = optionalInt(form.bedrooms);
-    const bath = optionalBathroomLabel(form.bathrooms);
+    const isLand = isLandPropertyType(form.propertyType);
+    const bed = isLand ? undefined : optionalInt(form.bedrooms);
+    const bath = isLand ? undefined : optionalBathroomLabel(form.bathrooms);
 
     setPending(true);
     try {
@@ -109,7 +125,7 @@ export function ListingSetupForm() {
       };
       if (bed !== undefined) unitBody.bedrooms = bed;
       if (bath !== undefined) unitBody.bathrooms = bath;
-      const builtFloat = optionalFloat(form.builtArea);
+      const builtFloat = isLand ? undefined : optionalFloat(form.builtArea);
       if (builtFloat !== undefined) unitBody.built_area = builtFloat;
 
       const unitRes = await fetch(`/api/v1/properties/${property.id}/units`, {
@@ -158,7 +174,7 @@ export function ListingSetupForm() {
           id="propertyType"
           label="Tipo"
           value={form.propertyType}
-          onChange={(e) => set("propertyType", e.target.value)}
+          onChange={(e) => setPropertyType(e.target.value)}
         >
           {PROPERTY_TYPES.map((t) => (
             <option key={t} value={t}>
@@ -186,30 +202,7 @@ export function ListingSetupForm() {
           value={form.stateOrRegion}
           onChange={(e) => set("stateOrRegion", e.target.value)}
         />
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          <TextField
-            id="bedrooms"
-            label="Recámaras"
-            inputMode="numeric"
-            value={form.bedrooms}
-            onChange={(e) =>
-              set("bedrooms", e.target.value.replace(/\D/g, "").slice(0, 3))
-            }
-          />
-          <TextField
-            id="bathrooms"
-            label="Baños"
-            hint={BATHROOMS_FIELD_HINT}
-            value={form.bathrooms}
-            onChange={(e) => set("bathrooms", e.target.value)}
-          />
-          <TextField
-            id="builtArea"
-            label="Construcción (m²)"
-            inputMode="decimal"
-            value={form.builtArea}
-            onChange={(e) => set("builtArea", e.target.value)}
-          />
+        {isLandPropertyType(form.propertyType) ? (
           <TextField
             id="landArea"
             label="Terreno (m²)"
@@ -217,7 +210,40 @@ export function ListingSetupForm() {
             value={form.landArea}
             onChange={(e) => set("landArea", e.target.value)}
           />
-        </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            <TextField
+              id="bedrooms"
+              label="Recámaras"
+              inputMode="numeric"
+              value={form.bedrooms}
+              onChange={(e) =>
+                set("bedrooms", e.target.value.replace(/\D/g, "").slice(0, 3))
+              }
+            />
+            <TextField
+              id="bathrooms"
+              label="Baños"
+              hint={BATHROOMS_FIELD_HINT}
+              value={form.bathrooms}
+              onChange={(e) => set("bathrooms", e.target.value)}
+            />
+            <TextField
+              id="builtArea"
+              label="Construcción (m²)"
+              inputMode="decimal"
+              value={form.builtArea}
+              onChange={(e) => set("builtArea", e.target.value)}
+            />
+            <TextField
+              id="landArea"
+              label="Terreno (m²)"
+              inputMode="decimal"
+              value={form.landArea}
+              onChange={(e) => set("landArea", e.target.value)}
+            />
+          </div>
+        )}
       </Section>
 
       <Section legend="Unidad">
