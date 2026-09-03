@@ -12,11 +12,11 @@ const SHARED_DEFAULT_ABOUT_KICKER = "La inmobiliaria";
 const SHARED_DEFAULT_ABOUT_TITLE = "Acompañamiento cercano en cada decisión";
 const SHARED_DEFAULT_ABOUT_DESCRIPTION =
   "Publicamos inmuebles en renta y venta con información clara para que puedas comparar, preguntar y agendar una visita con la inmobiliaria.";
-const SHARED_DEFAULT_ABOUT_BENEFITS = [
+const SHARED_DEFAULT_ABOUT_BENEFITS: readonly string[] = [
   "Catálogo publicado y actualizado por la inmobiliaria",
   "Precio, ubicación y características visibles desde el anuncio",
   "Contacto directo por WhatsApp o formulario del inmueble",
-] as const;
+];
 const SHARED_DEFAULT_ABOUT_CTA = "Ver propiedades";
 
 export type BeigeCopy = {
@@ -49,92 +49,98 @@ export type BeigeCopy = {
   contactSubmit: string;
   generalInquiryPrefix: string;
   contactNeedsListing: string;
+  phoneLabel: string;
+  emailLabel: string;
 };
 
 const ES: BeigeCopy = {
   contactCta: "Contáctanos",
   officeLabel: "Oficina",
   whatsappPrefix: "WhatsApp",
-  openWhatsApp: "Abrir WhatsApp directo",
+  openWhatsApp: "Contactar por WhatsApp",
   callNow: "Llamar ahora",
-  contactKicker: "Inicia hoy mismo",
-  heroEyebrow: "Propiedades para cada etapa",
-  heroTitle: "Encuentra el espacio que estás buscando",
+  contactKicker: "Hablemos",
+  heroEyebrow: "Propiedades para comprar o rentar",
+  heroTitle: "Encuentra el espacio para tu próxima etapa",
   heroTitleAccent: "el espacio",
   heroSubtitle:
-    "Explora propiedades disponibles para comprar o rentar y encuentra una opción que se adapte a tus necesidades.",
+    "Explora propiedades disponibles y filtra por ubicación, tipo de inmueble y características para encontrar opciones que se adapten a tus necesidades.",
   catalogEyebrow: "Propiedades disponibles",
   catalogTitle: "Encuentra tu próxima propiedad",
   catalogDescription:
-    "Consulta opciones disponibles y filtra por operación, ubicación, tipo de inmueble y número de recámaras.",
-  locationsEyebrow: "Destinos",
+    "Compara opciones de compra y renta con la información más importante en un solo lugar.",
+  locationsEyebrow: "Ubicaciones",
   locationsTitle: "Explora propiedades por ubicación",
   locationsDescription:
-    "Descubre las ciudades donde tenemos propiedades disponibles y encuentra opciones que se adapten a tu estilo de vida.",
+    "Selecciona una ciudad para consultar las propiedades disponibles en esa ubicación.",
   locationsCta: "Ver propiedades",
   processTitle: "Te acompañamos en cada paso",
   processSubtitle:
-    "Desde la búsqueda hasta el cierre, recibe orientación durante todo el proceso inmobiliario.",
-  aboutKicker: "Nuestra mirada",
-  aboutTitle: "Encontrar el espacio correcto pide criterio",
+    "Un proceso claro para conocer opciones, resolver dudas y coordinar una visita.",
+  aboutKicker: "Atención inmobiliaria",
+  aboutTitle: "Encuentra una propiedad que se adapte a ti",
   aboutDescription:
-    "Combinamos un catálogo claro con atención cercana. Comparas opciones reales de compra o renta, con los datos a la vista y un equipo listo para resolver dudas y coordinar visitas.",
+    "Consulta opciones para comprar o rentar, compara la información esencial y recibe atención para resolver dudas y coordinar visitas.",
   aboutBenefits: [
-    "Propiedades presentadas con claridad, no con promesas vacías",
-    "Precio, ubicación y características visibles desde el primer vistazo",
-    "Te acompañamos de la consulta a la visita, por WhatsApp o formulario",
+    "Información clara sobre precio, ubicación y características",
+    "Opciones de compra y renta organizadas para comparar mejor",
+    "Atención por WhatsApp o formulario para resolver tus dudas",
   ],
   aboutCta: "Explorar propiedades",
-  contactTitle: "¡Contáctanos hoy mismo!",
+  contactTitle: "¿Encontraste una propiedad que te interesa?",
   contactSubtitle:
-    "Estamos aquí para ayudarte a encontrar la propiedad ideal con atención personalizada y profesional.",
+    "Escríbenos para recibir más información, resolver dudas o coordinar una visita.",
   contactSubmit: "Enviar solicitud",
   generalInquiryPrefix: "Consulta general del sitio",
   contactNeedsListing:
     "No hay anuncios publicados para enviar el formulario. Escríbenos por WhatsApp o llama a la oficina.",
+  phoneLabel: "Teléfono",
+  emailLabel: "Correo electrónico",
 };
 
 const EN: BeigeCopy = {
   contactCta: "Contact us",
   officeLabel: "Office",
   whatsappPrefix: "WhatsApp",
-  openWhatsApp: "Open WhatsApp directly",
+  openWhatsApp: "Contact us on WhatsApp",
   callNow: "Call now",
-  contactKicker: "Start today",
-  heroEyebrow: "Homes for every stage",
-  heroTitle: "Find the space you are looking for",
+  contactKicker: "Let\u2019s talk",
+  heroEyebrow: "Properties to buy or rent",
+  heroTitle: "Find the space for your next chapter",
   heroTitleAccent: "the space",
   heroSubtitle:
-    "Browse homes for sale or rent and find an option that fits what you need.",
+    "Explore available properties and filter by location, property type, and features to find options that fit your needs.",
   catalogEyebrow: "Available properties",
   catalogTitle: "Find your next property",
   catalogDescription:
-    "Browse published listings and filter by sale or rent, city, property type, and bedrooms.",
-  locationsEyebrow: "Destinations",
+    "Compare properties for sale and rent with the essential information in one place.",
+  locationsEyebrow: "Locations",
   locationsTitle: "Explore properties by location",
   locationsDescription:
-    "See the cities where listings are available and find options that fit how you live.",
+    "Select a city to view the properties currently available there.",
   locationsCta: "View properties",
-  processTitle: "We walk with you at every step",
+  processTitle: "We guide you through each step",
   processSubtitle:
-    "From search through closing, get guidance throughout the real-estate process.",
-  aboutKicker: "Our approach",
-  aboutTitle: "Finding the right space takes judgment",
+    "A clear process to explore options, ask questions, and schedule a visit.",
+  aboutKicker: "Real estate support",
+  aboutTitle: "Find a property that fits your needs",
   aboutDescription:
-    "We combine a clear catalog with close attention. Compare real options to buy or rent, with the facts in view and a team ready to answer questions and arrange visits.",
+    "Browse properties for sale or rent, compare essential details, and contact the team to ask questions or schedule a visit.",
   aboutBenefits: [
-    "Listings presented with clarity, not empty promises",
-    "Price, location, and features visible from the first look",
-    "We stay with you from the first question to the visit, on WhatsApp or the form",
+    "Clear information about price, location, and features",
+    "Sale and rental options organized for easier comparison",
+    "Support through WhatsApp or the contact form",
   ],
   aboutCta: "Explore properties",
-  contactTitle: "Get in touch today",
+  contactTitle: "Interested in a property?",
   contactSubtitle:
-    "We are here to help you find the right property with personal, professional attention.",
+    "Contact us for more information, to ask questions, or to schedule a visit.",
   contactSubmit: "Send request",
   generalInquiryPrefix: "General site inquiry",
   contactNeedsListing:
     "There are no published listings to send this form. Message us on WhatsApp or call the office.",
+  phoneLabel: "Phone",
+  emailLabel: "Email",
 };
 
 function customOrDefault(

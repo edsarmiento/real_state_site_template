@@ -51,7 +51,8 @@ export function BeigeLocations({
     .map((location) => {
       const city = location.filter.city?.trim();
       if (!city) return null;
-      const href = localizedHref("/", locale, { city }, defaultLocale);
+      const href =
+        localizedHref("/", locale, { city }, defaultLocale) + "#residencial";
       const listingPhoto =
         listings.find(
           (listing) =>
@@ -321,7 +322,10 @@ export function BeigeContact({
   const { contact } = content;
   const copy = getBeigeCopy(locale);
   const headings = resolveBeigeContactCopy(content, locale);
-  const whatsapp = content.whatsapp.href ?? contact.whatsappHref;
+  const whatsappHref = content.whatsapp.href ?? contact.whatsappHref;
+  const phoneHref = contact.phoneHref;
+  const showWhatsApp = Boolean(whatsappHref);
+  const showCall = Boolean(phoneHref && contact.phone);
 
   return (
     <section id="contacto" className="bg-[#2D2A26] py-24 text-[#FBF9F5]">
@@ -337,25 +341,23 @@ export function BeigeContact({
             <p className="mx-auto mt-4 max-w-xl font-light text-[#E5D9C5]">
               {headings.subtitle}
             </p>
-            {whatsapp || (contact.phoneHref && contact.phone) ? (
-              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                {whatsapp ? (
+            {showWhatsApp || showCall ? (
+              <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+                {showWhatsApp && whatsappHref ? (
                   <a
-                    href={whatsapp}
-                    className="beige-btn inline-flex min-w-[16rem] items-center justify-center gap-2 rounded-full bg-[#A4B494] px-8 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-[#2D2A26]"
+                    href={whatsappHref}
+                    className="beige-contact-cta beige-contact-cta--primary"
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label={`${copy.openWhatsApp}. ${dict.a11y.opensInNewTab}`}
                   >
-                    <BeigeIconWhatsApp className="h-4 w-4" />
+                    <BeigeIconWhatsApp className="h-5 w-5 shrink-0" />
                     {copy.openWhatsApp}
                   </a>
                 ) : null}
-                {contact.phoneHref && contact.phone ? (
-                  <a
-                    href={contact.phoneHref}
-                    className="beige-btn inline-flex min-w-[16rem] items-center justify-center gap-2 rounded-full border border-white/80 bg-transparent px-8 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-white"
-                  >
-                    <BeigeIconPhone className="h-4 w-4" />
+                {showCall && phoneHref ? (
+                  <a href={phoneHref} className="beige-contact-cta beige-contact-cta--outline">
+                    <BeigeIconPhone className="h-5 w-5 shrink-0" />
                     {copy.callNow}
                   </a>
                 ) : null}

@@ -32,12 +32,8 @@ export function beigeNavLinks(
 ): { href: string; label: string }[] {
   return [
     {
-      href: localizedHref("/#inventario", locale, null, defaultLocale),
-      label: dict.nav.inventory,
-    },
-    {
       href: localizedHref("/#residencial", locale, null, defaultLocale),
-      label: dict.nav.residential,
+      label: locale === "en" ? "Properties" : "Propiedades",
     },
     {
       href: localizedHref("/#ubicaciones", locale, null, defaultLocale),

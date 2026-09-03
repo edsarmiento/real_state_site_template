@@ -36,16 +36,16 @@ export function BeigeSocialLinks({ social, dict, heading }: Props) {
   return (
     <div>
       {heading ? (
-        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#FBF9F5]">
+        <p className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#FBF9F5]">
           {heading}
         </p>
       ) : null}
-      <ul className="flex gap-3" aria-label={dict.a11y.socialNav}>
+      <ul className="flex gap-4" aria-label={dict.a11y.socialNav}>
         {items.map((item) => (
           <li key={item.key}>
             <a
               href={item.href}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#E5D9C5]/30 text-[#FBF9F5] transition-colors hover:border-[#C4D3A2] hover:text-[#C4D3A2]"
+              className="beige-social-icon inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#A4B494]/40 text-[#E5D9C5] transition-all duration-300 hover:border-[#A4B494] hover:bg-[#A4B494] hover:text-[#2D2A26] hover:shadow-lg hover:shadow-[#A4B494]/20 focus-visible:border-[#A4B494] focus-visible:bg-[#A4B494] focus-visible:text-[#2D2A26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A4B494] focus-visible:ring-offset-2 focus-visible:ring-offset-[#2D2A26]"
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${item.label}. ${dict.a11y.opensInNewTab}`}
