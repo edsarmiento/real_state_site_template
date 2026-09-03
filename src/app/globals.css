@@ -4019,6 +4019,10 @@ body {
   transform: none;
 }
 
+html[data-site-layout="beige"] {
+  scroll-behavior: smooth;
+}
+
 [data-site-theme="beige"] {
   --beige-ivory: #fbf9f5;
   --beige-surface: #f4efe6;
@@ -4031,6 +4035,7 @@ body {
   --beige-olive-light: #c4d3a2;
   --beige-white: #ffffff;
   --beige-whatsapp: #25d366;
+  --beige-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --font-beige-heading: var(--font-beige-playfair), Georgia, serif;
   --font-beige-body: var(--font-beige-jakarta), system-ui, sans-serif;
   background: var(--beige-ivory);
@@ -4085,6 +4090,7 @@ body {
 
 [data-site-theme="beige"] .beige-nav-link {
   position: relative;
+  transition: color 0.3s var(--beige-ease);
 }
 
 [data-site-theme="beige"] .beige-nav-link::after {
@@ -4095,7 +4101,7 @@ body {
   width: 0;
   height: 2px;
   background: var(--beige-olive);
-  transition: width 0.3s ease;
+  transition: width 0.35s var(--beige-ease);
 }
 
 [data-site-theme="beige"] .beige-nav-link:hover::after,
@@ -4131,12 +4137,87 @@ body {
 }
 
 [data-site-theme="beige"] .beige-img-zoom {
-  transition: transform 0.7s ease;
+  transition: transform 0.7s var(--beige-ease);
 }
 
 [data-site-theme="beige"] .group:hover .beige-img-zoom,
 [data-site-theme="beige"] a:hover .beige-img-zoom {
+  transform: scale(1.1);
+}
+
+[data-site-theme="beige"] .beige-btn {
+  transition:
+    transform 0.3s var(--beige-ease),
+    box-shadow 0.3s var(--beige-ease),
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+[data-site-theme="beige"] .beige-btn:hover {
   transform: scale(1.05);
+  box-shadow: 0 18px 36px -16px rgba(45, 42, 38, 0.35);
+}
+
+[data-site-theme="beige"] .beige-soft-btn {
+  transition:
+    background-color 0.3s var(--beige-ease),
+    color 0.3s var(--beige-ease);
+}
+
+[data-site-theme="beige"] .beige-soft-btn:hover {
+  background: var(--beige-charcoal);
+  color: #fff;
+}
+
+[data-site-theme="beige"] .beige-field {
+  width: 100%;
+  border: 1px solid var(--beige-border);
+  background: var(--beige-ivory);
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--beige-charcoal);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s var(--beige-ease);
+}
+
+[data-site-theme="beige"] .beige-field:focus {
+  border-color: var(--beige-olive);
+  box-shadow: 0 0 0 4px rgba(164, 180, 148, 0.22);
+}
+
+[data-site-theme="beige"] .beige-faq summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+[data-site-theme="beige"] .beige-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+[data-site-theme="beige"] .beige-faq__chevron {
+  transition: transform 0.35s var(--beige-ease);
+}
+
+[data-site-theme="beige"] .beige-faq details[open] .beige-faq__chevron {
+  transform: rotate(180deg);
+}
+
+[data-site-theme="beige"] .beige-thumb {
+  border: 2px solid transparent;
+  transition:
+    border-color 0.3s var(--beige-ease),
+    transform 0.3s var(--beige-ease);
+}
+
+[data-site-theme="beige"] .beige-thumb:hover,
+[data-site-theme="beige"] .beige-thumb.is-active {
+  border-color: var(--beige-olive);
+}
+
+[data-site-theme="beige"] .beige-thumb:hover {
+  transform: translateY(-2px);
 }
 
 [data-site-theme="beige"] .beige-glow {
@@ -4170,6 +4251,7 @@ body {
 }
 
 [data-site-theme="beige"] .beige-whatsapp-float {
+  transition: transform 0.3s var(--beige-ease);
   position: fixed;
   right: 1.25rem;
   bottom: 1.25rem;
@@ -4195,7 +4277,7 @@ body {
 }
 
 [data-site-theme="beige"] .beige-gallery__main {
-  transition: opacity 0.45s ease;
+  transition: opacity 0.5s var(--beige-ease);
 }
 
 [data-site-theme="beige"] .beige-locale {
@@ -4237,7 +4319,10 @@ body {
   [data-site-theme="beige"] .beige-img-zoom,
   [data-site-theme="beige"] .beige-whatsapp-float,
   [data-site-theme="beige"] .beige-gallery__main,
-  [data-site-theme="beige"] .beige-nav-link::after {
+  [data-site-theme="beige"] .beige-nav-link::after,
+  [data-site-theme="beige"] .beige-btn,
+  [data-site-theme="beige"] .beige-btn:hover,
+  [data-site-theme="beige"] .beige-thumb {
     animation: none !important;
     transition: none !important;
     transform: none !important;

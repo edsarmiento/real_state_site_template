@@ -38,12 +38,8 @@ export function BeigeShareButton({ slug, title, dict, className }: Props) {
   }
 
   return (
-    <span className="inline-flex flex-col items-start">
-      <button
-        type="button"
-        onClick={() => void share()}
-        className={className}
-      >
+    <span className="inline-flex w-full flex-col items-stretch">
+      <button type="button" onClick={() => void share()} className={className}>
         {dict.listing.share}
       </button>
       <span className="beige-sr-only" role="status">

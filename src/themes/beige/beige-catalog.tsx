@@ -57,7 +57,12 @@ export async function BeigeCatalog({
   const collagePhotos = listings
     .map((listing) => listing.photo_url)
     .filter((url): url is string => Boolean(url?.trim()))
-    .slice(0, 4);
+    .slice(0, 3);
+  const collage = [heroImage, ...collagePhotos]
+    .filter((url): url is string => Boolean(url))
+    .filter((url, index, all) => all.indexOf(url) === index)
+    .slice(0, 3);
+  const whatsappHref = content.whatsapp.href ?? content.contact.whatsappHref;
   const locations =
     content.locations.length > 0
       ? content.locations
@@ -93,44 +98,56 @@ export async function BeigeCatalog({
     <BeigeShell lang={lang}>
       <BeigeHeader lang={lang} variant="home" />
 
-      <section className="relative overflow-hidden bg-[#2D2A26] text-[#FBF9F5]">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:py-24">
-          <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-[#C4D3A2]">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#FBF9F5] via-[#F4EFE6]/30 to-[#FBF9F5] pb-20 pt-16">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-10 [background-image:radial-gradient(#8A7759_1px,transparent_1px)] [background-size:24px_24px]"
+          aria-hidden
+        />
+        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-between gap-12 px-6 lg:flex-row">
+          <div className="max-w-xl space-y-6">
+            <span className="inline-flex items-center rounded-full border border-[#A4B494]/30 bg-[#A4B494]/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-[#2D2A26]">
               {content.hero.eyebrow || dict.hero.badge}
-            </p>
-            <h1 className="beige-hero__title mt-4 text-4xl leading-tight md:text-6xl">
+            </span>
+            <h1 className="beige-hero__title text-4xl font-normal leading-tight tracking-tight text-[#2D2A26] sm:text-6xl">
               {dict.hero.titleBefore}{" "}
-              <em className="not-italic text-[#C4D3A2]">{dict.hero.titleAccent}</em>{" "}
+              <em className="italic text-[#8F9F81]">{dict.hero.titleAccent}</em>{" "}
               {dict.hero.titleAfter}
             </h1>
-            <p className="mt-5 max-w-lg text-[#E5D9C5]">{dict.hero.subtitle}</p>
+            <p className="text-base font-light leading-relaxed text-[#8A7759] sm:text-lg">
+              {dict.hero.subtitle}
+            </p>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            {[heroImage, ...collagePhotos].filter(Boolean).slice(0, 4).map(
-              (src, index) => (
-                <div
-                  key={`${src}-${index}`}
-                  className={`overflow-hidden rounded-2xl bg-[#3a3530] ${
-                    index === 0 ? "col-span-2 aspect-[16/9]" : "aspect-square"
-                  }`}
-                >
-                  <BeigeCoverImage
-                    src={src}
-                    alt=""
-                    className="beige-img-zoom h-full w-full object-cover"
-                    placeholderClassName="h-full min-h-[8rem] bg-[#3a3530]"
-                    placeholder=""
-                  />
-                </div>
-              ),
-            )}
-            {![heroImage, ...collagePhotos].some(Boolean) ? (
-              <div className="col-span-2 aspect-[16/9] rounded-2xl bg-[#3a3530]" />
-            ) : null}
+          <div className="grid w-full grid-cols-2 gap-4 lg:w-1/2">
+            <div className="col-span-2 overflow-hidden rounded-3xl border-2 border-white shadow-2xl">
+              <BeigeCoverImage
+                src={collage[0]}
+                alt=""
+                className="beige-img-zoom h-52 w-full object-cover md:h-64"
+                placeholderClassName="h-52 bg-[#E5D9C5] md:h-64"
+                placeholder=""
+              />
+            </div>
+            <div className="overflow-hidden rounded-2xl border-2 border-white shadow-xl">
+              <BeigeCoverImage
+                src={collage[1]}
+                alt=""
+                className="beige-img-zoom h-36 w-full object-cover"
+                placeholderClassName="h-36 bg-[#E5D9C5]"
+                placeholder=""
+              />
+            </div>
+            <div className="overflow-hidden rounded-2xl border-2 border-white shadow-xl">
+              <BeigeCoverImage
+                src={collage[2]}
+                alt=""
+                className="beige-img-zoom h-36 w-full object-cover"
+                placeholderClassName="h-36 bg-[#E5D9C5]"
+                placeholder=""
+              />
+            </div>
           </div>
         </div>
-        <div className="relative z-10 mx-auto max-w-6xl px-6 pb-12">
+        <div className="relative z-20 mx-auto mt-16 max-w-5xl px-6">
           <BeigeSearch
             oferta={oferta}
             city={city}
@@ -143,9 +160,9 @@ export async function BeigeCatalog({
         </div>
       </section>
 
-      <main id="residencial" className="py-16">
+      <main id="residencial" className="py-24">
         <BeigeReveal>
-          <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto max-w-7xl px-6">
             {!catalogOk ? (
               <p className="text-[#8A7759]">
                 {fillTemplate(dict.results.catalogError, {
@@ -176,25 +193,25 @@ export async function BeigeCatalog({
               </div>
             ) : (
               <section>
-                <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+                <div className="mb-16 flex flex-col justify-between md:flex-row md:items-end">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-[#A39073]">
-                      {dict.nav.residential}
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A39073]">
+                      {dict.results.kicker}
                     </p>
-                    <h2 className="beige-section__title mt-2 text-3xl">
+                    <h2 className="beige-section__title mt-2 text-3xl text-[#2D2A26] sm:text-5xl">
                       {catalogHeading(dict, oferta, city, total)}
                     </h2>
                   </div>
                   {propertyType || bedrooms || city ? (
                     <Link
                       href={clearHref}
-                      className="text-sm text-[#8A7759] underline-offset-4 hover:underline"
+                      className="mt-4 text-sm font-semibold text-[#2D2A26] transition-colors hover:text-[#A39073] md:mt-0"
                     >
                       {dict.results.clearFilters}
                     </Link>
                   ) : null}
                 </div>
-                <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <ul className="grid grid-cols-1 gap-8 md:grid-cols-3">
                   {gridListings.map((listing) => (
                     <li key={listing.slug}>
                       <BeigeListingCard
@@ -202,6 +219,7 @@ export async function BeigeCatalog({
                         locale={locale}
                         defaultLocale={defaultLocale}
                         dict={dict}
+                        whatsappHref={whatsappHref}
                       />
                     </li>
                   ))}

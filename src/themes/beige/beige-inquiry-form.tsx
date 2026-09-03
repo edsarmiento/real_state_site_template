@@ -23,8 +23,7 @@ function onlyPhoneDigits(value: string): string {
   return value.replace(/\D/g, "").slice(0, 10);
 }
 
-const inputClass =
-  "w-full border border-[#E5D9C5] bg-[#FBF9F5] px-3 py-2 text-sm text-[#2D2A26]";
+const inputClass = "beige-field";
 
 export function BeigeInquiryForm({
   slug,
@@ -164,7 +163,7 @@ export function BeigeInquiryForm({
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl bg-[#A4B494] px-4 py-3 text-sm font-semibold text-[#2D2A26] disabled:opacity-60"
+        className="beige-btn w-full rounded-2xl bg-[#A4B494] px-4 py-3.5 text-sm font-medium text-[#2D2A26] disabled:opacity-60"
       >
         {pending ? dict.inquiry.sending : dict.inquiry.send}
       </button>

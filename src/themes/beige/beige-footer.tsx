@@ -16,7 +16,7 @@ export async function BeigeFooter({ lang }: Props) {
 
   return (
     <footer className="bg-[#2D2A26] text-[#E5D9C5]">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 md:grid-cols-4">
         <div className="md:col-span-1">
           {brand.logoUrl ? (
             <BeigeLogo

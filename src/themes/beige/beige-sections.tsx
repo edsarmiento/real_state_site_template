@@ -6,7 +6,6 @@ import {
   type PublicLocation,
 } from "@/lib/public-site-content";
 import {
-  fillTemplate,
   localizeSiteHref,
   localizedHref,
   type SiteDictionary,
@@ -74,51 +73,52 @@ export function BeigeLocations({
   if (items.length === 0) return null;
 
   return (
-    <section id="ubicaciones" className="bg-[#F4EFE6] py-20">
+    <section id="ubicaciones" className="border-y border-[#E5D9C5] bg-white py-24">
       <BeigeReveal>
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#A39073]">
-            {dict.locations.eyebrow}
-          </p>
-          <h2 className="beige-section__title mt-3 text-3xl md:text-4xl">
-            {dict.locations.title}
-          </h2>
-          <p className="mt-3 max-w-2xl text-[#8A7759]">
-            {dict.locations.description}
-          </p>
-          <ul className="mt-10 grid gap-6 md:grid-cols-2">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#A39073]">
+              {dict.locations.eyebrow}
+            </p>
+            <h2 className="beige-section__title mt-2 text-3xl text-[#2D2A26] sm:text-5xl">
+              {dict.locations.title}
+            </h2>
+            <p className="mt-4 font-light text-[#8A7759]">
+              {dict.locations.description}
+            </p>
+          </div>
+          <ul className="grid grid-cols-1 gap-6 md:grid-cols-4">
             {items.map(({ location, href, imageSrc }) => (
               <li key={location.id}>
                 <Link
                   href={href}
-                  className="beige-card-hover group block overflow-hidden rounded-2xl border border-[#E5D9C5] bg-[#FBF9F5]"
+                  className="beige-card-hover group block cursor-pointer rounded-3xl border border-[#E5D9C5] bg-[#FBF9F5] p-8 text-center"
                 >
-                  <div className="aspect-[16/9] bg-[#E5D9C5]">
-                    <BeigeCoverImage
-                      src={imageSrc}
-                      alt={
-                        pickLocalized(location.imageAlt, locale) ||
-                        fillTemplate(dict.locations.fallbackAlt, {
-                          name: location.name,
-                        })
-                      }
-                      className="beige-img-zoom h-full w-full object-cover"
-                      placeholderClassName="flex h-full items-center justify-center text-[#A39073]"
-                      placeholder={location.name}
-                    />
+                  <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#A4B494]/20 text-[#2D2A26] shadow-sm transition-colors duration-300 group-hover:bg-[#A4B494] group-hover:text-white">
+                    {imageSrc ? (
+                      <span className="h-full w-full overflow-hidden rounded-2xl">
+                        <BeigeCoverImage
+                          src={imageSrc}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          placeholderClassName="flex h-full items-center justify-center"
+                          placeholder=""
+                        />
+                      </span>
+                    ) : (
+                      <BeigeIconMapPin className="h-6 w-6" />
+                    )}
                   </div>
-                  <div className="p-5">
-                    <h3 className="text-xl">{location.name}</h3>
-                    {pickLocalized(location.shortDescription, locale) ? (
-                      <p className="mt-2 text-sm text-[#8A7759]">
-                        {pickLocalized(location.shortDescription, locale)}
-                      </p>
-                    ) : null}
-                    <span className="mt-3 inline-flex items-center gap-1 text-sm text-[#8F9F81]">
-                      {dict.locations.cta}
-                      <BeigeIconArrowRight className="h-4 w-4" />
-                    </span>
-                  </div>
+                  <h3 className="mb-2 text-xl font-medium">{location.name}</h3>
+                  {pickLocalized(location.shortDescription, locale) ? (
+                    <p className="mb-4 text-xs font-light text-[#A39073]">
+                      {pickLocalized(location.shortDescription, locale)}
+                    </p>
+                  ) : null}
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#2D2A26] transition-colors group-hover:text-[#A4B494]">
+                    {dict.locations.cta}
+                    <BeigeIconArrowRight className="h-3 w-3" />
+                  </span>
                 </Link>
               </li>
             ))}
@@ -142,41 +142,67 @@ export function BeigeCommercial({
   const whatsapp = content.whatsapp.href ?? content.contact.whatsappHref;
 
   return (
-    <section id="comercial" className="py-20">
+    <section id="comercial" className="border-y border-[#E5D9C5]/60 bg-[#F4EFE6]/50 py-24">
       <BeigeReveal>
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#A39073]">
-            {dict.commercial.kicker}
-          </p>
-          <h2 className="beige-section__title mt-3 text-3xl md:text-4xl">
-            {dict.commercial.title}
-          </h2>
-          <p className="mt-3 max-w-2xl text-[#8A7759]">
-            {dict.commercial.description}
-          </p>
-          {commercial.length > 0 ? (
-            <ul className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {commercial.map((listing) => (
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid items-center gap-12 lg:grid-cols-12">
+            <div className="space-y-6 lg:col-span-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A39073]">
+                {dict.commercial.kicker}
+              </p>
+              <h2 className="beige-section__title text-3xl leading-tight text-[#2D2A26] sm:text-5xl">
+                {dict.commercial.title}
+              </h2>
+              <p className="font-light leading-relaxed text-[#8A7759]">
+                {dict.commercial.description}
+              </p>
+              {whatsapp ? (
+                <a
+                  href={whatsapp}
+                  className="beige-btn inline-block rounded-full bg-[#2D2A26] px-8 py-4 text-sm font-medium text-white shadow-lg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {dict.commercial.cta}
+                </a>
+              ) : null}
+            </div>
+            <div className="lg:col-span-6">
+              {commercial.length > 0 ? (
+                <ul className="grid gap-6">
+                  {commercial.slice(0, 1).map((listing) => (
+                    <li key={listing.slug}>
+                      <div className="beige-card-hover relative overflow-hidden rounded-3xl border-4 border-white shadow-2xl">
+                        <BeigeCoverImage
+                          src={listing.photo_url}
+                          alt={listing.title}
+                          className="beige-img-zoom h-[420px] w-full object-cover"
+                          placeholderClassName="h-[420px] bg-[#E5D9C5]"
+                          placeholder={listing.title}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="h-[420px] rounded-3xl border-4 border-white bg-[#E5D9C5] shadow-2xl" />
+              )}
+            </div>
+          </div>
+          {commercial.length > 1 ? (
+            <ul className="mt-12 grid gap-8 md:grid-cols-3">
+              {commercial.slice(1, 4).map((listing) => (
                 <li key={listing.slug}>
                   <BeigeListingCard
                     listing={listing}
                     locale={locale}
                     defaultLocale={defaultLocale}
                     dict={dict}
+                    whatsappHref={whatsapp}
                   />
                 </li>
               ))}
             </ul>
-          ) : whatsapp ? (
-            <a
-              href={whatsapp}
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#A4B494] px-5 py-3 text-sm font-semibold text-[#2D2A26]"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <BeigeIconWhatsApp className="h-4 w-4" />
-              {dict.commercial.cta}
-            </a>
           ) : null}
         </div>
       </BeigeReveal>
@@ -192,34 +218,34 @@ export function BeigeAbout({
 }: Shared) {
   const { about } = content;
   return (
-    <section id="nosotros" className="bg-[#F4EFE6] py-20">
+    <section id="nosotros" className="border-y border-[#E5D9C5] bg-white py-24">
       <BeigeReveal>
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 md:grid-cols-2">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 md:grid-cols-2">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#A39073]">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A39073]">
               {dict.about.kicker}
             </p>
-            <h2 className="beige-section__title mt-3 text-3xl md:text-4xl">
+            <h2 className="beige-section__title mt-2 text-3xl sm:text-5xl">
               {dict.about.title}
             </h2>
-            <p className="mt-4 leading-relaxed text-[#8A7759]">
+            <p className="mt-4 font-light leading-relaxed text-[#8A7759]">
               {dict.about.description}
             </p>
-            <ul className="mt-6 space-y-2 text-sm text-[#2D2A26]">
-              <li>{dict.about.benefit1}</li>
-              <li>{dict.about.benefit2}</li>
-              <li>{dict.about.benefit3}</li>
+            <ul className="mt-6 space-y-3 text-sm font-medium text-[#2D2A26]">
+              <li className="flex items-center gap-2">{dict.about.benefit1}</li>
+              <li className="flex items-center gap-2">{dict.about.benefit2}</li>
+              <li className="flex items-center gap-2">{dict.about.benefit3}</li>
             </ul>
             {about.cta ? (
               <Link
                 href={localizeSiteHref(about.cta.href, locale, defaultLocale)}
-                className="mt-6 inline-flex rounded-full bg-[#A4B494] px-5 py-3 text-sm font-semibold text-[#2D2A26]"
+                className="beige-btn mt-8 inline-flex rounded-full bg-[#A4B494] px-8 py-3.5 text-sm font-medium text-[#2D2A26] shadow-md"
               >
                 {dict.about.cta}
               </Link>
             ) : null}
           </div>
-          <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-[#E5D9C5]">
+          <div className="aspect-[4/5] overflow-hidden rounded-3xl border-4 border-white bg-[#E5D9C5] shadow-2xl">
             {about.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -278,7 +304,7 @@ export function BeigeTestimonials({
             {resolved.map((item) => (
               <li
                 key={item.id}
-                className="rounded-2xl border border-[#E5D9C5] bg-[#FBF9F5] p-6"
+                className="beige-card-hover rounded-3xl border border-[#E5D9C5] bg-[#FBF9F5] p-8 shadow-sm"
               >
                 <blockquote>
                   <p className="text-sm leading-relaxed text-[#2D2A26]">
@@ -305,22 +331,29 @@ export function BeigeProcess({ dict }: Pick<Shared, "dict">) {
     { n: "03", title: dict.process.step3Title, copy: dict.process.step3Description },
   ];
   return (
-    <section id="proceso" className="bg-[#2D2A26] py-20 text-[#FBF9F5]">
+    <section id="proceso" className="bg-[#FBF9F5] py-24">
       <BeigeReveal>
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#A39073]">
-            {dict.process.kicker}
-          </p>
-          <h2 className="beige-section__title mt-3 text-3xl md:text-4xl">
-            {dict.process.title}
-          </h2>
-          <p className="mt-3 max-w-2xl text-[#E5D9C5]">{dict.process.subtitle}</p>
-          <ol className="mt-10 grid gap-8 md:grid-cols-3">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A39073]">
+              {dict.process.kicker}
+            </p>
+            <h2 className="beige-section__title mt-2 text-3xl sm:text-5xl">
+              {dict.process.title}
+            </h2>
+            <p className="mt-4 font-light text-[#8A7759]">{dict.process.subtitle}</p>
+          </div>
+          <ol className="grid gap-8 md:grid-cols-3">
             {steps.map((step) => (
-              <li key={step.n}>
-                <p className="text-sm text-[#A4B494]">{step.n}</p>
-                <h3 className="mt-2 text-xl">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#E5D9C5]">
+              <li
+                key={step.n}
+                className="beige-card-hover group relative rounded-3xl border border-[#E5D9C5] bg-white p-8 shadow-sm"
+              >
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#A4B494]/20 font-bold text-[#2D2A26] transition-colors duration-300 group-hover:bg-[#A4B494] group-hover:text-white">
+                  {step.n}
+                </div>
+                <h3 className="mb-2 text-lg font-medium">{step.title}</h3>
+                <p className="text-xs font-light leading-relaxed text-[#8A7759]">
                   {step.copy}
                 </p>
               </li>
@@ -339,23 +372,31 @@ export function BeigeFaq({ dict }: Pick<Shared, "dict">) {
     { q: dict.faq.q3, a: dict.faq.a3 },
   ];
   return (
-    <section id="faq" className="py-20">
+    <section id="faq" className="beige-faq py-24">
       <BeigeReveal>
         <div className="mx-auto max-w-3xl px-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#A39073]">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A39073]">
             {dict.faq.eyebrow}
           </p>
-          <h2 className="beige-section__title mt-3 text-3xl">{dict.faq.title}</h2>
-          <dl className="mt-10 space-y-6">
+          <h2 className="beige-section__title mt-2 text-3xl sm:text-5xl">
+            {dict.faq.title}
+          </h2>
+          <div className="mt-10 space-y-4">
             {items.map((item) => (
-              <div key={item.q} className="border-b border-[#E5D9C5] pb-6">
-                <dt className="text-lg">{item.q}</dt>
-                <dd className="mt-2 text-sm leading-relaxed text-[#8A7759]">
+              <details
+                key={item.q}
+                className="group rounded-3xl border border-[#E5D9C5] bg-white px-6 py-2 shadow-sm"
+              >
+                <summary className="flex items-center justify-between gap-4 py-4 text-lg">
+                  {item.q}
+                  <BeigeIconArrowRight className="beige-faq__chevron h-4 w-4 shrink-0 rotate-90 text-[#A39073]" />
+                </summary>
+                <p className="pb-4 text-sm font-light leading-relaxed text-[#8A7759]">
                   {item.a}
-                </dd>
-              </div>
+                </p>
+              </details>
             ))}
-          </dl>
+          </div>
         </div>
       </BeigeReveal>
     </section>
@@ -371,9 +412,9 @@ export function BeigeContact({
   const { contact } = content;
   const whatsapp = content.whatsapp.href ?? contact.whatsappHref;
   return (
-    <section id="contacto" className="bg-[#F4EFE6] py-20">
+    <section id="contacto" className="bg-[#F4EFE6] py-24">
       <BeigeReveal>
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 md:grid-cols-2">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 md:grid-cols-2">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-[#A39073]">
               {dict.contact.kicker}

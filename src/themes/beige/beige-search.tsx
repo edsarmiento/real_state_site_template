@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   catalogOfferQueryValue,
@@ -14,7 +14,7 @@ import {
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
-import { BeigeIconSearch } from "@/themes/beige/beige-icons";
+import { BeigeIconMapPin, BeigeIconSearch } from "@/themes/beige/beige-icons";
 
 type Props = {
   oferta: CatalogOfferFilter;
@@ -56,8 +56,14 @@ export function BeigeSearch({
 }: Props) {
   const router = useRouter();
   const id = useId();
-  const field =
-    "w-full rounded-none border-0 bg-transparent text-sm text-[#2D2A26] outline-none";
+  const [offer, setOffer] = useState(oferta);
+  const offerQuery =
+    offer === "sale" ? "venta" : offer === "rent" ? "renta" : "todas";
+  const pills: { id: CatalogOfferFilter; value: string; label: string }[] = [
+    { id: "sale", value: "venta", label: dict.search.buy },
+    { id: "rent", value: "renta", label: dict.search.rent },
+    { id: "all", value: "todas", label: dict.search.all },
+  ];
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -79,47 +85,54 @@ export function BeigeSearch({
   return (
     <form
       id="inventario"
-      className="beige-glow rounded-2xl bg-[#FBF9F5] p-4 shadow-[0_20px_50px_-20px_rgba(45,42,38,0.25)] sm:p-6"
+      className="beige-glow rounded-3xl border border-[#E5D9C5]/80 bg-white/95 p-6 shadow-2xl backdrop-blur-md sm:p-8"
       method="get"
       action="/"
       onSubmit={onSubmit}
     >
       <input type="hidden" name="lang" value={locale} />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        <label className="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wider text-[#A39073]">
-          {dict.search.operation}
-          <select
-            name="oferta"
-            defaultValue={
-              oferta === "sale"
-                ? "venta"
-                : oferta === "rent"
-                  ? "renta"
-                  : "todas"
-            }
-            className={field}
-          >
-            <option value="venta">{dict.search.buy}</option>
-            <option value="renta">{dict.search.rent}</option>
-            <option value="todas">{dict.search.all}</option>
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wider text-[#A39073]">
+      <input type="hidden" name="oferta" value={offerQuery} />
+      <div className="grid items-end gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <fieldset className="space-y-2">
+          <legend className="text-xs font-semibold uppercase tracking-wider text-[#8A7759]">
+            {dict.search.operation}
+          </legend>
+          <div className="flex rounded-2xl border border-[#E5D9C5] bg-[#FBF9F5] p-1 shadow-inner">
+            {pills.map((pill) => (
+              <button
+                key={pill.id}
+                type="button"
+                onClick={() => setOffer(pill.id)}
+                className={`flex-1 rounded-xl py-2 text-xs font-medium transition-all duration-300 ${
+                  offer === pill.id
+                    ? "bg-white text-[#2D2A26] shadow-sm"
+                    : "text-[#A39073] hover:text-[#2D2A26]"
+                }`}
+              >
+                {pill.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+        <label className="space-y-2 text-xs font-semibold uppercase tracking-wider text-[#8A7759]">
           {dict.search.location}
-          <input
-            id={`${id}-city`}
-            name="city"
-            defaultValue={city}
-            placeholder={dict.search.locationPlaceholder}
-            className={field}
-          />
+          <span className="relative mt-2 block">
+            <BeigeIconMapPin className="pointer-events-none absolute left-4 top-3.5 h-4 w-4 text-[#A39073]" />
+            <input
+              id={`${id}-city`}
+              name="city"
+              defaultValue={city}
+              placeholder={dict.search.locationPlaceholder}
+              className="beige-field pl-11"
+            />
+          </span>
         </label>
-        <label className="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wider text-[#A39073]">
+        <label className="space-y-2 text-xs font-semibold uppercase tracking-wider text-[#8A7759]">
           {dict.search.propertyType}
           <select
             name="tipo"
             defaultValue={propertyType}
-            className={field}
+            className="beige-field mt-2 cursor-pointer"
           >
             <option value="">{dict.search.allTypes}</option>
             {PROPERTY_TYPES.map((type) => (
@@ -129,12 +142,12 @@ export function BeigeSearch({
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wider text-[#A39073]">
+        <label className="space-y-2 text-xs font-semibold uppercase tracking-wider text-[#8A7759]">
           {dict.search.bedrooms}
           <select
             name="recamaras"
             defaultValue={bedrooms}
-            className={field}
+            className="beige-field mt-2 cursor-pointer"
           >
             <option value="">{dict.search.any}</option>
             {(["1", "2", "3", "4"] as const).map((count) => (
@@ -144,12 +157,14 @@ export function BeigeSearch({
             ))}
           </select>
         </label>
+      </div>
+      <div className="mt-6 flex justify-end border-t border-[#F4EFE6] pt-6">
         <button
           type="submit"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#A4B494] px-4 py-3 text-sm font-semibold text-[#2D2A26] transition hover:bg-[#8F9F81]"
+          className="beige-btn inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#A4B494] px-8 py-3.5 text-sm font-medium text-[#2D2A26] shadow-md md:w-auto"
         >
           <BeigeIconSearch className="h-4 w-4" />
-          {dict.search.submitShort}
+          {dict.search.submit}
         </button>
       </div>
     </form>
