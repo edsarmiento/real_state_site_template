@@ -6,10 +6,11 @@ import { getBeigeCopy } from "@/themes/beige/beige-copy";
 import {
   BEIGE_LOGO_NAV_CLASS,
   formatBeigePhoneDisplay,
-  sameContactNumber,
 } from "@/themes/beige/beige-display";
+import { BeigeHeaderChrome } from "@/themes/beige/beige-header-chrome";
 import {
   BeigeIconPhone,
+  BeigeIconWhatsApp,
 } from "@/themes/beige/beige-icons";
 import { BeigeLocaleSwitcher } from "@/themes/beige/beige-locale-switcher";
 import { BeigeLogo } from "@/themes/beige/beige-logo";
@@ -36,11 +37,9 @@ export async function BeigeHeader({
   const whatsappNumber = channels.whatsappNumber;
   const officePhone = channels.phone;
   const officeHref = channels.phoneHref;
-  const duplicateNumbers = sameContactNumber(whatsappNumber, officePhone);
   const showWhatsApp = Boolean(whatsappHref && whatsappNumber);
-  const showOffice =
-    Boolean(officePhone && officeHref) && !duplicateNumbers;
-  const showTopBar = showWhatsApp || Boolean(officePhone && officeHref);
+  const showOffice = Boolean(officePhone && officeHref);
+  const showTopBar = showWhatsApp || showOffice;
   const switcherProps = {
     locale,
     defaultLocale,
@@ -53,10 +52,6 @@ export async function BeigeHeader({
     } as const,
   };
   const light = variant === "detail";
-  const navClass = light
-    ? "beige-glass-nav--light border-b border-[#E5D9C5]/60"
-    : "beige-glass-nav border-b border-white/10";
-  const textClass = light ? "text-[#2D2A26]" : "text-white";
   const mutedClass = light ? "text-[#2D2A26]" : "text-white/90";
   const ctaClass = light
     ? "beige-btn hidden items-center gap-2 rounded-full bg-[#A4B494] px-6 py-3.5 text-sm font-medium text-white shadow-md lg:inline-flex"
@@ -69,114 +64,104 @@ export async function BeigeHeader({
     ? `${copy.officeLabel}: ${formatBeigePhoneDisplay(officePhone)}`
     : copy.officeLabel;
 
-  return (
-    <header className="sticky top-0 z-50">
-      {showTopBar ? (
-        <div className="border-b border-white/10 bg-[#2D2A26] px-6 py-2.5 text-xs tracking-wide text-[#F4EFE6]">
-          <div
-            className={`mx-auto flex max-w-7xl flex-col gap-2 sm:flex-row sm:items-center ${
-              showWhatsApp && showOffice
-                ? "sm:justify-between"
-                : "sm:justify-start"
-            }`}
+  const topBar = showTopBar ? (
+    <div data-beige-topbar className="beige-topbar">
+      <div
+        className={`mx-auto flex max-w-7xl flex-col gap-2 sm:flex-row sm:items-center ${
+          showWhatsApp && showOffice ? "sm:justify-between" : "sm:justify-start"
+        }`}
+      >
+        {showWhatsApp && whatsappHref ? (
+          <a
+            href={whatsappHref}
+            className="beige-topbar__link"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-beige-cta="topbar-whatsapp"
+            aria-label={`${whatsappLabel}. ${dict.a11y.opensInNewTab}`}
           >
-            {showWhatsApp && whatsappHref ? (
-              <a
-                href={whatsappHref}
-                className="inline-flex items-center gap-2 transition-colors hover:text-[#C4D3A2]"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${whatsappLabel}. ${dict.a11y.opensInNewTab}`}
-              >
-                <BeigeIconPhone className="h-3.5 w-3.5 shrink-0 text-[#A4B494]" />
-                {whatsappLabel}
-              </a>
-            ) : null}
-            {!showWhatsApp && officeHref && officePhone ? (
-              <a
-                href={officeHref}
-                className="inline-flex items-center gap-2 font-medium text-[#C4D3A2] hover:text-[#A4B494]"
-              >
-                <BeigeIconPhone className="h-3.5 w-3.5 shrink-0 text-[#A4B494]" />
-                {officeLabel}
-              </a>
-            ) : null}
-            {showOffice && officeHref && officePhone ? (
-              <a
-                href={officeHref}
-                className="inline-flex items-center gap-1.5 font-medium text-[#C4D3A2] hover:text-[#A4B494]"
-              >
-                {officeLabel}
-              </a>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-
-      <div className={`relative ${navClass} ${textClass}`}>
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-6 lg:h-24">
-          <Link href={homeHref} className="beige-brand min-w-0 shrink-0">
-            {brand.logoUrl ? (
-              <BeigeLogo
-                src={brand.logoUrl}
-                alt={brand.name}
-                className={BEIGE_LOGO_NAV_CLASS}
-                fallbackClassName="text-2xl font-medium uppercase tracking-[0.2em]"
-              />
-            ) : (
-              <span className="block text-2xl uppercase tracking-[0.2em]">
-                {brand.name}
-                {brand.tagline ? (
-                  <span
-                    className={`mt-0.5 block font-sans text-[9px] font-light tracking-[0.3em] ${
-                      light ? "text-[#A39073]" : "text-[#A4B494]"
-                    }`}
-                  >
-                    {brand.tagline}
-                  </span>
-                ) : null}
-              </span>
-            )}
-          </Link>
-
-          <nav
-            className={`hidden items-center space-x-7 text-sm font-medium tracking-wide lg:flex ${mutedClass}`}
-            aria-label={dict.a11y.primaryNav}
+            <BeigeIconWhatsApp className="h-3.5 w-3.5 shrink-0 text-[#A4B494]" />
+            {whatsappLabel}
+          </a>
+        ) : null}
+        {showOffice && officeHref && officePhone ? (
+          <a
+            href={officeHref}
+            className="beige-topbar__link beige-topbar__link--office"
+            data-beige-cta="topbar-call"
           >
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="beige-nav-link py-2 hover:text-[#A4B494]"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Suspense fallback={null}>
-              <BeigeLocaleSwitcher {...switcherProps} />
-            </Suspense>
-            <Link href={contactHref} className={ctaClass}>
-              {copy.contactCta}
-            </Link>
-            <BeigeMobileNav
-              links={links}
-              contactCta={{ href: contactHref, label: copy.contactCta }}
-              menuLabel={dict.a11y.primaryNav}
-              openLabel={dict.a11y.openMenu}
-              closeLabel={dict.a11y.closeMenu}
-              light={light}
-              localeSwitcher={
-                <Suspense fallback={null}>
-                  <BeigeLocaleSwitcher {...switcherProps} />
-                </Suspense>
-              }
-            />
-          </div>
-        </div>
+            <BeigeIconPhone className="h-3.5 w-3.5 shrink-0 text-[#A4B494]" />
+            {officeLabel}
+          </a>
+        ) : null}
       </div>
-    </header>
+    </div>
+  ) : null;
+
+  return (
+    <BeigeHeaderChrome
+      light={light}
+      topBar={topBar}
+      brand={
+        <Link href={homeHref} className="beige-logo-link min-w-0 shrink-0">
+          {brand.logoUrl ? (
+            <BeigeLogo
+              src={brand.logoUrl}
+              alt={brand.name}
+              className={BEIGE_LOGO_NAV_CLASS}
+              fallbackClassName="text-2xl font-medium uppercase tracking-[0.2em]"
+            />
+          ) : (
+            <span className="beige-serif block text-2xl uppercase tracking-[0.2em]">
+              {brand.name}
+              {brand.tagline ? (
+                <span
+                  className={`mt-0.5 block font-sans text-[9px] font-light tracking-[0.3em] ${
+                    light ? "text-[#A39073]" : "text-[#A4B494]"
+                  }`}
+                >
+                  {brand.tagline}
+                </span>
+              ) : null}
+            </span>
+          )}
+        </Link>
+      }
+      nav={
+        <nav
+          className={`hidden items-center space-x-8 text-sm font-medium tracking-wide lg:flex ${mutedClass}`}
+          aria-label={dict.a11y.primaryNav}
+        >
+          {links.map((link) => (
+            <Link key={link.href} href={link.href} className="beige-nav-link">
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+      }
+      tools={
+        <div className="flex items-center gap-3">
+          <Suspense fallback={null}>
+            <BeigeLocaleSwitcher {...switcherProps} />
+          </Suspense>
+          <Link href={contactHref} className={ctaClass}>
+            {copy.contactCta}
+          </Link>
+          <BeigeMobileNav
+            links={links}
+            contactCta={{ href: contactHref, label: copy.contactCta }}
+            menuLabel={dict.a11y.primaryNav}
+            openLabel={dict.a11y.openMenu}
+            closeLabel={dict.a11y.closeMenu}
+            light={light}
+            localeSwitcher={
+              <Suspense fallback={null}>
+                <BeigeLocaleSwitcher {...switcherProps} />
+              </Suspense>
+            }
+          />
+        </div>
+      }
+    />
   );
 }

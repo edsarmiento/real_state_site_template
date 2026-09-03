@@ -8,9 +8,10 @@ export type BeigeContactChannels = {
 };
 
 /**
- * Institutional contact only: SiteConfig / public site content, which already
- * falls back to SITE_WHATSAPP_NUMBER and SITE_CONTACT_PHONE.
- * Listing `contact_phone` must not be used here.
+ * Institutional contact only, from getPublicSiteContent():
+ * SITE_WHATSAPP_NUMBER, SITE_CONTACT_PHONE.
+ * Social and email are read from SITE_FACEBOOK_URL, SITE_INSTAGRAM_URL,
+ * SITE_CONTACT_EMAIL in public-site-content — not from listing contact_phone.
  */
 export function beigeContactChannels(
   content: PublicSiteContent,

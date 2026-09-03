@@ -12,17 +12,6 @@ export function digitsOnly(value: string): string {
   return value.replace(/\D/g, "");
 }
 
-export function sameContactNumber(
-  left: string | null | undefined,
-  right: string | null | undefined,
-): boolean {
-  if (!left || !right) return false;
-  const a = digitsOnly(left);
-  const b = digitsOnly(right);
-  if (a.length < 8 || b.length < 8) return false;
-  return a.slice(-10) === b.slice(-10);
-}
-
 export function formatBeigePhoneDisplay(raw: string): string {
   const digits = digitsOnly(raw);
   if (digits.length === 12 && digits.startsWith("52")) {
@@ -35,7 +24,7 @@ export function formatBeigePhoneDisplay(raw: string): string {
 }
 
 export const BEIGE_LOGO_NAV_CLASS =
-  "h-10 max-h-12 w-auto max-w-[10.5rem] bg-transparent object-contain object-left sm:h-12 sm:max-h-12 sm:max-w-[13rem] md:h-14 md:max-h-16 md:max-w-[15rem] lg:h-16 lg:max-h-16 lg:max-w-[17rem]";
+  "h-14 max-h-16 w-auto max-w-[12rem] object-contain object-left sm:h-16 sm:max-h-[4.5rem] sm:max-w-[16rem] md:h-[4.5rem] md:max-h-20 md:max-w-[18rem] lg:h-20 lg:max-h-20 lg:max-w-[20rem]";
 
 export const BEIGE_LOGO_FOOTER_CLASS =
-  "mb-4 h-12 max-h-14 w-auto max-w-[14rem] bg-transparent object-contain object-left sm:h-14 sm:max-h-16 sm:max-w-[16rem]";
+  "mb-5 h-14 max-h-16 w-auto max-w-[16rem] object-contain object-left sm:h-16 sm:max-h-[4.5rem] sm:max-w-[18rem]";

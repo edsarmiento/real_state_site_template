@@ -25,6 +25,9 @@ export type BeigeCopy = {
   whatsappPrefix: string;
   openWhatsApp: string;
   callNow: string;
+  phonesHeading: string;
+  emailHeading: string;
+  followHeading: string;
   contactKicker: string;
   heroEyebrow: string;
   heroTitle: string;
@@ -68,6 +71,9 @@ const ES: BeigeCopy = {
   whatsappPrefix: "WhatsApp",
   openWhatsApp: "Contactar por WhatsApp",
   callNow: "Llamar ahora",
+  phonesHeading: "Números telefónicos",
+  emailHeading: "Correo electrónico",
+  followHeading: "Síguenos",
   contactKicker: "Hablemos",
   heroEyebrow: "Propiedades para comprar o rentar",
   heroTitle: "Encuentra el espacio para tu próxima etapa",
@@ -122,6 +128,9 @@ const EN: BeigeCopy = {
   whatsappPrefix: "WhatsApp",
   openWhatsApp: "Contact us on WhatsApp",
   callNow: "Call now",
+  phonesHeading: "Phone numbers",
+  emailHeading: "Email",
+  followHeading: "Follow us",
   contactKicker: "Let\u2019s talk",
   heroEyebrow: "Properties to buy or rent",
   heroTitle: "Find the space for your next chapter",

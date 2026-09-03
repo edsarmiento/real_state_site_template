@@ -34,19 +34,23 @@ export async function BeigeFooter({ lang }: Props) {
   const whatsappHref = channels.whatsappHref;
   const whatsappNumber = channels.whatsappNumber;
   const year = new Date().getFullYear();
-  const hasContact = Boolean(
-    whatsappHref || channels.phoneHref || content.contact.emailHref,
+  const showWhatsApp = Boolean(whatsappHref && whatsappNumber);
+  const showOffice = Boolean(channels.phoneHref && channels.phone);
+  const showPhones = showWhatsApp || showOffice;
+  const showEmail = Boolean(
+    content.contact.emailHref && content.contact.email,
   );
   const hasSocial = Boolean(social.instagramUrl || social.facebookUrl);
 
   const linkClass =
     "inline-flex items-center gap-2.5 transition-colors hover:text-[#C4D3A2]";
   const iconClass = "h-4 w-4 shrink-0 text-[#A4B494]";
+  const headingClass =
+    "mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#FBF9F5]";
 
   return (
     <footer className="bg-[#2D2A26] text-[#E5D9C5]">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Column 1 — Brand */}
         <div>
           {brand.logoUrl ? (
             <BeigeLogo
@@ -66,15 +70,15 @@ export async function BeigeFooter({ lang }: Props) {
           </p>
         </div>
 
-        {/* Column 2 — Navigation */}
         <nav aria-label={dict.a11y.footerNav}>
-          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#FBF9F5]">
-            {dict.footer.navigation}
-          </p>
+          <p className={headingClass}>{dict.footer.navigation}</p>
           <ul className="space-y-3 text-[0.9375rem]">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="transition-colors hover:text-[#C4D3A2]">
+                <Link
+                  href={link.href}
+                  className="transition-colors hover:text-[#C4D3A2]"
+                >
                   {link.label}
                 </Link>
               </li>
@@ -82,81 +86,78 @@ export async function BeigeFooter({ lang }: Props) {
           </ul>
         </nav>
 
-        {/* Column 3 — Contact */}
-        {hasContact ? (
-          <div>
-            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#FBF9F5]">
-              {dict.footer.contact}
-            </p>
-            <ul className="space-y-3 text-[0.9375rem]">
-              {whatsappHref && whatsappNumber ? (
-                <li>
-                  <a
-                    href={whatsappHref}
-                    className={linkClass}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${copy.whatsappPrefix}: ${formatBeigePhoneDisplay(whatsappNumber)}. ${dict.a11y.opensInNewTab}`}
-                  >
-                    <BeigeIconWhatsApp className={iconClass} />
-                    <span className="truncate">
-                      {formatBeigePhoneDisplay(whatsappNumber)}
-                    </span>
-                  </a>
-                </li>
-              ) : whatsappHref ? (
-                <li>
-                  <a
-                    href={whatsappHref}
-                    className={linkClass}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${dict.whatsapp.footer}. ${dict.a11y.opensInNewTab}`}
-                  >
-                    <BeigeIconWhatsApp className={iconClass} />
-                    <span>{copy.whatsappPrefix}</span>
-                  </a>
-                </li>
-              ) : null}
-              {channels.phoneHref && channels.phone ? (
-                <li>
-                  <a href={channels.phoneHref} className={linkClass}>
-                    <BeigeIconPhone className={iconClass} />
-                    <span className="truncate">
-                      {formatBeigePhoneDisplay(channels.phone)}
-                    </span>
-                  </a>
-                </li>
-              ) : null}
-              {content.contact.emailHref && content.contact.email ? (
-                <li>
-                  <a
-                    href={content.contact.emailHref}
-                    className={`${linkClass} break-all`}
-                  >
-                    <BeigeIconMail className={iconClass} />
-                    <span className="truncate">{content.contact.email}</span>
-                  </a>
-                </li>
-              ) : null}
-            </ul>
-          </div>
-        ) : null}
+        <div className="space-y-10">
+          {showPhones ? (
+            <div data-beige-footer-phones>
+              <p className={headingClass}>{copy.phonesHeading}</p>
+              <ul className="space-y-4 text-[0.9375rem]">
+                {showWhatsApp && whatsappHref && whatsappNumber ? (
+                  <li>
+                    <p className="mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#A39073]">
+                      {copy.whatsappPrefix}
+                    </p>
+                    <a
+                      href={whatsappHref}
+                      className={linkClass}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-beige-cta="footer-whatsapp"
+                      aria-label={`${copy.whatsappPrefix}: ${formatBeigePhoneDisplay(whatsappNumber)}. ${dict.a11y.opensInNewTab}`}
+                    >
+                      <BeigeIconWhatsApp className={iconClass} />
+                      <span className="truncate">
+                        {formatBeigePhoneDisplay(whatsappNumber)}
+                      </span>
+                    </a>
+                  </li>
+                ) : null}
+                {showOffice && channels.phoneHref && channels.phone ? (
+                  <li>
+                    <p className="mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#A39073]">
+                      {copy.officeLabel}
+                    </p>
+                    <a
+                      href={channels.phoneHref}
+                      className={linkClass}
+                      data-beige-cta="footer-call"
+                    >
+                      <BeigeIconPhone className={iconClass} />
+                      <span className="truncate">
+                        {formatBeigePhoneDisplay(channels.phone)}
+                      </span>
+                    </a>
+                  </li>
+                ) : null}
+              </ul>
+            </div>
+          ) : null}
 
-        {/* Column 4 — Social + Legal */}
+          {showEmail ? (
+            <div data-beige-footer-email>
+              <p className={headingClass}>{copy.emailHeading}</p>
+              <a
+                href={content.contact.emailHref ?? undefined}
+                className={`${linkClass} break-all`}
+                data-beige-cta="footer-email"
+              >
+                <BeigeIconMail className={iconClass} />
+                <span className="truncate">{content.contact.email}</span>
+              </a>
+            </div>
+          ) : null}
+        </div>
+
         <div className="space-y-10">
           {hasSocial ? (
             <BeigeSocialLinks
               social={social}
               dict={dict}
-              heading={dict.footer.follow}
+              heading={copy.followHeading}
             />
           ) : null}
 
           <nav aria-label={dict.a11y.legalNav}>
-            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#FBF9F5]">
-              {dict.footer.legal}
-            </p>
+            <p className={headingClass}>{dict.footer.legal}</p>
             <ul className="space-y-3 text-[0.9375rem]">
               <li>
                 <Link

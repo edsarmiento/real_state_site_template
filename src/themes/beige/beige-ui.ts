@@ -33,7 +33,7 @@ export function beigeNavLinks(
   return [
     {
       href: localizedHref("/#propiedades", locale, null, defaultLocale),
-      label: locale === "en" ? "Properties" : "Propiedades",
+      label: dict.nav.properties,
     },
     {
       href: localizedHref("/#ubicaciones", locale, null, defaultLocale),

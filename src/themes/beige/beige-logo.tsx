@@ -19,7 +19,7 @@ export function BeigeLogo({ src, alt, className, fallbackClassName }: Props) {
     <img
       src={src}
       alt={alt}
-      className={className}
+      className={["beige-logo", className].filter(Boolean).join(" ")}
       decoding="async"
       onError={() => setFailed(true)}
     />

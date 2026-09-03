@@ -233,7 +233,7 @@ export async function BeigeListingDetail({
             </div>
 
             <aside id="inquiry" className="space-y-6 lg:col-span-4">
-              <div className="sticky top-28 space-y-6 rounded-3xl border border-[#E5D9C5] bg-white p-8 shadow-xl">
+              <div className="sticky top-36 space-y-6 rounded-3xl border border-[#E5D9C5] bg-white p-8 shadow-xl lg:top-40">
                 <div>
                   <h2 className="text-2xl font-normal">
                     {isSale

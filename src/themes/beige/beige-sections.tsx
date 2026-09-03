@@ -343,13 +343,17 @@ export function BeigeContact({
               {headings.subtitle}
             </p>
             {showWhatsApp || showCall ? (
-              <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+              <div
+                data-beige-contact-actions
+                className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center"
+              >
                 {showWhatsApp && whatsappHref ? (
                   <a
                     href={whatsappHref}
                     className="beige-contact-cta beige-contact-cta--primary"
                     target="_blank"
                     rel="noopener noreferrer"
+                    data-beige-cta="form-whatsapp"
                     aria-label={`${copy.openWhatsApp}. ${dict.a11y.opensInNewTab}`}
                   >
                     <BeigeIconWhatsApp className="h-5 w-5 shrink-0" />
@@ -357,7 +361,11 @@ export function BeigeContact({
                   </a>
                 ) : null}
                 {showCall && phoneHref ? (
-                  <a href={phoneHref} className="beige-contact-cta beige-contact-cta--outline">
+                  <a
+                    href={phoneHref}
+                    className="beige-contact-cta beige-contact-cta--outline"
+                    data-beige-cta="form-call"
+                  >
                     <BeigeIconPhone className="h-5 w-5 shrink-0" />
                     {copy.callNow}
                   </a>
