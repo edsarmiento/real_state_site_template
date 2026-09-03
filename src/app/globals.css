@@ -4187,21 +4187,57 @@ html[data-site-layout="beige"] {
   box-shadow: 0 0 0 4px rgba(164, 180, 148, 0.22);
 }
 
-[data-site-theme="beige"] .beige-faq summary {
-  cursor: pointer;
-  list-style: none;
+[data-site-theme="beige"] .beige-field--icon {
+  padding-left: 2.75rem;
 }
 
-[data-site-theme="beige"] .beige-faq summary::-webkit-details-marker {
-  display: none;
+@keyframes beige-hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-[data-site-theme="beige"] .beige-faq__chevron {
-  transition: transform 0.35s var(--beige-ease);
+[data-site-theme="beige"] .beige-hero-frame {
+  position: relative;
+  animation: beige-hero-in 1.05s var(--beige-ease) both;
 }
 
-[data-site-theme="beige"] .beige-faq details[open] .beige-faq__chevron {
-  transform: rotate(180deg);
+[data-site-theme="beige"] .beige-hero-frame--1 {
+  animation-delay: 0.05s;
+}
+
+[data-site-theme="beige"] .beige-hero-frame--2 {
+  animation-delay: 0.18s;
+}
+
+[data-site-theme="beige"] .beige-hero-frame--3 {
+  animation-delay: 0.3s;
+}
+
+[data-site-theme="beige"] .beige-hero-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 45%,
+    rgba(45, 42, 38, 0.18)
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s var(--beige-ease);
+}
+
+[data-site-theme="beige"][data-beige-motion="none"] .beige-hero-frame,
+[data-site-theme="beige"][data-beige-motion="none"] .beige-hero-frame::after {
+  animation: none;
+  opacity: 1;
+  transform: none;
 }
 
 [data-site-theme="beige"] .beige-thumb {
@@ -4322,7 +4358,9 @@ html[data-site-layout="beige"] {
   [data-site-theme="beige"] .beige-nav-link::after,
   [data-site-theme="beige"] .beige-btn,
   [data-site-theme="beige"] .beige-btn:hover,
-  [data-site-theme="beige"] .beige-thumb {
+  [data-site-theme="beige"] .beige-thumb,
+  [data-site-theme="beige"] .beige-hero-frame,
+  [data-site-theme="beige"] .beige-hero-frame::after {
     animation: none !important;
     transition: none !important;
     transform: none !important;

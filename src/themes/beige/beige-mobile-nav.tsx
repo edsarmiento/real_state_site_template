@@ -2,26 +2,21 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import {
-  BeigeIconClose,
-  BeigeIconMenu,
-  BeigeIconWhatsApp,
-} from "@/themes/beige/beige-icons";
+import { BeigeIconClose, BeigeIconMenu } from "@/themes/beige/beige-icons";
 
 type NavLink = {
   href: string;
   label: string;
 };
 
-type WhatsAppLink = {
+type ContactCta = {
   href: string;
   label: string;
-  ariaLabel?: string;
 };
 
 type Props = {
   links: NavLink[];
-  whatsapp: WhatsAppLink | null;
+  contactCta: ContactCta;
   menuLabel: string;
   openLabel: string;
   closeLabel: string;
@@ -31,7 +26,7 @@ type Props = {
 
 export function BeigeMobileNav({
   links,
-  whatsapp,
+  contactCta,
   menuLabel,
   openLabel,
   closeLabel,
@@ -92,19 +87,13 @@ export function BeigeMobileNav({
               </Link>
             ))}
             {localeSwitcher ? <div>{localeSwitcher}</div> : null}
-            {whatsapp ? (
-              <a
-                href={whatsapp.href}
-                className="inline-flex items-center gap-2 rounded-full bg-[#A4B494] px-4 py-2 text-sm font-medium text-[#2D2A26]"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={whatsapp.ariaLabel}
-                onClick={() => setOpen(false)}
-              >
-                <BeigeIconWhatsApp className="h-4 w-4" />
-                {whatsapp.label}
-              </a>
-            ) : null}
+            <Link
+              href={contactCta.href}
+              className="inline-flex items-center justify-center rounded-full bg-[#A4B494] px-4 py-2 text-sm font-medium text-[#2D2A26]"
+              onClick={() => setOpen(false)}
+            >
+              {contactCta.label}
+            </Link>
           </div>
         </nav>
       ) : null}

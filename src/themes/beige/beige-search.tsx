@@ -117,13 +117,13 @@ export function BeigeSearch({
         <label className="space-y-2 text-xs font-semibold uppercase tracking-wider text-[#8A7759]">
           {dict.search.location}
           <span className="relative mt-2 block">
-            <BeigeIconMapPin className="pointer-events-none absolute left-4 top-3.5 h-4 w-4 text-[#A39073]" />
+            <BeigeIconMapPin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#A39073]" />
             <input
               id={`${id}-city`}
               name="city"
               defaultValue={city}
               placeholder={dict.search.locationPlaceholder}
-              className="beige-field pl-11"
+              className="beige-field beige-field--icon"
             />
           </span>
         </label>

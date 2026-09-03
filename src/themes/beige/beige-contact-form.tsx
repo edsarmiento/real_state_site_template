@@ -1,108 +1,170 @@
 "use client";
 
-import type { FormEvent } from "react";
-import type { ContactContent, LegalContent } from "@/lib/public-site-content";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import { parseApiFailureMessage } from "@/lib/listing-types";
+import type { LegalContent } from "@/lib/public-site-content";
 import {
   localizeSiteHref,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
-import { BeigeIconWhatsApp } from "@/themes/beige/beige-icons";
+import { getBeigeCopy } from "@/themes/beige/beige-copy";
 
 type Props = {
-  contact: ContactContent;
+  listingSlug: string | null;
   legal: LegalContent;
   dict: SiteDictionary;
   locale: SiteLocale;
   defaultLocale: SiteLocale;
 };
 
+const PHONE_DIGITS = /^\d{10}$/;
+
+function onlyPhoneDigits(value: string): string {
+  return value.replace(/\D/g, "").slice(0, 10);
+}
+
 const field =
-  "w-full border border-[#E5D9C5] bg-[#FBF9F5] px-3 py-2 text-sm text-[#2D2A26] disabled:opacity-70";
+  "beige-field mt-1";
 
 export function BeigeContactForm({
-  contact,
+  listingSlug,
   legal,
   dict,
   locale,
   defaultLocale,
 }: Props) {
+  const copy = getBeigeCopy(locale);
   const privacyHref = localizeSiteHref(
     legal.privacyNoticeUrl,
     locale,
     defaultLocale,
   );
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [phone, setPhone] = useState("");
 
-  if (contact.formMode === "hidden") {
-    return (
-      <aside
-        className="rounded-2xl border border-[#E5D9C5] bg-[#F4EFE6] p-6"
-        aria-label={dict.contact.kicker}
-      >
-        <p className="text-xs uppercase tracking-wider text-[#A39073]">
-          {dict.contact.formEyebrow}
-        </p>
-        <h3 className="beige-serif mt-2 text-2xl">{dict.contact.formTitle}</h3>
-        <p className="mt-3 text-sm leading-relaxed text-[#8A7759]">
-          {dict.contact.formUnavailable}
-        </p>
-      </aside>
-    );
+  function onPhoneChange(event: ChangeEvent<HTMLInputElement>) {
+    setPhone(onlyPhoneDigits(event.target.value));
   }
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
+    const fd = new FormData(form);
+    const phoneDigits = onlyPhoneDigits(String(fd.get("phone") || phone));
+    if (!PHONE_DIGITS.test(phoneDigits)) {
+      setError(dict.inquiry.phoneError);
+      return;
+    }
+    if (!fd.get("privacyAccepted")) {
+      setError(dict.contact.privacyConsent);
+      return;
+    }
+    if (!listingSlug) {
+      setError(copy.contactNeedsListing);
+      return;
+    }
+
+    setError(null);
+    setPending(true);
+    try {
+      const message = String(fd.get("message") || "").trim();
+      const res = await fetch(
+        `/api/public/listings/${encodeURIComponent(listingSlug)}/inquiries`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            inquiry: {
+              name: String(fd.get("name") || "").trim(),
+              phone: phoneDigits,
+              message: message
+                ? `${copy.generalInquiryPrefix}\n\n${message}`
+                : copy.generalInquiryPrefix,
+            },
+          }),
+        },
+      );
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const message = parseApiFailureMessage(data);
+        setError(
+          !message || message === "No se pudo completar la solicitud."
+            ? dict.inquiry.requestFailed
+            : message,
+        );
+        return;
+      }
+      setSent(true);
+      setPhone("");
+      form.reset();
+    } finally {
+      setPending(false);
+    }
+  }
+
+  if (sent) {
+    return (
+      <p className="p-8 text-sm text-[#8F9F81]" role="status">
+        {dict.inquiry.success}
+      </p>
+    );
   }
 
   return (
     <form
-      className="rounded-2xl border border-[#E5D9C5] bg-[#FBF9F5] p-6"
+      className="space-y-4"
       onSubmit={onSubmit}
       noValidate
-      aria-label={dict.contact.previewAria}
+      aria-busy={pending}
     >
-      <p className="text-xs uppercase tracking-wider text-[#A39073]">
-        {dict.contact.formEyebrow}
-      </p>
-      <p className="mt-1 text-xs font-semibold text-[#8F9F81]">
-        {dict.contact.previewBadge}
-      </p>
-      <h3 className="beige-serif mt-2 text-2xl">{dict.contact.formTitle}</h3>
-      <p className="mt-2 text-sm text-[#8A7759]">{dict.contact.formDescription}</p>
-
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <label className="text-xs uppercase tracking-wider text-[#A39073]">
-          {dict.contact.name}
-          <input
-            name="name"
-            className={`${field} mt-1`}
-            placeholder={dict.contact.namePlaceholder}
-            disabled
-          />
-        </label>
-        <label className="text-xs uppercase tracking-wider text-[#A39073]">
-          {dict.contact.phone}
-          <input
-            name="phone"
-            className={`${field} mt-1`}
-            placeholder={dict.contact.phonePlaceholder}
-            disabled
-          />
-        </label>
-        <label className="text-xs uppercase tracking-wider text-[#A39073] sm:col-span-2">
-          {dict.contact.message}
-          <textarea
-            name="message"
-            rows={4}
-            className={`${field} mt-1`}
-            placeholder={dict.contact.messagePlaceholder}
-            disabled
-          />
-        </label>
-      </div>
-
-      <label className="mt-4 flex items-start gap-2 text-xs text-[#8A7759]">
-        <input type="checkbox" name="privacyAccepted" disabled className="mt-0.5" />
+      {error ? (
+        <p className="text-sm text-red-700" role="alert">
+          {error}
+        </p>
+      ) : null}
+      <label className="block text-xs font-semibold uppercase tracking-wider text-[#A39073]">
+        {dict.contact.name}
+        <input
+          name="name"
+          required
+          autoComplete="name"
+          className={field}
+          placeholder={dict.contact.namePlaceholder}
+        />
+      </label>
+      <label className="block text-xs font-semibold uppercase tracking-wider text-[#A39073]">
+        {dict.contact.phone}
+        <input
+          name="phone"
+          inputMode="numeric"
+          required
+          autoComplete="tel"
+          value={phone}
+          onChange={onPhoneChange}
+          className={field}
+          placeholder={dict.contact.phonePlaceholder}
+        />
+      </label>
+      <label className="block text-xs font-semibold uppercase tracking-wider text-[#A39073]">
+        {dict.contact.message}
+        <textarea
+          name="message"
+          required
+          rows={4}
+          className={field}
+          placeholder={dict.contact.messagePlaceholder}
+        />
+      </label>
+      <label className="flex items-start gap-2 text-xs leading-relaxed text-[#8A7759]">
+        <input
+          type="checkbox"
+          name="privacyAccepted"
+          required
+          className="mt-0.5"
+        />
         <span>
           {dict.contact.privacyConsent}{" "}
           <a href={privacyHref} className="underline underline-offset-2">
@@ -110,28 +172,13 @@ export function BeigeContactForm({
           </a>
         </span>
       </label>
-
       <button
         type="submit"
-        disabled
-        className="mt-4 w-full rounded-xl bg-[#E5D9C5] px-4 py-3 text-sm font-semibold text-[#8A7759]"
+        disabled={pending}
+        className="beige-btn w-full rounded-2xl bg-[#2D2A26] px-4 py-3.5 text-sm font-medium text-white disabled:opacity-60"
       >
-        {dict.contact.submit}
+        {pending ? dict.inquiry.sending : copy.contactSubmit}
       </button>
-      <p className="mt-3 text-sm text-[#A39073]" role="status">
-        {dict.contact.previewNote}
-      </p>
-      {contact.whatsappHref ? (
-        <a
-          href={contact.whatsappHref}
-          className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[#8F9F81]"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <BeigeIconWhatsApp className="h-4 w-4" />
-          {dict.whatsapp.label}
-        </a>
-      ) : null}
     </form>
   );
 }

@@ -20,6 +20,7 @@ import { BeigeInquiryForm } from "@/themes/beige/beige-inquiry-form";
 import { BeigeListingWhatsAppButton } from "@/themes/beige/beige-listing-whatsapp";
 import { BeigeShareButton } from "@/themes/beige/beige-share-button";
 import { BeigeShell } from "@/themes/beige/beige-shell";
+import { displayListingTitle } from "@/themes/beige/beige-display";
 import { formatBeigePriceParts, getBeigeUi } from "@/themes/beige/beige-ui";
 import { luxuryVisibleSpecs } from "@/themes/luxury/luxury-specs";
 
@@ -78,7 +79,7 @@ export async function BeigeListingDetail({
                     {listing.location_label || typeLabel}
                   </p>
                   <h1 className="beige-serif text-3xl font-normal leading-tight text-[#2D2A26] sm:text-4xl">
-                    {listing.title}
+                    {displayListingTitle(listing.title) || listing.title}
                   </h1>
                   <p className="mt-3 text-3xl font-bold text-[#8F9F81]">
                     {price.amount}{" "}

@@ -2,17 +2,16 @@ import Link from "next/link";
 import { locationsFromListings } from "@/lib/public-site-content";
 import { fillTemplate, localizedHref } from "@/lib/site-i18n";
 import type { CatalogThemeProps } from "@/themes/theme-types";
-import { BeigeCoverImage } from "@/themes/beige/beige-cover-image";
+import { getBeigeCopy, resolveBeigeHeroCopy } from "@/themes/beige/beige-copy";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
+import { BeigeHeroCollage } from "@/themes/beige/beige-hero-collage";
 import { BeigeListingCard } from "@/themes/beige/beige-listing-card";
 import { BeigeReveal } from "@/themes/beige/beige-reveal";
 import { BeigeSearch } from "@/themes/beige/beige-search";
 import {
   BeigeAbout,
-  BeigeCommercial,
   BeigeContact,
-  BeigeFaq,
   BeigeLocations,
   BeigeProcess,
   BeigeTestimonials,
@@ -53,6 +52,8 @@ export async function BeigeCatalog({
   lang,
 }: CatalogThemeProps) {
   const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
+  const copy = getBeigeCopy(locale);
+  const hero = resolveBeigeHeroCopy(content, locale);
   const heroImage = content.hero.imageUrl;
   const collagePhotos = listings
     .map((listing) => listing.photo_url)
@@ -106,46 +107,32 @@ export async function BeigeCatalog({
         <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-between gap-12 px-6 lg:flex-row">
           <div className="max-w-xl space-y-6">
             <span className="inline-flex items-center rounded-full border border-[#A4B494]/30 bg-[#A4B494]/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-[#2D2A26]">
-              {content.hero.eyebrow || dict.hero.badge}
+              {hero.heroEyebrow}
             </span>
             <h1 className="beige-hero__title text-4xl font-normal leading-tight tracking-tight text-[#2D2A26] sm:text-6xl">
-              {dict.hero.titleBefore}{" "}
-              <em className="italic text-[#8F9F81]">{dict.hero.titleAccent}</em>{" "}
-              {dict.hero.titleAfter}
+              {hero.heroTitle.includes(hero.heroTitleAccent) ? (
+                <>
+                  {hero.heroTitle.slice(
+                    0,
+                    hero.heroTitle.indexOf(hero.heroTitleAccent),
+                  )}
+                  <em className="italic text-[#8F9F81]">
+                    {hero.heroTitleAccent}
+                  </em>
+                  {hero.heroTitle.slice(
+                    hero.heroTitle.indexOf(hero.heroTitleAccent) +
+                      hero.heroTitleAccent.length,
+                  )}
+                </>
+              ) : (
+                hero.heroTitle
+              )}
             </h1>
             <p className="text-base font-light leading-relaxed text-[#8A7759] sm:text-lg">
-              {dict.hero.subtitle}
+              {hero.heroSubtitle}
             </p>
           </div>
-          <div className="grid w-full grid-cols-2 gap-4 lg:w-1/2">
-            <div className="col-span-2 overflow-hidden rounded-3xl border-2 border-white shadow-2xl">
-              <BeigeCoverImage
-                src={collage[0]}
-                alt=""
-                className="beige-img-zoom h-52 w-full object-cover md:h-64"
-                placeholderClassName="h-52 bg-[#E5D9C5] md:h-64"
-                placeholder=""
-              />
-            </div>
-            <div className="overflow-hidden rounded-2xl border-2 border-white shadow-xl">
-              <BeigeCoverImage
-                src={collage[1]}
-                alt=""
-                className="beige-img-zoom h-36 w-full object-cover"
-                placeholderClassName="h-36 bg-[#E5D9C5]"
-                placeholder=""
-              />
-            </div>
-            <div className="overflow-hidden rounded-2xl border-2 border-white shadow-xl">
-              <BeigeCoverImage
-                src={collage[2]}
-                alt=""
-                className="beige-img-zoom h-36 w-full object-cover"
-                placeholderClassName="h-36 bg-[#E5D9C5]"
-                placeholder=""
-              />
-            </div>
-          </div>
+          <BeigeHeroCollage urls={collage} />
         </div>
         <div className="relative z-20 mx-auto mt-16 max-w-5xl px-6">
           <BeigeSearch
@@ -196,11 +183,17 @@ export async function BeigeCatalog({
                 <div className="mb-16 flex flex-col justify-between md:flex-row md:items-end">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A39073]">
-                      {dict.results.kicker}
+                      {copy.catalogEyebrow}
                     </p>
                     <h2 className="beige-section__title mt-2 text-3xl text-[#2D2A26] sm:text-5xl">
-                      {catalogHeading(dict, oferta, city, total)}
+                      {copy.catalogTitle}
                     </h2>
+                    <p className="mt-3 max-w-xl text-sm font-light text-[#8A7759]">
+                      {copy.catalogDescription}
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-[#2D2A26]">
+                      {catalogHeading(dict, oferta, city, total)}
+                    </p>
                   </div>
                   {propertyType || bedrooms || city ? (
                     <Link
@@ -235,14 +228,7 @@ export async function BeigeCatalog({
         listings={listings}
         locale={locale}
         defaultLocale={defaultLocale}
-        dict={dict}
-      />
-      <BeigeCommercial
-        listings={listings}
-        content={content}
-        dict={dict}
-        locale={locale}
-        defaultLocale={defaultLocale}
+        copy={copy}
       />
       <BeigeAbout
         content={content}
@@ -251,13 +237,13 @@ export async function BeigeCatalog({
         defaultLocale={defaultLocale}
       />
       <BeigeTestimonials content={content} dict={dict} locale={locale} />
-      <BeigeProcess dict={dict} />
-      <BeigeFaq dict={dict} />
+      <BeigeProcess dict={dict} content={content} locale={locale} />
       <BeigeContact
         content={content}
         dict={dict}
         locale={locale}
         defaultLocale={defaultLocale}
+        listingSlug={listings[0]?.slug ?? null}
       />
       <BeigeFooter lang={lang} />
     </BeigeShell>

@@ -44,20 +44,12 @@ export function beigeNavLinks(
       label: dict.nav.locations,
     },
     {
-      href: localizedHref("/#comercial", locale, null, defaultLocale),
-      label: dict.nav.commercial,
-    },
-    {
       href: localizedHref("/#nosotros", locale, null, defaultLocale),
       label: dict.nav.about,
     },
     {
       href: localizedHref("/#proceso", locale, null, defaultLocale),
       label: dict.nav.process,
-    },
-    {
-      href: localizedHref("/#faq", locale, null, defaultLocale),
-      label: dict.nav.faq,
     },
   ];
 }

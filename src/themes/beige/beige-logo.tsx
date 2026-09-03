@@ -20,6 +20,7 @@ export function BeigeLogo({ src, alt, className, fallbackClassName }: Props) {
       src={src}
       alt={alt}
       className={className}
+      decoding="async"
       onError={() => setFailed(true)}
     />
   );

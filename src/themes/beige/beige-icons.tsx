@@ -117,3 +117,29 @@ export function BeigeIconClose({ className }: IconProps) {
     </svg>
   );
 }
+
+export function BeigeIconInstagram({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect
+        x="4.5"
+        y="4.5"
+        width="15"
+        height="15"
+        rx="4"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+      <circle cx="12" cy="12" r="3.4" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="16.4" cy="7.6" r="0.9" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function BeigeIconFacebook({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M14.2 8.2h1.8V5.4h-1.8c-2.2 0-3.6 1.5-3.6 3.7v1.6H9v2.8h1.6V19h3.1v-5.5h2.1l.4-2.8h-2.5V9.2c0-.6.3-1 .9-1Z" />
+    </svg>
+  );
+}
