@@ -16,10 +16,11 @@ import {
   buildPropertyCreatePayload,
   optionalFloat,
   optionalInt,
+  optionalBathroomLabel,
   validatePropertySetupFields,
+  BATHROOMS_FIELD_HINT,
   type PropertySetupFields,
 } from "@/lib/property-setup-payload";
-import { optionalHalfBathroom, sanitizeHalfBathroomInput, BATHROOMS_FIELD_HINT } from "@/lib/bathrooms";
 import {
   applyApiFormErrors,
   type ValidationErrors,
@@ -72,7 +73,7 @@ export function ListingSetupForm() {
     }
 
     const bed = optionalInt(form.bedrooms);
-    const bath = optionalHalfBathroom(form.bathrooms);
+    const bath = optionalBathroomLabel(form.bathrooms);
 
     setPending(true);
     try {
@@ -198,12 +199,9 @@ export function ListingSetupForm() {
           <TextField
             id="bathrooms"
             label="Baños"
-            inputMode="decimal"
             hint={BATHROOMS_FIELD_HINT}
             value={form.bathrooms}
-            onChange={(e) =>
-              set("bathrooms", sanitizeHalfBathroomInput(e.target.value))
-            }
+            onChange={(e) => set("bathrooms", e.target.value)}
           />
           <TextField
             id="builtArea"

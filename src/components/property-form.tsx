@@ -14,13 +14,7 @@ import {
   propertyStatusLabel,
   propertyTypeLabel,
 } from "@/lib/property-labels";
-import { optionalFloat, optionalInt } from "@/lib/property-setup-payload";
-import {
-  BATHROOMS_FIELD_HINT,
-  formatBathroomsCount,
-  optionalHalfBathroom,
-  sanitizeHalfBathroomInput,
-} from "@/lib/bathrooms";
+import { optionalFloat, optionalInt, BATHROOMS_FIELD_HINT, normalizeBathroomLabel } from "@/lib/property-setup-payload";
 import {
   applyApiFormErrors,
   type ValidationErrors,
@@ -98,7 +92,7 @@ function formFromProperty(p: Property): FormState {
     built_area: p.built_area != null ? String(p.built_area) : "",
     land_area: p.land_area != null ? String(p.land_area) : "",
     bedrooms: p.bedrooms != null ? String(p.bedrooms) : "",
-    bathrooms: p.bathrooms != null ? formatBathroomsCount(p.bathrooms) : "",
+    bathrooms: p.bathrooms ?? "",
     parking_spaces: p.parking_spaces != null ? String(p.parking_spaces) : "",
     floors: p.floors != null ? String(p.floors) : "",
     year_built: p.year_built != null ? String(p.year_built) : "",
@@ -143,8 +137,7 @@ function toPayload(f: FormState): Record<string, string | number | null> {
     if (v !== undefined) p[key] = v;
   }
 
-  const bath = optionalHalfBathroom(f.bathrooms);
-  if (bath !== undefined) p.bathrooms = bath;
+  p.bathrooms = normalizeBathroomLabel(f.bathrooms);
 
   return p;
 }
@@ -353,12 +346,9 @@ export function PropertyForm(props: Props) {
           <TextField
             id="bathrooms"
             label="Baños"
-            inputMode="decimal"
             hint={BATHROOMS_FIELD_HINT}
             value={form.bathrooms}
-            onChange={(e) =>
-              set("bathrooms", sanitizeHalfBathroomInput(e.target.value))
-            }
+            onChange={(e) => set("bathrooms", e.target.value)}
           />
           <TextField
             id="parking_spaces"

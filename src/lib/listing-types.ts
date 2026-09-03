@@ -1,5 +1,4 @@
 import type { SiteDictionary } from "@/lib/site-i18n";
-import { formatBathroomsCount, formatBathroomsLabel } from "@/lib/bathrooms";
 
 export type ListingStatus = "draft" | "published" | "paused";
 export type ListingOfferType = "rent" | "sale";
@@ -27,7 +26,7 @@ export type StaffListing = {
   colony: string | null;
   property_type: string;
   bedrooms: number | null;
-  bathrooms: number | null;
+  bathrooms: string | null;
   built_area: string | null;
   land_area: string | null;
   show_exact_address: boolean;
@@ -66,7 +65,7 @@ export type PublicListingCard = {
   location_label: string;
   property_type: string;
   bedrooms: number | null;
-  bathrooms: number | null;
+  bathrooms: string | null;
   built_area: string | null;
   land_area: string | null;
   photo_url: string | null;
@@ -130,7 +129,7 @@ export function listingPublicSpecsLocalized(
   listing: {
     property_type: string;
     bedrooms: number | null;
-    bathrooms: number | null;
+    bathrooms: string | null;
     built_area: string | null;
     land_area?: string | null;
   },
@@ -145,10 +144,10 @@ export function listingPublicSpecsLocalized(
       value: String(listing.bedrooms),
     });
   }
-  if (!land && listing.bathrooms != null) {
+  if (!land && listing.bathrooms?.trim()) {
     specs.push({
       label: dict.listing.specs.bathrooms,
-      value: formatBathroomsCount(listing.bathrooms),
+      value: listing.bathrooms.trim(),
     });
   }
   if (listing.land_area) {
@@ -176,7 +175,7 @@ export function listingPublicSpecsLocalized(
 export function listingCardSpecLine(listing: {
   property_type: string;
   bedrooms: number | null;
-  bathrooms: number | null;
+  bathrooms: string | null;
   built_area: string | null;
   land_area?: string | null;
 }): string {
@@ -186,8 +185,8 @@ export function listingCardSpecLine(listing: {
   if (!land && listing.bedrooms != null) {
     parts.push(`${listing.bedrooms} rec.`);
   }
-  if (!land && listing.bathrooms != null) {
-    parts.push(formatBathroomsLabel(listing.bathrooms));
+  if (!land && listing.bathrooms?.trim()) {
+    parts.push(listing.bathrooms.trim());
   }
   if (listing.land_area) {
     parts.push(`${listing.land_area} m²`);

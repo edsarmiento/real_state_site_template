@@ -8,7 +8,7 @@ export type Unit = {
   name: string;
   status: UnitStatus;
   bedrooms: number | null;
-  bathrooms: number | null;
+  bathrooms: string | null;
   /** Size in m² (metric) or ft² (imperial), per parent property `measurement_system`. */
   built_area: number | null;
   floor: number | null;
@@ -23,7 +23,7 @@ export type UnitCreateBody = {
     name: string;
     status?: UnitStatus;
     bedrooms?: number | null;
-    bathrooms?: number | null;
+    bathrooms?: string | null;
     built_area?: number | null;
     floor?: number | null;
     furnished?: boolean | null;

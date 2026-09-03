@@ -101,8 +101,6 @@ export type SiteDictionary = {
       built: string;
     };
     specBedroomsShort: string;
-    specBathOne: string;
-    specBathMany: string;
     inquireSale: string;
     inquireRent: string;
     inquireSaleCopy: string;
@@ -502,8 +500,6 @@ const dictionaries = {
         built: "Construcción",
       },
       specBedroomsShort: "{count} rec.",
-      specBathOne: "1 baño",
-      specBathMany: "{count} baños",
       inquireSale: "Me interesa comprar",
       inquireRent: "Me interesa rentar",
       inquireSaleCopy: "Pregunta precio, escrituración o visita.",
@@ -770,8 +766,6 @@ const dictionaries = {
         built: "Built",
       },
       specBedroomsShort: "{count} bd",
-      specBathOne: "1 ba",
-      specBathMany: "{count} ba",
       inquireSale: "I’m interested in buying",
       inquireRent: "I’m interested in renting",
       inquireSaleCopy: "Ask about price, closing, or a visit.",

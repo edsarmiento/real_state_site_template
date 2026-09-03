@@ -1,5 +1,4 @@
 import type { PublicListingCard } from "@/lib/listing-types";
-import { formatBathroomsCount } from "@/lib/bathrooms";
 
 export type LuxurySpecKey = "bedrooms" | "bathrooms" | "land" | "built";
 
@@ -18,7 +17,7 @@ function isAbsentSpecValue(value: string): boolean {
 export function luxuryVisibleSpecs(listing: {
   property_type: string;
   bedrooms: number | null;
-  bathrooms: number | null;
+  bathrooms: string | null;
   built_area: string | null;
   land_area?: string | null;
 }): LuxurySpec[] {
@@ -28,8 +27,8 @@ export function luxuryVisibleSpecs(listing: {
   if (!land && listing.bedrooms != null) {
     specs.push({ key: "bedrooms", value: String(listing.bedrooms) });
   }
-  if (!land && listing.bathrooms != null) {
-    specs.push({ key: "bathrooms", value: formatBathroomsCount(listing.bathrooms) });
+  if (!land && listing.bathrooms?.trim()) {
+    specs.push({ key: "bathrooms", value: listing.bathrooms.trim() });
   }
   if (listing.land_area && !isAbsentSpecValue(String(listing.land_area))) {
     specs.push({ key: "land", value: `${listing.land_area} m²` });
@@ -57,8 +56,6 @@ export function luxuryCardSpecLine(
   listing: PublicListingCard,
   labels: {
     specBedroomsShort: string;
-    specBathOne: string;
-    specBathMany: string;
   },
 ): string {
   const parts: string[] = [];
@@ -68,15 +65,8 @@ export function luxuryCardSpecLine(
       labels.specBedroomsShort.replace("{count}", String(listing.bedrooms)),
     );
   }
-  if (!land && listing.bathrooms != null) {
-    parts.push(
-      listing.bathrooms === 1
-        ? labels.specBathOne
-        : labels.specBathMany.replace(
-            "{count}",
-            formatBathroomsCount(listing.bathrooms),
-          ),
-    );
+  if (!land && listing.bathrooms?.trim()) {
+    parts.push(listing.bathrooms.trim());
   }
   if (listing.land_area) parts.push(`${listing.land_area} m²`);
   else if (listing.built_area) parts.push(`${listing.built_area} m²`);

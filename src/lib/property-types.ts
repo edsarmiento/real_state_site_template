@@ -38,7 +38,7 @@ export type Property = {
   built_area: number | null;
   land_area: number | null;
   bedrooms: number | null;
-  bathrooms: number | null;
+  bathrooms: string | null;
   parking_spaces: number | null;
   floors: number | null;
   year_built: number | null;
@@ -67,7 +67,7 @@ export type PropertyCreateBody = {
     built_area?: number;
     land_area?: number;
     bedrooms?: number;
-    bathrooms?: number;
+    bathrooms?: string | null;
     parking_spaces?: number;
     floors?: number;
     year_built?: number;

@@ -15,12 +15,9 @@ import { propertyTypeLabel } from "@/lib/property-labels";
 import {
   buildPropertyCreatePayload,
   validatePropertySetupFields,
+  BATHROOMS_FIELD_HINT,
   type PropertySetupFields,
 } from "@/lib/property-setup-payload";
-import {
-  BATHROOMS_FIELD_HINT,
-  sanitizeHalfBathroomInput,
-} from "@/lib/bathrooms";
 import {
   applyApiFormErrors,
   type ValidationErrors,
@@ -153,12 +150,9 @@ export function PropertySetupForm() {
           <TextField
             id="bathrooms"
             label="Baños"
-            inputMode="decimal"
             hint={BATHROOMS_FIELD_HINT}
             value={form.bathrooms}
-            onChange={(e) =>
-              set("bathrooms", sanitizeHalfBathroomInput(e.target.value))
-            }
+            onChange={(e) => set("bathrooms", e.target.value)}
           />
           <TextField
             id="builtArea"

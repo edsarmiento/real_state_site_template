@@ -1,5 +1,20 @@
 import { DEFAULT_PROPERTY_COUNTRY } from "@/lib/property-types";
-import { optionalHalfBathroom } from "@/lib/bathrooms";
+
+export const BATHROOMS_FIELD_HINT =
+  "Texto libre (ej. 1, 1/2, 1 1/2).";
+
+/** Empty string clears the field on update. */
+export function normalizeBathroomLabel(value: string): string | null {
+  return value.trim() || null;
+}
+
+/** Omit from create payloads when empty. */
+export function optionalBathroomLabel(
+  value: string,
+): string | undefined {
+  const trimmed = value.trim();
+  return trimmed || undefined;
+}
 
 export type PropertySetupFields = {
   name: string;
@@ -45,7 +60,7 @@ export function buildPropertyCreatePayload(
 
   const bed = optionalInt(fields.bedrooms);
   if (bed !== undefined) payload.bedrooms = bed;
-  const bath = optionalHalfBathroom(fields.bathrooms);
+  const bath = optionalBathroomLabel(fields.bathrooms);
   if (bath !== undefined) payload.bathrooms = bath;
   const built = optionalFloat(fields.builtArea);
   if (built !== undefined) payload.built_area = built;
