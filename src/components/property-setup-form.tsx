@@ -18,6 +18,10 @@ import {
   type PropertySetupFields,
 } from "@/lib/property-setup-payload";
 import {
+  BATHROOMS_FIELD_HINT,
+  sanitizeHalfBathroomInput,
+} from "@/lib/bathrooms";
+import {
   applyApiFormErrors,
   type ValidationErrors,
 } from "@/lib/validation";
@@ -149,10 +153,11 @@ export function PropertySetupForm() {
           <TextField
             id="bathrooms"
             label="Baños"
-            inputMode="numeric"
+            inputMode="decimal"
+            hint={BATHROOMS_FIELD_HINT}
             value={form.bathrooms}
             onChange={(e) =>
-              set("bathrooms", e.target.value.replace(/\D/g, "").slice(0, 3))
+              set("bathrooms", sanitizeHalfBathroomInput(e.target.value))
             }
           />
           <TextField

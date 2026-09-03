@@ -1,4 +1,5 @@
 import type { PublicListingCard } from "@/lib/listing-types";
+import { formatBathroomsCount } from "@/lib/bathrooms";
 
 export type LuxurySpecKey = "bedrooms" | "bathrooms" | "land" | "built";
 
@@ -28,7 +29,7 @@ export function luxuryVisibleSpecs(listing: {
     specs.push({ key: "bedrooms", value: String(listing.bedrooms) });
   }
   if (!land && listing.bathrooms != null) {
-    specs.push({ key: "bathrooms", value: String(listing.bathrooms) });
+    specs.push({ key: "bathrooms", value: formatBathroomsCount(listing.bathrooms) });
   }
   if (listing.land_area && !isAbsentSpecValue(String(listing.land_area))) {
     specs.push({ key: "land", value: `${listing.land_area} m²` });
@@ -71,7 +72,10 @@ export function luxuryCardSpecLine(
     parts.push(
       listing.bathrooms === 1
         ? labels.specBathOne
-        : labels.specBathMany.replace("{count}", String(listing.bathrooms)),
+        : labels.specBathMany.replace(
+            "{count}",
+            formatBathroomsCount(listing.bathrooms),
+          ),
     );
   }
   if (listing.land_area) parts.push(`${listing.land_area} m²`);

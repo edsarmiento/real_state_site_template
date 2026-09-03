@@ -15,6 +15,12 @@ import {
   type ValidationErrors,
 } from "@/lib/validation";
 import { optionalFloat, optionalInt } from "@/lib/property-setup-payload";
+import {
+  BATHROOMS_FIELD_HINT,
+  formatBathroomsCount,
+  optionalHalfBathroom,
+  sanitizeHalfBathroomInput,
+} from "@/lib/bathrooms";
 import { UNIT_STATUSES, type Unit } from "@/lib/unit-types";
 import { unitStatusLabel } from "@/lib/unit-labels";
 import type { MeasurementSystem } from "@/lib/property-types";
@@ -46,7 +52,7 @@ function formFromUnit(u: Unit): FormState {
     name: u.name,
     status: u.status,
     bedrooms: u.bedrooms != null ? String(u.bedrooms) : "",
-    bathrooms: u.bathrooms != null ? String(u.bathrooms) : "",
+    bathrooms: u.bathrooms != null ? formatBathroomsCount(u.bathrooms) : "",
     builtArea: u.built_area != null ? String(u.built_area) : "",
     floor: u.floor != null ? String(u.floor) : "",
     furnished:
@@ -63,7 +69,7 @@ function toPayload(
   };
   const bed = optionalInt(f.bedrooms);
   if (bed !== undefined) p.bedrooms = bed;
-  const bath = optionalInt(f.bathrooms);
+  const bath = optionalHalfBathroom(f.bathrooms);
   if (bath !== undefined) p.bathrooms = bath;
   const built = optionalFloat(f.builtArea);
   if (built !== undefined) p.built_area = built;
@@ -201,10 +207,11 @@ export function UnitForm(props: Props) {
           <TextField
             id="bathrooms"
             label="Baños"
-            inputMode="numeric"
+            inputMode="decimal"
+            hint={BATHROOMS_FIELD_HINT}
             value={form.bathrooms}
             onChange={(e) =>
-              set("bathrooms", e.target.value.replace(/\D/g, "").slice(0, 3))
+              set("bathrooms", sanitizeHalfBathroomInput(e.target.value))
             }
           />
           <TextField

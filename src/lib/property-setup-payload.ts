@@ -1,4 +1,5 @@
 import { DEFAULT_PROPERTY_COUNTRY } from "@/lib/property-types";
+import { optionalHalfBathroom } from "@/lib/bathrooms";
 
 export type PropertySetupFields = {
   name: string;
@@ -44,7 +45,7 @@ export function buildPropertyCreatePayload(
 
   const bed = optionalInt(fields.bedrooms);
   if (bed !== undefined) payload.bedrooms = bed;
-  const bath = optionalInt(fields.bathrooms);
+  const bath = optionalHalfBathroom(fields.bathrooms);
   if (bath !== undefined) payload.bathrooms = bath;
   const built = optionalFloat(fields.builtArea);
   if (built !== undefined) payload.built_area = built;

@@ -16,6 +16,12 @@ import {
 } from "@/lib/property-labels";
 import { optionalFloat, optionalInt } from "@/lib/property-setup-payload";
 import {
+  BATHROOMS_FIELD_HINT,
+  formatBathroomsCount,
+  optionalHalfBathroom,
+  sanitizeHalfBathroomInput,
+} from "@/lib/bathrooms";
+import {
   applyApiFormErrors,
   type ValidationErrors,
 } from "@/lib/validation";
@@ -92,7 +98,7 @@ function formFromProperty(p: Property): FormState {
     built_area: p.built_area != null ? String(p.built_area) : "",
     land_area: p.land_area != null ? String(p.land_area) : "",
     bedrooms: p.bedrooms != null ? String(p.bedrooms) : "",
-    bathrooms: p.bathrooms != null ? String(p.bathrooms) : "",
+    bathrooms: p.bathrooms != null ? formatBathroomsCount(p.bathrooms) : "",
     parking_spaces: p.parking_spaces != null ? String(p.parking_spaces) : "",
     floors: p.floors != null ? String(p.floors) : "",
     year_built: p.year_built != null ? String(p.year_built) : "",
@@ -129,7 +135,6 @@ function toPayload(f: FormState): Record<string, string | number | null> {
 
   for (const [key, raw] of [
     ["bedrooms", f.bedrooms],
-    ["bathrooms", f.bathrooms],
     ["parking_spaces", f.parking_spaces],
     ["floors", f.floors],
     ["year_built", f.year_built],
@@ -137,6 +142,9 @@ function toPayload(f: FormState): Record<string, string | number | null> {
     const v = optionalInt(raw);
     if (v !== undefined) p[key] = v;
   }
+
+  const bath = optionalHalfBathroom(f.bathrooms);
+  if (bath !== undefined) p.bathrooms = bath;
 
   return p;
 }
@@ -345,10 +353,11 @@ export function PropertyForm(props: Props) {
           <TextField
             id="bathrooms"
             label="Baños"
-            inputMode="numeric"
+            inputMode="decimal"
+            hint={BATHROOMS_FIELD_HINT}
             value={form.bathrooms}
             onChange={(e) =>
-              set("bathrooms", e.target.value.replace(/\D/g, "").slice(0, 3))
+              set("bathrooms", sanitizeHalfBathroomInput(e.target.value))
             }
           />
           <TextField

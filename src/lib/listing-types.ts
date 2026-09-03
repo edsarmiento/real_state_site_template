@@ -1,4 +1,5 @@
 import type { SiteDictionary } from "@/lib/site-i18n";
+import { formatBathroomsCount, formatBathroomsLabel } from "@/lib/bathrooms";
 
 export type ListingStatus = "draft" | "published" | "paused";
 export type ListingOfferType = "rent" | "sale";
@@ -147,7 +148,7 @@ export function listingPublicSpecsLocalized(
   if (!land && listing.bathrooms != null) {
     specs.push({
       label: dict.listing.specs.bathrooms,
-      value: String(listing.bathrooms),
+      value: formatBathroomsCount(listing.bathrooms),
     });
   }
   if (listing.land_area) {
@@ -186,7 +187,7 @@ export function listingCardSpecLine(listing: {
     parts.push(`${listing.bedrooms} rec.`);
   }
   if (!land && listing.bathrooms != null) {
-    parts.push(`${listing.bathrooms} ${listing.bathrooms === 1 ? "baño" : "baños"}`);
+    parts.push(formatBathroomsLabel(listing.bathrooms));
   }
   if (listing.land_area) {
     parts.push(`${listing.land_area} m²`);

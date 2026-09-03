@@ -19,6 +19,7 @@ import {
   validatePropertySetupFields,
   type PropertySetupFields,
 } from "@/lib/property-setup-payload";
+import { optionalHalfBathroom, sanitizeHalfBathroomInput, BATHROOMS_FIELD_HINT } from "@/lib/bathrooms";
 import {
   applyApiFormErrors,
   type ValidationErrors,
@@ -71,7 +72,7 @@ export function ListingSetupForm() {
     }
 
     const bed = optionalInt(form.bedrooms);
-    const bath = optionalInt(form.bathrooms);
+    const bath = optionalHalfBathroom(form.bathrooms);
 
     setPending(true);
     try {
@@ -197,10 +198,11 @@ export function ListingSetupForm() {
           <TextField
             id="bathrooms"
             label="Baños"
-            inputMode="numeric"
+            inputMode="decimal"
+            hint={BATHROOMS_FIELD_HINT}
             value={form.bathrooms}
             onChange={(e) =>
-              set("bathrooms", e.target.value.replace(/\D/g, "").slice(0, 3))
+              set("bathrooms", sanitizeHalfBathroomInput(e.target.value))
             }
           />
           <TextField
