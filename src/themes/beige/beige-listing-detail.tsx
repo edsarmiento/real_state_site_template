@@ -57,7 +57,7 @@ export async function BeigeListingDetail({
         <div className="mx-auto max-w-7xl space-y-8 px-6">
           <Link
             href={backHref}
-            className="inline-flex items-center gap-2 rounded-xl border border-[#E5D9C5] bg-white px-4 py-2 text-sm font-semibold text-[#8A7759] shadow-sm transition-colors hover:text-[#2D2A26]"
+            className="inline-flex items-center gap-2 rounded-xl border border-[#E5D9C5] bg-white px-4 py-2 text-sm font-semibold text-[#5C4E3A] shadow-sm transition-colors hover:text-[#2D2A26]"
           >
             <BeigeIconArrowLeft className="h-4 w-4" />
             {dict.listing.back}
@@ -75,15 +75,15 @@ export async function BeigeListingDetail({
 
               <div className="space-y-6 rounded-3xl border border-[#E5D9C5] bg-white p-8 shadow-sm">
                 <div>
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-[#A39073]">
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-[#5C4E3A]">
                     {listing.location_label || typeLabel}
                   </p>
                   <h1 className="beige-serif text-3xl font-normal leading-tight text-[#2D2A26] sm:text-4xl">
                     {displayListingTitle(listing.title) || listing.title}
                   </h1>
-                  <p className="mt-3 text-3xl font-bold text-[#8F9F81]">
+                  <p className="mt-3 text-3xl font-bold text-[#2D2A26]">
                     {price.amount}{" "}
-                    <span className="text-base font-normal text-[#A39073]">
+                    <span className="text-base font-normal text-[#5C4E3A]">
                       {price.currency}
                       {offerType === "rent" ? ` ${dict.listing.perMonth}` : ""}
                     </span>
@@ -97,7 +97,7 @@ export async function BeigeListingDetail({
                         key={spec.key}
                         className="rounded-2xl bg-[#FBF9F5] p-4"
                       >
-                        <dt className="text-xs font-semibold uppercase text-[#A39073]">
+                        <dt className="text-xs font-semibold uppercase text-[#5C4E3A]">
                           {spec.key === "bedrooms" ? (
                             <BeigeIconBed className="mx-auto mb-1 h-5 w-5 text-[#A4B494]" />
                           ) : spec.key === "bathrooms" ? (
@@ -122,7 +122,7 @@ export async function BeigeListingDetail({
                     <h2 className="text-xl font-medium">
                       {dict.listing.description}
                     </h2>
-                    <div className="space-y-4 text-sm font-light leading-relaxed text-[#8A7759]">
+                    <div className="space-y-4 text-sm font-normal leading-relaxed text-[#4A4035]">
                       {descriptionBlocks.map((block, index) => {
                         if (block.type === "paragraph") {
                           return <p key={`p-${index}`}>{block.text}</p>;
@@ -205,7 +205,7 @@ export async function BeigeListingDetail({
                         <div>
                           <p className="text-sm font-bold">{agency}</p>
                           {listing.address_label ? (
-                            <p className="text-xs font-light text-[#A39073]">
+                            <p className="text-xs font-normal text-[#5C4E3A]">
                               {listing.address_label}
                             </p>
                           ) : null}
@@ -215,7 +215,7 @@ export async function BeigeListingDetail({
                   </section>
                 ) : null}
 
-                <div className="flex items-center justify-between border-t border-[#F4EFE6] pt-4 text-xs text-[#A39073]">
+                <div className="flex items-center justify-between border-t border-[#F4EFE6] pt-4 text-xs text-[#5C4E3A]">
                   <span>
                     {dict.listing.listedBy}:{" "}
                     <strong className="font-medium text-[#2D2A26]">
@@ -226,7 +226,7 @@ export async function BeigeListingDetail({
                     slug={listing.slug}
                     title={listing.title}
                     dict={dict}
-                    className="text-xs font-semibold uppercase tracking-wider text-[#8A7759]"
+                    className="text-xs font-semibold uppercase tracking-wider text-[#5C4E3A]"
                   />
                 </div>
               </div>
@@ -240,7 +240,7 @@ export async function BeigeListingDetail({
                       ? dict.listing.inquireSale
                       : dict.listing.inquireRent}
                   </h2>
-                  <p className="mt-1 text-xs font-light text-[#A39073]">
+                  <p className="mt-1 text-xs font-normal text-[#5C4E3A]">
                     {isSale
                       ? dict.listing.inquireSaleCopy
                       : dict.listing.inquireRentCopy}
@@ -259,7 +259,7 @@ export async function BeigeListingDetail({
                 {listing.contact_phone ? (
                   <div className="relative flex items-center py-2">
                     <div className="flex-grow border-t border-[#E5D9C5]" />
-                    <span className="mx-4 flex-shrink text-xs uppercase tracking-widest text-[#A39073]">
+                    <span className="mx-4 flex-shrink text-xs uppercase tracking-widest text-[#5C4E3A]">
                       {dict.listing.orLeaveDetails}
                     </span>
                     <div className="flex-grow border-t border-[#E5D9C5]" />

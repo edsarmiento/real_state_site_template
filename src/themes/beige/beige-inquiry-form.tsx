@@ -108,7 +108,7 @@ export function BeigeInquiryForm({
         </p>
       ) : null}
       <div>
-        <label htmlFor="beige-inquiry-name" className="mb-1 block text-xs uppercase tracking-wider text-[#A39073]">
+        <label htmlFor="beige-inquiry-name" className="mb-1 block text-xs uppercase tracking-wider text-[#5C4E3A]">
           {dict.inquiry.name}
         </label>
         <input
@@ -120,7 +120,7 @@ export function BeigeInquiryForm({
         />
       </div>
       <div>
-        <label htmlFor="beige-inquiry-phone" className="mb-1 block text-xs uppercase tracking-wider text-[#A39073]">
+        <label htmlFor="beige-inquiry-phone" className="mb-1 block text-xs uppercase tracking-wider text-[#5C4E3A]">
           {dict.inquiry.phone}
         </label>
         <input
@@ -135,7 +135,7 @@ export function BeigeInquiryForm({
         />
       </div>
       <div>
-        <label htmlFor="beige-inquiry-message" className="mb-1 block text-xs uppercase tracking-wider text-[#A39073]">
+        <label htmlFor="beige-inquiry-message" className="mb-1 block text-xs uppercase tracking-wider text-[#5C4E3A]">
           {dict.inquiry.message}
         </label>
         <textarea
@@ -151,7 +151,7 @@ export function BeigeInquiryForm({
           }
         />
       </div>
-      <label className="flex items-start gap-2 text-xs leading-relaxed text-[#8A7759]">
+      <label className="flex items-start gap-2 text-xs leading-relaxed text-[#4A4035]">
         <input type="checkbox" name="privacyAccepted" required className="mt-0.5" />
         <span>
           {dict.contact.privacyConsent}{" "}

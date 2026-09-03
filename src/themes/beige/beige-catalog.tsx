@@ -3,7 +3,6 @@ import { catalogTotalPages } from "@/lib/catalog-pagination";
 import { locationsFromListings } from "@/lib/public-site-content";
 import { fillTemplate, localizedHref } from "@/lib/site-i18n";
 import type { CatalogThemeProps } from "@/themes/theme-types";
-import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
 import { getBeigeCopy, resolveBeigeHeroCopy } from "@/themes/beige/beige-copy";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
@@ -67,8 +66,6 @@ export async function BeigeCatalog({
     .filter((url): url is string => Boolean(url))
     .filter((url, index, all) => all.indexOf(url) === index)
     .slice(0, 3);
-  const channels = beigeContactChannels(content);
-  const whatsappHref = channels.whatsappHref;
   const locations =
     content.locations.length > 0
       ? content.locations
@@ -221,7 +218,6 @@ export async function BeigeCatalog({
                         locale={locale}
                         defaultLocale={defaultLocale}
                         dict={dict}
-                        whatsappHref={whatsappHref}
                       />
                     </li>
                   ))}

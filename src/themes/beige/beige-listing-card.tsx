@@ -14,7 +14,6 @@ import {
   BeigeIconBed,
   BeigeIconMapPin,
   BeigeIconMaximize,
-  BeigeIconWhatsApp,
 } from "@/themes/beige/beige-icons";
 import { BeigeShareButton } from "@/themes/beige/beige-share-button";
 import { formatBeigePriceParts } from "@/themes/beige/beige-ui";
@@ -25,7 +24,6 @@ type Props = {
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   dict: SiteDictionary;
-  whatsappHref?: string | null;
 };
 
 export function BeigeListingCard({
@@ -33,7 +31,6 @@ export function BeigeListingCard({
   locale,
   defaultLocale,
   dict,
-  whatsappHref,
 }: Props) {
   const offerType = parseOfferType(listing.offer_type);
   const offerLabel =
@@ -146,8 +143,7 @@ export function BeigeListingCard({
             ))}
           </div>
         ) : null}
-        <div className="mt-auto space-y-3 pt-6">
-          <div className="grid grid-cols-2 gap-2">
+        <div className="mt-auto grid grid-cols-2 gap-2 pt-6">
             <Link
               href={href}
               className="beige-soft-btn block rounded-2xl bg-[#FBF9F5] py-3 text-center text-xs font-medium text-[#2D2A26] shadow-sm"
@@ -162,18 +158,6 @@ export function BeigeListingCard({
               className="beige-soft-btn w-full rounded-2xl bg-[#FBF9F5] py-3 text-xs font-medium text-[#2D2A26] shadow-sm"
             />
           </div>
-          {whatsappHref ? (
-            <a
-              href={whatsappHref}
-              className="beige-btn flex w-full items-center justify-center gap-2 rounded-2xl bg-[#A4B494] py-3 text-xs font-medium text-[#2D2A26] shadow-sm"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <BeigeIconWhatsApp className="h-4 w-4" />
-              {dict.listing.consultWhatsApp}
-            </a>
-          ) : null}
-        </div>
       </div>
     </article>
   );

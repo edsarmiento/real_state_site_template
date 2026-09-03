@@ -9,12 +9,14 @@ import {
 } from "@/themes/beige/beige-display";
 import { BeigeHeaderChrome } from "@/themes/beige/beige-header-chrome";
 import {
+  BeigeIconMail,
   BeigeIconPhone,
   BeigeIconWhatsApp,
 } from "@/themes/beige/beige-icons";
 import { BeigeLocaleSwitcher } from "@/themes/beige/beige-locale-switcher";
 import { BeigeLogo } from "@/themes/beige/beige-logo";
 import { BeigeMobileNav } from "@/themes/beige/beige-mobile-nav";
+import { BeigeSocialLinks } from "@/themes/beige/beige-social-links";
 import { beigeNavLinks, getBeigeUi } from "@/themes/beige/beige-ui";
 
 type Props = {
@@ -28,7 +30,7 @@ export async function BeigeHeader({
 }: Props) {
   const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
   const copy = getBeigeCopy(locale);
-  const { brand } = content;
+  const { brand, social } = content;
   const links = beigeNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
   const contactHref = localizedHref("/#contacto", locale, null, defaultLocale);
@@ -37,9 +39,14 @@ export async function BeigeHeader({
   const whatsappNumber = channels.whatsappNumber;
   const officePhone = channels.phone;
   const officeHref = channels.phoneHref;
+  const email = content.contact.email;
+  const emailHref = content.contact.emailHref;
   const showWhatsApp = Boolean(whatsappHref && whatsappNumber);
   const showOffice = Boolean(officePhone && officeHref);
-  const showTopBar = showWhatsApp || showOffice;
+  const showEmail = Boolean(email && emailHref);
+  const hasSocial = Boolean(social.instagramUrl || social.facebookUrl);
+  const showContactCluster = showWhatsApp || showOffice;
+  const showTopBar = showContactCluster || showEmail || hasSocial;
   const switcherProps = {
     locale,
     defaultLocale,
@@ -65,35 +72,61 @@ export async function BeigeHeader({
     : copy.officeLabel;
 
   const topBar = showTopBar ? (
-    <div data-beige-topbar className="beige-topbar">
-      <div
-        className={`mx-auto flex max-w-7xl flex-col gap-2 sm:flex-row sm:items-center ${
-          showWhatsApp && showOffice ? "sm:justify-between" : "sm:justify-start"
-        }`}
-      >
-        {showWhatsApp && whatsappHref ? (
-          <a
-            href={whatsappHref}
-            className="beige-topbar__link"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-beige-cta="topbar-whatsapp"
-            aria-label={`${whatsappLabel}. ${dict.a11y.opensInNewTab}`}
-          >
-            <BeigeIconWhatsApp className="h-3.5 w-3.5 shrink-0 text-[#A4B494]" />
-            {whatsappLabel}
-          </a>
-        ) : null}
-        {showOffice && officeHref && officePhone ? (
-          <a
-            href={officeHref}
-            className="beige-topbar__link beige-topbar__link--office"
-            data-beige-cta="topbar-call"
-          >
-            <BeigeIconPhone className="h-3.5 w-3.5 shrink-0 text-[#A4B494]" />
-            {officeLabel}
-          </a>
-        ) : null}
+    <div className="beige-topbar">
+      <div className="beige-topbar__inner">
+        <div className="beige-topbar__cluster">
+          {showContactCluster ? (
+            <span className="beige-topbar__kicker">{copy.attentionKicker}</span>
+          ) : null}
+          {showContactCluster ? (
+            <span className="beige-topbar__sep beige-topbar__sep--kicker" aria-hidden />
+          ) : null}
+          {showWhatsApp && whatsappHref && whatsappNumber ? (
+            <a
+              href={whatsappHref}
+              className="beige-topbar__link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${whatsappLabel}. ${dict.a11y.opensInNewTab}`}
+              title={whatsappLabel}
+            >
+              <BeigeIconWhatsApp className="beige-topbar__icon" />
+              <span className="beige-topbar__text">
+                {formatBeigePhoneDisplay(whatsappNumber)}
+              </span>
+            </a>
+          ) : null}
+          {showWhatsApp && showOffice ? (
+            <span className="beige-topbar__sep" aria-hidden />
+          ) : null}
+          {showOffice && officeHref && officePhone ? (
+            <a
+              href={officeHref}
+              className="beige-topbar__link"
+              aria-label={officeLabel}
+              title={officeLabel}
+            >
+              <BeigeIconPhone className="beige-topbar__icon" />
+              <span className="beige-topbar__text">
+                {formatBeigePhoneDisplay(officePhone)}
+              </span>
+            </a>
+          ) : null}
+        </div>
+        <div className="beige-topbar__meta">
+          {showEmail && emailHref && email ? (
+            <a href={emailHref} className="beige-topbar__email" title={email}>
+              <BeigeIconMail className="beige-topbar__icon" />
+              <span>{email}</span>
+            </a>
+          ) : null}
+          {showEmail && hasSocial ? (
+            <span className="beige-topbar__sep beige-topbar__sep--meta" aria-hidden />
+          ) : null}
+          {hasSocial ? (
+            <BeigeSocialLinks social={social} dict={dict} variant="compact" />
+          ) : null}
+        </div>
       </div>
     </div>
   ) : null;

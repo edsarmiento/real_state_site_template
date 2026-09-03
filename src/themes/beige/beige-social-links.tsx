@@ -9,9 +9,15 @@ type Props = {
   social: PublicSocialLinks;
   dict: SiteDictionary;
   heading?: string;
+  variant?: "list" | "compact";
 };
 
-export function BeigeSocialLinks({ social, dict, heading }: Props) {
+export function BeigeSocialLinks({
+  social,
+  dict,
+  heading,
+  variant = "list",
+}: Props) {
   const items = [
     social.facebookUrl
       ? {
@@ -33,8 +39,29 @@ export function BeigeSocialLinks({ social, dict, heading }: Props) {
 
   if (items.length === 0) return null;
 
+  if (variant === "compact") {
+    return (
+      <ul className="flex items-center gap-1.5" aria-label={dict.a11y.socialNav}>
+        {items.map((item) => (
+          <li key={item.key}>
+            <a
+              href={item.href}
+              className="beige-social-icon"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${item.label}. ${dict.a11y.opensInNewTab}`}
+              title={item.label}
+            >
+              <item.icon className="h-4 w-4" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
   return (
-    <div data-beige-social>
+    <div>
       {heading ? (
         <p className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#FBF9F5]">
           {heading}
@@ -48,7 +75,6 @@ export function BeigeSocialLinks({ social, dict, heading }: Props) {
               className="beige-social-link inline-flex items-center gap-2.5 text-[#E5D9C5] transition-colors hover:text-[#C4D3A2] focus-visible:text-[#C4D3A2]"
               target="_blank"
               rel="noopener noreferrer"
-              data-beige-social={item.key}
               aria-label={`${item.label}. ${dict.a11y.opensInNewTab}`}
               title={item.label}
             >

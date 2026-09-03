@@ -21,6 +21,7 @@ const SHARED_DEFAULT_ABOUT_CTA = "Ver propiedades";
 
 export type BeigeCopy = {
   contactCta: string;
+  attentionKicker: string;
   officeLabel: string;
   whatsappPrefix: string;
   openWhatsApp: string;
@@ -67,6 +68,7 @@ export type BeigeCopy = {
 
 const ES: BeigeCopy = {
   contactCta: "Contáctanos",
+  attentionKicker: "Atención personalizada",
   officeLabel: "Oficina",
   whatsappPrefix: "WhatsApp",
   openWhatsApp: "Contactar por WhatsApp",
@@ -124,6 +126,7 @@ const ES: BeigeCopy = {
 
 const EN: BeigeCopy = {
   contactCta: "Contact us",
+  attentionKicker: "Personal attention",
   officeLabel: "Office",
   whatsappPrefix: "WhatsApp",
   openWhatsApp: "Contact us on WhatsApp",
