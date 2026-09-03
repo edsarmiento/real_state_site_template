@@ -50,7 +50,7 @@ export async function generateMetadata({
   const config = await getResolvedSiteConfig();
   const themeName = themeNameFromLayoutKey(config.layoutKey);
 
-  if (themeName === "luxury") {
+  if (themeName === "luxury" || themeName === "beige") {
     const content = await getPublicSiteContent();
     const locale = resolveRequestLocale(firstSearchParam(sp.lang), content.locale);
     const dict = getDictionary(locale);

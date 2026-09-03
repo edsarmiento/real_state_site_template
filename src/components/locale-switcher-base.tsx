@@ -11,7 +11,7 @@ export type LocaleSwitcherBaseProps = {
   label: string;
   optionLabel: (locale: SiteLocale) => string;
   optionAriaLabel: (locale: SiteLocale) => string;
-  variant?: "default" | "luxury";
+  variant?: "default" | "luxury" | "beige";
   className?: string;
 };
 
@@ -43,15 +43,16 @@ export function LocaleSwitcherBase({
     router.replace(href, { scroll: false });
   }
 
-  if (variant === "luxury") {
+  if (variant === "luxury" || variant === "beige") {
+    const prefix = variant === "beige" ? "beige-locale" : "luxury-locale";
     return (
-      <div className="luxury-locale" role="group" aria-label={label}>
-        {supportedLocales.map((option, index) => {
-          const selected = option === locale;
+      <div className={prefix} role="group" aria-label={label}>
+        {supportedLocales.map((code, index) => {
+          const selected = code === locale;
           return (
-            <span key={option} className="luxury-locale__pair">
+            <span key={code} className={`${prefix}__pair`}>
               {index > 0 ? (
-                <span className="luxury-locale__rule" aria-hidden>
+                <span className={`${prefix}__rule`} aria-hidden>
                   |
                 </span>
               ) : null}
@@ -59,15 +60,15 @@ export function LocaleSwitcherBase({
                 type="button"
                 className={
                   selected
-                    ? "luxury-locale__option is-active"
-                    : "luxury-locale__option"
+                    ? `${prefix}__option is-active`
+                    : `${prefix}__option`
                 }
-                aria-label={optionAriaLabel(option)}
+                aria-label={optionAriaLabel(code)}
                 aria-pressed={selected}
                 aria-current={selected ? "true" : undefined}
-                onClick={() => select(option)}
+                onClick={() => select(code)}
               >
-                {optionLabel(option)}
+                {optionLabel(code)}
               </button>
             </span>
           );

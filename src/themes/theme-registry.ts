@@ -1,3 +1,6 @@
+import { BeigeCatalog } from "@/themes/beige/beige-catalog";
+import { BeigeListingDetail } from "@/themes/beige/beige-listing-detail";
+import { BeigeLegalPage } from "@/themes/beige/beige-legal-page";
 import { DefaultCatalog } from "@/themes/default/default-catalog";
 import { DefaultListingDetail } from "@/themes/default/default-listing-detail";
 import { DefaultLegalPage } from "@/themes/default/default-legal-page";
@@ -32,6 +35,13 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     Catalog: LuxuryCatalog,
     ListingDetail: LuxuryListingDetail,
     LegalPage: LuxuryLegalPage,
+  },
+  beige: {
+    name: "beige",
+    layoutKeys: LAYOUT_KEYS_BY_THEME.beige,
+    Catalog: BeigeCatalog,
+    ListingDetail: BeigeListingDetail,
+    LegalPage: BeigeLegalPage,
   },
 };
 

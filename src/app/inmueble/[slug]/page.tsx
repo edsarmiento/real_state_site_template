@@ -14,6 +14,7 @@ import { listingPublicUrl } from "@/lib/site-config-env";
 import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import { fillTemplate, getDictionary, resolveRequestLocale } from "@/lib/site-i18n";
 import { firstSearchParam } from "@/lib/search-params";
+import { BeigeShell } from "@/themes/beige/beige-shell";
 import { LuxuryShell } from "@/themes/luxury/luxury-shell";
 import {
   resolveSiteThemeFromConfig,
@@ -63,7 +64,7 @@ export async function generateMetadata({
   );
 
   if (!result.ok) {
-    if (themeName === "luxury") {
+    if (themeName === "luxury" || themeName === "beige") {
       const content = await getPublicSiteContent();
       const locale = resolveRequestLocale(lang, content.locale);
       return { title: getDictionary(locale).listing.metaFallback };
@@ -77,7 +78,7 @@ export async function generateMetadata({
   let description = listingShareDescription(listing);
   let ogLocale = "es_MX";
 
-  if (themeName === "luxury") {
+  if (themeName === "luxury" || themeName === "beige") {
     const content = await getPublicSiteContent();
     const locale = resolveRequestLocale(lang, content.locale);
     const dict = getDictionary(locale);
@@ -133,15 +134,23 @@ export default async function ListingDetailPage({
 
   if (result.status === 404) notFound();
   if (!result.ok) {
-    if (theme.name === "luxury") {
+    if (theme.name === "luxury" || theme.name === "beige") {
       const content = await getPublicSiteContent();
       const locale = resolveRequestLocale(lang, content.locale);
       const dict = getDictionary(locale);
+      const message = fillTemplate(dict.results.listingError, {
+        status: result.status,
+      });
+      if (theme.name === "beige") {
+        return (
+          <BeigeShell lang={lang}>
+            <p className="px-6 py-16 text-center text-[#8A7759]">{message}</p>
+          </BeigeShell>
+        );
+      }
       return (
         <LuxuryShell lang={lang}>
-          <p className="luxury-state luxury-state--error">
-            {fillTemplate(dict.results.listingError, { status: result.status })}
-          </p>
+          <p className="luxury-state luxury-state--error">{message}</p>
         </LuxuryShell>
       );
     }

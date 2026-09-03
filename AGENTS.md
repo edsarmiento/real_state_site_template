@@ -160,6 +160,7 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | Contrato de props por theme | `src/themes/theme-types.ts` |
 | Tema default (catálogo + ficha) | `src/themes/default/` |
 | Tema Luxury (piloto `deo`) | `src/themes/luxury/` |
+| Tema Beige | `src/themes/beige/` |
 | Contenido marketing del tema | `src/lib/public-site-content.ts` (lee `getResolvedSiteConfig` + env `SITE_*`) |
 | Páginas legales | `src/app/terminos/`, `cookies/`, `aviso-de-privacidad/` + `*-legal-page.tsx` por theme |
 | Admin anuncios | `src/app/(admin)/listings/` |
@@ -202,8 +203,9 @@ Fuente de verdad: `THEME_DEFINITIONS` en `src/themes/theme-definitions.ts` (keys
 |------------------------|-----------------|-------------|
 | `default` | `default` | Catalog, ListingDetail, LegalPage |
 | `deo` / `luxury` | `luxury` | Catalog, ListingDetail, LegalPage |
+| `beige` | `beige` | Catalog, ListingDetail, LegalPage |
 
-Unknown `layout_key` → `default`.
+Unknown `layout_key` → `default` (nunca beige).
 
 **Legacy:** `deo-catalog-hero.tsx` es de la Fase 3; con `layout_key: deo` **no** se usa (Luxury reemplaza el catálogo). No crear plantillas nuevas solo como hero.
 
@@ -234,7 +236,7 @@ Reglas en template:
 
 - `resolveRequestLocale(?lang, config.locale)` elige idioma activo; fallback inválido → `default_locale`.
 - El selector solo se renderiza si `show_locale_switcher === true` **y** hay ≥2 idiomas en `supported_locales` (`locale-switcher-base.tsx`).
-- Diccionarios: `getDictionary(locale)` en `site-i18n.ts`. Server: `getSiteUi(lang)` o `getLuxuryUi(lang)`.
+- Diccionarios: `getDictionary(locale)` en `site-i18n.ts`. Server: `getSiteUi(lang)`, `getLuxuryUi(lang)` o `getBeigeUi(lang)`.
 - `?lang=en` / `?lang=es` en URLs cuando el idioma está en `supported_locales` (con o sin selector visible).
 
 ### Tema `default` (estructura)
@@ -251,6 +253,15 @@ Reglas en template:
 - CSS: `[data-site-theme="luxury"]`, variables `--luxury-*` (`luxuryThemeCssVars()` en `globals.css`).
 - Legales: `theme.LegalPage` (registrado como `LuxuryLegalPage`).
 - Gaps API: [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md).
+
+### Tema `beige`
+
+- `src/themes/beige/` — catálogo (hero collage, buscador, residencial, ubicaciones, comercial, FAQ) y ficha con galería, inquiry y WhatsApp.
+- i18n: mismo `site-i18n.ts`; `getBeigeUi(lang)`.
+- CSS encapsulado en `[data-site-theme="beige"]` (`globals.css`): marfil/beige/oliva; Playfair Display + Plus Jakarta Sans vía `next/font`.
+- Legales: `theme.LegalPage` (registrado como `BeigeLegalPage`).
+- Admin/login: `isStyledSiteLayout` es true (cualquier `layout_key` distinto de `default`).
+- Para que Ops pueda elegir `beige`, el API debe aceptar `SiteConfig::LAYOUT_KEYS` con esa clave (cambio coordinado fuera de este repo).
 
 ### Admin / login vs theme público
 
@@ -277,7 +288,7 @@ Helpers: `isStyledSiteLayout(layoutKey)`, `SiteLayoutVariantProvider`, `useSiteL
 | `getResolvedSiteConfig()` | Server Components |
 | `resolveSiteThemeFromConfig()` | Elegir theme (legales, etc.) |
 | `getPublicSiteContent()` | Copy/marketing del theme (server) |
-| `getSiteUi(lang)` / `getLuxuryUi(lang)` | Locale + diccionario en Server Components |
+| `getSiteUi(lang)` / `getLuxuryUi(lang)` / `getBeigeUi(lang)` | Locale + diccionario en Server Components |
 | `pickSiteBranding(config)` | Marca en `"use client"` |
 | `site-config-env.ts` | `ACCOUNT_ID`, `listingPublicUrl` — solo servidor |
 

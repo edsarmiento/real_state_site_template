@@ -31,12 +31,22 @@ export type SiteDictionary = {
     about: string;
     process: string;
     contact: string;
+    inventory: string;
+    residential: string;
+    locations: string;
+    commercial: string;
+    faq: string;
+    listProperty: string;
   };
   hero: {
     title: string;
     subtitle: string;
     primaryCta: string;
     secondaryCta: string;
+    badge: string;
+    titleBefore: string;
+    titleAccent: string;
+    titleAfter: string;
   };
   search: {
     eyebrow: string;
@@ -89,6 +99,10 @@ export type SiteDictionary = {
     perMonth: string;
     viewProperty: string;
     viewPropertyAria: string;
+    viewDetail: string;
+    share: string;
+    shareCopied: string;
+    consultWhatsApp: string;
     back: string;
     description: string;
     location: string;
@@ -216,6 +230,22 @@ export type SiteDictionary = {
     eyebrow: string;
     title: string;
     previewNote: string;
+  };
+  faq: {
+    eyebrow: string;
+    title: string;
+    q1: string;
+    a1: string;
+    q2: string;
+    a2: string;
+    q3: string;
+    a3: string;
+  };
+  commercial: {
+    kicker: string;
+    title: string;
+    description: string;
+    cta: string;
   };
   whatsapp: {
     label: string;
@@ -433,12 +463,22 @@ const dictionaries = {
       about: "Sobre nosotros",
       process: "Cómo trabajamos",
       contact: "Contacto",
+      inventory: "Inventario",
+      residential: "Residencial",
+      locations: "Ubicaciones",
+      commercial: "Comercial",
+      faq: "FAQ",
+      listProperty: "Anunciar propiedad",
     },
     hero: {
       title: "Encuentra tu próximo inmueble",
       subtitle: "Catálogo de inmuebles en renta y venta.",
       primaryCta: "Ver propiedades",
       secondaryCta: "Conócenos",
+      badge: "Bienes raíces de alta gama",
+      titleBefore: "Encuentra tu",
+      titleAccent: "próximo espacio",
+      titleAfter: "exclusivo",
     },
     search: {
       eyebrow: "Encuentra tu próximo espacio",
@@ -493,6 +533,10 @@ const dictionaries = {
       perMonth: "/ mes",
       viewProperty: "Ver propiedad",
       viewPropertyAria: "Ver propiedad: {title}",
+      viewDetail: "Ver detalle",
+      share: "Compartir",
+      shareCopied: "Enlace copiado",
+      consultWhatsApp: "Consultar por WhatsApp",
       back: "Volver a propiedades",
       description: "Descripción",
       location: "Ubicación",
@@ -635,6 +679,23 @@ const dictionaries = {
       previewNote:
         "Vista previa. Estos textos son provisionales y no son reseñas verificadas.",
     },
+    faq: {
+      eyebrow: "Resolvemos tus dudas",
+      title: "Preguntas frecuentes",
+      q1: "¿Qué servicios ofrecen?",
+      a1: "Publicamos inmuebles en renta y venta. Puedes filtrar el catálogo, ver cada ficha y contactar a la inmobiliaria por WhatsApp o formulario.",
+      q2: "¿Cómo agendo una visita?",
+      a2: "Usa el botón de WhatsApp o deja tus datos en la ficha del inmueble. La inmobiliaria te contacta para coordinar.",
+      q3: "¿En qué zonas hay propiedades?",
+      a3: "El catálogo muestra las ciudades de los anuncios publicados. Filtra por ubicación en el buscador para ver lo disponible.",
+    },
+    commercial: {
+      kicker: "Inversión comercial",
+      title: "Espacios comerciales publicados",
+      description:
+        "Locales, oficinas y naves que la inmobiliaria tiene en el catálogo. Si no hay resultados, consulta por WhatsApp.",
+      cta: "Consultar disponibilidad",
+    },
     whatsapp: {
       label: "WhatsApp",
       float: "Escríbenos por WhatsApp",
@@ -706,12 +767,22 @@ const dictionaries = {
       about: "About us",
       process: "How it works",
       contact: "Contact",
+      inventory: "Inventory",
+      residential: "Residential",
+      locations: "Locations",
+      commercial: "Commercial",
+      faq: "FAQ",
+      listProperty: "List a property",
     },
     hero: {
       title: "Find your next home",
       subtitle: "A catalog of rental and sale listings.",
       primaryCta: "View properties",
       secondaryCta: "About us",
+      badge: "High-end real estate",
+      titleBefore: "Find your",
+      titleAccent: "next space",
+      titleAfter: "exclusive",
     },
     search: {
       eyebrow: "Find your next space",
@@ -764,6 +835,10 @@ const dictionaries = {
       perMonth: "/ month",
       viewProperty: "View property",
       viewPropertyAria: "View property: {title}",
+      viewDetail: "View details",
+      share: "Share",
+      shareCopied: "Link copied",
+      consultWhatsApp: "Ask on WhatsApp",
       back: "Back to properties",
       description: "Description",
       location: "Location",
@@ -902,6 +977,23 @@ const dictionaries = {
       title: "Comments",
       previewNote:
         "Preview. These quotes are provisional and are not verified reviews.",
+    },
+    faq: {
+      eyebrow: "Answers",
+      title: "Frequently asked questions",
+      q1: "What services do you offer?",
+      a1: "We publish rental and sale listings. You can filter the catalog, open a listing, and contact the agency by WhatsApp or the listing form.",
+      q2: "How do I schedule a visit?",
+      a2: "Use the WhatsApp button or leave your details on the listing page. The agency will follow up to coordinate.",
+      q3: "Which areas do you cover?",
+      a3: "The catalog shows cities from published listings. Use the location filter to see what is available.",
+    },
+    commercial: {
+      kicker: "Commercial",
+      title: "Published commercial spaces",
+      description:
+        "Retail, offices, and warehouses currently in the catalog. If nothing matches, inquire on WhatsApp.",
+      cta: "Ask about availability",
     },
     whatsapp: {
       label: "WhatsApp",
