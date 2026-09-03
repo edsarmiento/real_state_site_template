@@ -5,9 +5,11 @@ import { publicApiFetch } from "@/lib/public-api-fetch";
 import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import { getSessionContext } from "@/lib/session-context";
 import {
+  listingGalleryUrls,
   parseCatalogOfferFilter,
   type CatalogOfferFilter,
   type PublicListingCard as PublicListingCardType,
+  type PublicListingDetail,
 } from "@/lib/listing-types";
 import type { PropertyType } from "@/lib/property-types";
 import { getPublicSiteContent } from "@/lib/public-site-content";
@@ -164,6 +166,23 @@ export default async function CatalogPage({
     }
   }
 
+  let heroPhotoUrls: string[] | undefined;
+  if (isBeige) {
+    const first = listings[0];
+    if (!first?.slug) {
+      heroPhotoUrls = [];
+    } else {
+      const detail = await publicApiFetch<PublicListingDetail>(
+        `/api/public/listings/${encodeURIComponent(first.slug)}`,
+      );
+      heroPhotoUrls = (
+        detail.ok
+          ? listingGalleryUrls(detail.data)
+          : listingGalleryUrls({ photo_url: first.photo_url })
+      ).slice(0, 3);
+    }
+  }
+
   const typeLabel = propertyType
     ? (getDictionary(
         resolveRequestLocale(firstSearchParam(sp.lang), config.locale),
@@ -191,6 +210,7 @@ export default async function CatalogPage({
       catalogStatus={result.status}
       isAdmin={session?.isStaffUser === true}
       lang={firstSearchParam(sp.lang)}
+      heroPhotoUrls={heroPhotoUrls}
     />
   );
 }

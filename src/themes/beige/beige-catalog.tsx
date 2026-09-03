@@ -6,6 +6,7 @@ import type { CatalogThemeProps } from "@/themes/theme-types";
 import { getBeigeCopy, resolveBeigeHeroCopy } from "@/themes/beige/beige-copy";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
+import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeHeroCollage } from "@/themes/beige/beige-hero-collage";
 import { BeigeListingCard } from "@/themes/beige/beige-listing-card";
 import { BeigePagination } from "@/themes/beige/beige-pagination";
@@ -53,19 +54,12 @@ export async function BeigeCatalog({
   catalogOk,
   catalogStatus,
   lang,
+  heroPhotoUrls,
 }: CatalogThemeProps) {
   const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
   const copy = getBeigeCopy(locale);
   const hero = resolveBeigeHeroCopy(content, locale);
-  const heroImage = content.hero.imageUrl;
-  const collagePhotos = listings
-    .map((listing) => listing.photo_url)
-    .filter((url): url is string => Boolean(url?.trim()))
-    .slice(0, 3);
-  const collage = [heroImage, ...collagePhotos]
-    .filter((url): url is string => Boolean(url))
-    .filter((url, index, all) => all.indexOf(url) === index)
-    .slice(0, 3);
+  const collage = (heroPhotoUrls ?? []).slice(0, 3);
   const locations =
     content.locations.length > 0
       ? content.locations
@@ -125,7 +119,11 @@ export async function BeigeCatalog({
               {hero.heroSubtitle}
             </p>
           </div>
-          <BeigeHeroCollage urls={collage} />
+          <BeigeHeroCollage
+            urls={collage}
+            title={displayListingTitle(listings[0]?.title ?? "")}
+            photoAltTemplate={dict.listing.gallery.photoAlt}
+          />
         </div>
         <div className="relative z-20 mx-auto mt-16 max-w-5xl px-6">
           <BeigeSearch

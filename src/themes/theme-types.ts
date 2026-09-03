@@ -23,6 +23,7 @@ export type CatalogThemeProps = {
   catalogStatus: number;
   isAdmin: boolean;
   lang?: string;
+  heroPhotoUrls?: string[];
 };
 
 export type ListingDetailThemeProps = {
