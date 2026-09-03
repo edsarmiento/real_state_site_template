@@ -65,10 +65,7 @@ export function BeigeListingCard({
       return {
         key: spec.key,
         icon: BeigeIconBath,
-        label:
-          spec.value === "1"
-            ? dict.listing.specBathOne
-            : fillTemplate(dict.listing.specBathMany, { count: spec.value }),
+        label: spec.value,
       };
     }
     return {
