@@ -39,7 +39,7 @@ export async function BeigeListingDetail({
   const isSale = offerType === "sale";
   const agency = listing.agency_name || content.brand.name;
   const hasMap = listing.latitude != null && listing.longitude != null;
-  const backHref = localizedHref("/#residencial", locale, null, defaultLocale);
+  const backHref = localizedHref("/#propiedades", locale, null, defaultLocale);
   const price = formatBeigePriceParts(
     listing.rent_cents,
     listing.currency,

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { parseCatalogPage, resolveCatalogPage } from "@/lib/catalog-pagination";
 import { publicApiFetch } from "@/lib/public-api-fetch";
 import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import { getSessionContext } from "@/lib/session-context";
@@ -9,14 +11,23 @@ import {
 } from "@/lib/listing-types";
 import type { PropertyType } from "@/lib/property-types";
 import { getPublicSiteContent } from "@/lib/public-site-content";
-import { getDictionary, fillTemplate, resolveRequestLocale } from "@/lib/site-i18n";
+import {
+  getDictionary,
+  fillTemplate,
+  localizedHref,
+  resolveRequestLocale,
+} from "@/lib/site-i18n";
 import { firstSearchParam } from "@/lib/search-params";
+import { beigeCatalogSearchParams } from "@/themes/beige/beige-pagination";
 import {
   resolveSiteThemeFromConfig,
   themeNameFromLayoutKey,
 } from "@/themes/resolve-site-theme";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+const DEFAULT_CATALOG_LIMIT = 24;
+const BEIGE_CATALOG_LIMIT = 12;
 
 function resultsHeading(
   oferta: CatalogOfferFilter,
@@ -60,10 +71,13 @@ export async function generateMetadata({
         : oferta === "rent"
           ? dict.seo.catalogRent
           : dict.seo.catalogAll;
+    const page = parseCatalogPage(firstSearchParam(sp.page));
     return {
       title,
       description: config.siteTagline,
-      ...(oferta === "all" && !firstSearchParam(sp.city)
+      ...(oferta === "all" &&
+      !firstSearchParam(sp.city) &&
+      (themeName !== "beige" || page === 1)
         ? { alternates: { canonical: "/" } }
         : {}),
     };
@@ -97,17 +111,23 @@ export default async function CatalogPage({
   const propertyType = firstSearchParam(sp.tipo).trim();
   const bedrooms = firstSearchParam(sp.recamaras).trim();
 
+  const isBeige = theme.name === "beige";
+  const page = isBeige ? parseCatalogPage(firstSearchParam(sp.page)) : 1;
+  const pageSize = isBeige ? BEIGE_CATALOG_LIMIT : DEFAULT_CATALOG_LIMIT;
+  const offset = isBeige ? (page - 1) * pageSize : 0;
+
   const qs = new URLSearchParams();
   if (city) qs.set("city", city);
   if (oferta === "rent") qs.set("offer_type", "rent");
   if (oferta === "sale") qs.set("offer_type", "sale");
   if (propertyType) qs.set("property_type", propertyType);
   if (bedrooms) qs.set("bedrooms", bedrooms);
-  qs.set("limit", "24");
+  qs.set("limit", String(pageSize));
+  if (isBeige) qs.set("offset", String(offset));
 
   const result = await publicApiFetch<{
     listings: PublicListingCardType[];
-    meta: { total: number };
+    meta: { total?: number; limit?: number; offset?: number };
   }>(`/api/public/listings?${qs.toString()}`);
 
   const listings =
@@ -115,6 +135,34 @@ export default async function CatalogPage({
       ? result.data.listings
       : [];
   const total = result.ok ? (result.data.meta?.total ?? listings.length) : 0;
+
+  if (isBeige && result.ok) {
+    const resolved = resolveCatalogPage(
+      firstSearchParam(sp.page),
+      total,
+      pageSize,
+    );
+    if (resolved.outOfRange) {
+      const locale = resolveRequestLocale(
+        firstSearchParam(sp.lang),
+        config.locale,
+      );
+      redirect(
+        localizedHref(
+          "/",
+          locale,
+          beigeCatalogSearchParams({
+            oferta,
+            city,
+            propertyType,
+            bedrooms,
+            page: resolved.page,
+          }),
+          config.locale.defaultLocale,
+        ),
+      );
+    }
+  }
 
   const typeLabel = propertyType
     ? (getDictionary(
@@ -135,6 +183,8 @@ export default async function CatalogPage({
       bedrooms={bedrooms}
       listings={listings}
       total={total}
+      page={page}
+      pageSize={pageSize}
       heading={resultsHeading(oferta, city, total, dict)}
       typeLabel={typeLabel}
       catalogOk={result.ok}

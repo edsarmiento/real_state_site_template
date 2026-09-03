@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fillTemplate, localizeSiteHref, localizedHref } from "@/lib/site-i18n";
+import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
 import { getBeigeCopy } from "@/themes/beige/beige-copy";
 import {
   BEIGE_LOGO_FOOTER_CLASS,
@@ -21,7 +22,7 @@ type Props = {
 export async function BeigeFooter({ lang }: Props) {
   const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
   const copy = getBeigeCopy(locale);
-  const { brand, contact, footer, legal, social } = content;
+  const { brand, footer, legal, social } = content;
   const navLinks = [
     ...beigeNavLinks(dict, locale, defaultLocale),
     {
@@ -29,12 +30,12 @@ export async function BeigeFooter({ lang }: Props) {
       label: dict.nav.contact,
     },
   ];
-  const whatsappHref = content.whatsapp.href ?? contact.whatsappHref;
-  const whatsappNumber =
-    content.whatsapp.number ?? contact.whatsappNumber ?? null;
+  const channels = beigeContactChannels(content);
+  const whatsappHref = channels.whatsappHref;
+  const whatsappNumber = channels.whatsappNumber;
   const year = new Date().getFullYear();
   const hasContact = Boolean(
-    whatsappHref || contact.phoneHref || contact.emailHref,
+    whatsappHref || channels.phoneHref || content.contact.emailHref,
   );
   const hasSocial = Boolean(social.instagramUrl || social.facebookUrl);
 
@@ -117,24 +118,24 @@ export async function BeigeFooter({ lang }: Props) {
                   </a>
                 </li>
               ) : null}
-              {contact.phoneHref && contact.phone ? (
+              {channels.phoneHref && channels.phone ? (
                 <li>
-                  <a href={contact.phoneHref} className={linkClass}>
+                  <a href={channels.phoneHref} className={linkClass}>
                     <BeigeIconPhone className={iconClass} />
                     <span className="truncate">
-                      {formatBeigePhoneDisplay(contact.phone)}
+                      {formatBeigePhoneDisplay(channels.phone)}
                     </span>
                   </a>
                 </li>
               ) : null}
-              {contact.emailHref && contact.email ? (
+              {content.contact.emailHref && content.contact.email ? (
                 <li>
                   <a
-                    href={contact.emailHref}
+                    href={content.contact.emailHref}
                     className={`${linkClass} break-all`}
                   >
                     <BeigeIconMail className={iconClass} />
-                    <span className="truncate">{contact.email}</span>
+                    <span className="truncate">{content.contact.email}</span>
                   </a>
                 </li>
               ) : null}

@@ -1,12 +1,15 @@
 import Link from "next/link";
+import { catalogTotalPages } from "@/lib/catalog-pagination";
 import { locationsFromListings } from "@/lib/public-site-content";
 import { fillTemplate, localizedHref } from "@/lib/site-i18n";
 import type { CatalogThemeProps } from "@/themes/theme-types";
+import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
 import { getBeigeCopy, resolveBeigeHeroCopy } from "@/themes/beige/beige-copy";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
 import { BeigeHeroCollage } from "@/themes/beige/beige-hero-collage";
 import { BeigeListingCard } from "@/themes/beige/beige-listing-card";
+import { BeigePagination } from "@/themes/beige/beige-pagination";
 import { BeigeReveal } from "@/themes/beige/beige-reveal";
 import { BeigeSearch } from "@/themes/beige/beige-search";
 import {
@@ -46,7 +49,8 @@ export async function BeigeCatalog({
   bedrooms,
   listings,
   total,
-  typeLabel,
+  page = 1,
+  pageSize = 12,
   catalogOk,
   catalogStatus,
   lang,
@@ -63,7 +67,8 @@ export async function BeigeCatalog({
     .filter((url): url is string => Boolean(url))
     .filter((url, index, all) => all.indexOf(url) === index)
     .slice(0, 3);
-  const whatsappHref = content.whatsapp.href ?? content.contact.whatsappHref;
+  const channels = beigeContactChannels(content);
+  const whatsappHref = channels.whatsappHref;
   const locations =
     content.locations.length > 0
       ? content.locations
@@ -77,23 +82,14 @@ export async function BeigeCatalog({
       : { oferta: oferta === "sale" ? "venta" : "renta" },
     defaultLocale,
   );
-  const emptyKind =
-    oferta === "sale"
-      ? dict.results.emptySale
-      : oferta === "rent"
-        ? dict.results.emptyRent
-        : "";
-  const localizedType =
-    dict.propertyTypes[propertyType as keyof typeof dict.propertyTypes] ??
-    typeLabel;
-  const residential = listings.filter(
-    (listing) =>
-      listing.property_type === "house" ||
-      listing.property_type === "apartment" ||
-      listing.property_type === "land" ||
-      listing.property_type === "other",
+  const availableLabel =
+    total === 1
+      ? copy.availableOne
+      : fillTemplate(copy.availableMany, { count: total });
+  const totalPages = catalogTotalPages(total, pageSize);
+  const hasFilters = Boolean(
+    propertyType || bedrooms || city || oferta !== "all",
   );
-  const gridListings = residential.length > 0 ? residential : listings;
 
   return (
     <BeigeShell lang={lang}>
@@ -147,7 +143,7 @@ export async function BeigeCatalog({
         </div>
       </section>
 
-      <main id="residencial" className="py-24">
+      <main id="propiedades" className="py-24" tabIndex={-1}>
         <BeigeReveal>
           <div className="mx-auto max-w-7xl px-6">
             {!catalogOk ? (
@@ -158,25 +154,32 @@ export async function BeigeCatalog({
               </p>
             ) : listings.length === 0 ? (
               <div className="rounded-2xl border border-[#E5D9C5] bg-[#F4EFE6] p-10 text-center">
-                <p className="text-xl">{dict.results.emptyTitle}</p>
-                <p className="mt-2 text-sm text-[#8A7759]">
-                  {dict.results.emptyCopy}
-                  {emptyKind ? ` ${emptyKind}` : ""}
-                  {city
-                    ? ` ${fillTemplate(dict.results.inPlace, { city })}`
-                    : ""}
-                  {localizedType ? ` · ${localizedType}` : ""}
-                  {bedrooms
-                    ? ` · ${fillTemplate(dict.results.bedroomsFilter, { count: bedrooms })}`
-                    : ""}
-                  .
+                <h2
+                  className="beige-section__title text-xl text-[#2D2A26] sm:text-3xl"
+                  tabIndex={-1}
+                >
+                  {copy.catalogTitle}
+                </h2>
+                <p className="mt-3 text-sm text-[#8A7759]">
+                  {hasFilters ? copy.emptyFilters : dict.results.emptyCopy}
                 </p>
                 <Link
                   href={homeHref}
                   className="mt-6 inline-flex rounded-full bg-[#A4B494] px-5 py-3 text-sm font-semibold text-[#2D2A26]"
                 >
-                  {dict.results.viewAll}
+                  {copy.clearFilters}
                 </Link>
+                <BeigePagination
+                  page={page}
+                  totalPages={totalPages}
+                  total={total}
+                  oferta={oferta}
+                  city={city}
+                  propertyType={propertyType}
+                  bedrooms={bedrooms}
+                  locale={locale}
+                  defaultLocale={defaultLocale}
+                />
               </div>
             ) : (
               <section>
@@ -185,27 +188,33 @@ export async function BeigeCatalog({
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A39073]">
                       {copy.catalogEyebrow}
                     </p>
-                    <h2 className="beige-section__title mt-2 text-3xl text-[#2D2A26] sm:text-5xl">
+                    <h2
+                      className="beige-section__title mt-2 text-3xl text-[#2D2A26] sm:text-5xl"
+                      tabIndex={-1}
+                    >
                       {copy.catalogTitle}
                     </h2>
                     <p className="mt-3 max-w-xl text-sm font-light text-[#8A7759]">
                       {copy.catalogDescription}
                     </p>
                     <p className="mt-2 text-sm font-medium text-[#2D2A26]">
-                      {catalogHeading(dict, oferta, city, total)}
+                      {availableLabel}
+                      {city || oferta !== "all"
+                        ? ` · ${catalogHeading(dict, oferta, city, total)}`
+                        : ""}
                     </p>
                   </div>
-                  {propertyType || bedrooms || city ? (
+                  {hasFilters ? (
                     <Link
                       href={clearHref}
                       className="mt-4 text-sm font-semibold text-[#2D2A26] transition-colors hover:text-[#A39073] md:mt-0"
                     >
-                      {dict.results.clearFilters}
+                      {copy.clearFilters}
                     </Link>
                   ) : null}
                 </div>
                 <ul className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                  {gridListings.map((listing) => (
+                  {listings.map((listing) => (
                     <li key={listing.slug}>
                       <BeigeListingCard
                         listing={listing}
@@ -217,6 +226,17 @@ export async function BeigeCatalog({
                     </li>
                   ))}
                 </ul>
+                <BeigePagination
+                  page={page}
+                  totalPages={totalPages}
+                  total={total}
+                  oferta={oferta}
+                  city={city}
+                  propertyType={propertyType}
+                  bedrooms={bedrooms}
+                  locale={locale}
+                  defaultLocale={defaultLocale}
+                />
               </section>
             )}
           </div>

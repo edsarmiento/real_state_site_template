@@ -15,6 +15,8 @@ export type CatalogThemeProps = {
   bedrooms: string;
   listings: PublicListingCard[];
   total: number;
+  page?: number;
+  pageSize?: number;
   heading: string;
   typeLabel: string | null;
   catalogOk: boolean;

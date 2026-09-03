@@ -51,6 +51,15 @@ export type BeigeCopy = {
   contactNeedsListing: string;
   phoneLabel: string;
   emailLabel: string;
+  paginationPrev: string;
+  paginationNext: string;
+  paginationPageOf: string;
+  paginationAria: string;
+  goToPage: string;
+  availableOne: string;
+  availableMany: string;
+  emptyFilters: string;
+  clearFilters: string;
 };
 
 const ES: BeigeCopy = {
@@ -96,6 +105,15 @@ const ES: BeigeCopy = {
     "No hay anuncios publicados para enviar el formulario. Escríbenos por WhatsApp o llama a la oficina.",
   phoneLabel: "Teléfono",
   emailLabel: "Correo electrónico",
+  paginationPrev: "Anterior",
+  paginationNext: "Siguiente",
+  paginationPageOf: "Página {current} de {total}",
+  paginationAria: "Paginación de propiedades",
+  goToPage: "Ir a la página {page}",
+  availableOne: "1 propiedad disponible",
+  availableMany: "{count} propiedades disponibles",
+  emptyFilters: "No encontramos propiedades con estos filtros",
+  clearFilters: "Limpiar filtros",
 };
 
 const EN: BeigeCopy = {
@@ -141,6 +159,15 @@ const EN: BeigeCopy = {
     "There are no published listings to send this form. Message us on WhatsApp or call the office.",
   phoneLabel: "Phone",
   emailLabel: "Email",
+  paginationPrev: "Previous",
+  paginationNext: "Next",
+  paginationPageOf: "Page {current} of {total}",
+  paginationAria: "Property pagination",
+  goToPage: "Go to page {page}",
+  availableOne: "1 property available",
+  availableMany: "{count} properties available",
+  emptyFilters: "No properties match these filters",
+  clearFilters: "Clear filters",
 };
 
 function customOrDefault(

@@ -4408,6 +4408,50 @@ html[data-site-layout="beige"] {
   font-weight: 600;
 }
 
+[data-site-theme="beige"] .beige-pagination {
+  width: 100%;
+}
+
+[data-site-theme="beige"] .beige-page-btn {
+  display: inline-flex;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--beige-border);
+  border-radius: 999px;
+  background: var(--beige-white);
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--beige-charcoal);
+  box-shadow: 0 8px 18px -14px rgba(45, 42, 38, 0.35);
+  transition:
+    transform 0.3s var(--beige-ease),
+    box-shadow 0.3s var(--beige-ease),
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+[data-site-theme="beige"] .beige-page-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--beige-olive);
+  box-shadow: 0 14px 24px -16px rgba(45, 42, 38, 0.4);
+}
+
+[data-site-theme="beige"] .beige-page-btn.is-active {
+  background: var(--beige-olive);
+  border-color: var(--beige-olive);
+  color: var(--beige-charcoal);
+}
+
+[data-site-theme="beige"] .beige-page-btn.is-disabled:hover {
+  transform: none;
+  border-color: var(--beige-border);
+  box-shadow: none;
+}
+
 [data-site-theme="beige"] .beige-sr-only {
   position: absolute;
   width: 1px;
@@ -4433,6 +4477,8 @@ html[data-site-layout="beige"] {
   [data-site-theme="beige"] .beige-btn:hover,
   [data-site-theme="beige"] .beige-contact-cta,
   [data-site-theme="beige"] .beige-contact-cta:hover,
+  [data-site-theme="beige"] .beige-page-btn,
+  [data-site-theme="beige"] .beige-page-btn:hover,
   [data-site-theme="beige"] .beige-thumb,
   [data-site-theme="beige"] .beige-hero-hover,
   [data-site-theme="beige"] .beige-hero-hover:hover,

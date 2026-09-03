@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { BEIGE_FONT_CLASS } from "@/themes/beige/beige-fonts";
+import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
 import { BeigeMotionRoot } from "@/themes/beige/beige-motion-root";
 import { getBeigeUi } from "@/themes/beige/beige-ui";
 import { BeigeWhatsAppFloat } from "@/themes/beige/beige-whatsapp-float";
@@ -16,7 +17,7 @@ export async function BeigeShell({
   lang,
 }: Props) {
   const { content, dict, locale } = await getBeigeUi(lang);
-  const href = content.whatsapp.href ?? content.contact.whatsappHref;
+  const href = beigeContactChannels(content).whatsappHref;
 
   return (
     <div

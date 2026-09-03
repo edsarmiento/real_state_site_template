@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { localizedHref } from "@/lib/site-i18n";
+import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
 import { getBeigeCopy } from "@/themes/beige/beige-copy";
 import {
   BEIGE_LOGO_NAV_CLASS,
@@ -20,18 +21,21 @@ type Props = {
   variant?: "home" | "detail";
 };
 
-export async function BeigeHeader({ lang, variant = "home" }: Props) {
+export async function BeigeHeader({
+  lang,
+  variant = "home",
+}: Props) {
   const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
   const copy = getBeigeCopy(locale);
-  const { brand, contact } = content;
+  const { brand } = content;
   const links = beigeNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
   const contactHref = localizedHref("/#contacto", locale, null, defaultLocale);
-  const whatsappHref = content.whatsapp.href ?? contact.whatsappHref;
-  const whatsappNumber =
-    content.whatsapp.number ?? contact.whatsappNumber ?? null;
-  const officePhone = contact.phone;
-  const officeHref = contact.phoneHref;
+  const channels = beigeContactChannels(content);
+  const whatsappHref = channels.whatsappHref;
+  const whatsappNumber = channels.whatsappNumber;
+  const officePhone = channels.phone;
+  const officeHref = channels.phoneHref;
   const duplicateNumbers = sameContactNumber(whatsappNumber, officePhone);
   const showWhatsApp = Boolean(whatsappHref && whatsappNumber);
   const showOffice =

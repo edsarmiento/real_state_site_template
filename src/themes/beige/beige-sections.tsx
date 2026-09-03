@@ -11,6 +11,7 @@ import {
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
+import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
 import {
   getBeigeCopy,
   resolveBeigeAboutCopy,
@@ -52,7 +53,7 @@ export function BeigeLocations({
       const city = location.filter.city?.trim();
       if (!city) return null;
       const href =
-        localizedHref("/", locale, { city }, defaultLocale) + "#residencial";
+        localizedHref("/", locale, { city }, defaultLocale) + "#propiedades";
       const listingPhoto =
         listings.find(
           (listing) =>
@@ -153,7 +154,7 @@ export function BeigeAbout({
   const copy = resolveBeigeAboutCopy(content, locale);
   const ctaHref =
     about.cta?.href === "#catalogo" || !about.cta?.href
-      ? localizedHref("/#residencial", locale, null, defaultLocale)
+      ? localizedHref("/#propiedades", locale, null, defaultLocale)
       : localizeSiteHref(about.cta.href, locale, defaultLocale);
   return (
     <section id="nosotros" className="border-y border-[#E5D9C5] bg-white py-24">
@@ -319,13 +320,13 @@ export function BeigeContact({
   defaultLocale,
   listingSlug,
 }: Shared & { listingSlug: string | null }) {
-  const { contact } = content;
   const copy = getBeigeCopy(locale);
   const headings = resolveBeigeContactCopy(content, locale);
-  const whatsappHref = content.whatsapp.href ?? contact.whatsappHref;
-  const phoneHref = contact.phoneHref;
+  const channels = beigeContactChannels(content);
+  const whatsappHref = channels.whatsappHref;
+  const phoneHref = channels.phoneHref;
   const showWhatsApp = Boolean(whatsappHref);
-  const showCall = Boolean(phoneHref && contact.phone);
+  const showCall = Boolean(phoneHref && channels.phone);
 
   return (
     <section id="contacto" className="bg-[#2D2A26] py-24 text-[#FBF9F5]">

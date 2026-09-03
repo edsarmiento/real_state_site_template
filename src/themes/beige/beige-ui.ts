@@ -32,7 +32,7 @@ export function beigeNavLinks(
 ): { href: string; label: string }[] {
   return [
     {
-      href: localizedHref("/#residencial", locale, null, defaultLocale),
+      href: localizedHref("/#propiedades", locale, null, defaultLocale),
       label: locale === "en" ? "Properties" : "Propiedades",
     },
     {
