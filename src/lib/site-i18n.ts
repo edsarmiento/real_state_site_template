@@ -457,7 +457,7 @@ const dictionaries = {
     propertyTypes: {
       house: "Casa",
       apartment: "Apartamento",
-      warehouse: "Almacén",
+      warehouse: "Bodega",
       land: "Terreno",
       office: "Oficina",
       retail: "Local comercial",

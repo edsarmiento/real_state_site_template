@@ -8,7 +8,7 @@ import type {
 export const propertyTypeLabel: Record<PropertyType, string> = {
   house: "Casa",
   apartment: "Apartamento",
-  warehouse: "Almacén",
+  warehouse: "Bodega",
   land: "Terreno",
   office: "Oficina",
   retail: "Local comercial",
