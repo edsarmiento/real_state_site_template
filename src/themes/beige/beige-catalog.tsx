@@ -95,7 +95,7 @@ export async function BeigeCatalog({
     <BeigeShell lang={lang}>
       <BeigeHeader lang={lang} variant="home" />
 
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#FBF9F5] via-[#F4EFE6]/30 to-[#FBF9F5] pb-20 pt-16">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#FBF9F5] via-[#F4EFE6]/30 to-[#FBF9F5] pb-8 pt-16">
         <div
           className="pointer-events-none absolute inset-0 opacity-10 [background-image:radial-gradient(#8A7759_1px,transparent_1px)] [background-size:24px_24px]"
           aria-hidden
@@ -143,7 +143,7 @@ export async function BeigeCatalog({
         </div>
       </section>
 
-      <main id="propiedades" className="py-24" tabIndex={-1}>
+      <main id="propiedades" className="pb-24 pt-16" tabIndex={-1}>
         <BeigeReveal>
           <div className="mx-auto max-w-7xl px-6">
             {!catalogOk ? (
