@@ -23,6 +23,7 @@ export type CatalogThemeProps = {
   catalogStatus: number;
   isAdmin: boolean;
   lang?: string;
+  /** Optional gallery URLs used by the catalog hero. */
   heroPhotoUrls?: string[];
 };
 
