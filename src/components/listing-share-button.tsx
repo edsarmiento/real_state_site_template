@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type Props = {
   url: string;
@@ -94,17 +94,30 @@ export function ListingShareButton({
   className,
 }: Props) {
   const [status, setStatus] = useState<ShareStatus>("idle");
+  const busyRef = useRef(false);
 
   function flash(next: Exclude<ShareStatus, "idle">) {
     setStatus(next);
     window.setTimeout(() => setStatus("idle"), 2500);
   }
 
+  function fallbackCopy(absoluteUrl: string) {
+    void copyText(absoluteUrl)
+      .then((ok) => flash(ok ? "copied" : "failed"))
+      .finally(() => {
+        busyRef.current = false;
+      });
+  }
+
   function onShare() {
+    if (busyRef.current) return;
+    busyRef.current = true;
+
     const absoluteUrl = resolveShareUrl(url);
-    const payload = {
+    // URL-only payload is the most compatible on real iOS / Android browsers.
+    const payload: ShareData = {
       title,
-      text: text ? `${text}\n${absoluteUrl}` : `${title}\n${absoluteUrl}`,
+      text: text ?? title,
       url: absoluteUrl,
     };
 
@@ -118,18 +131,25 @@ export function ListingShareButton({
         typeof navigator.canShare !== "function" || navigator.canShare(payload);
 
       if (canShare) {
-        // Keep share as the first async call so mobile keeps the user gesture.
-        void share(payload).catch((err: unknown) => {
-          const aborted =
-            err instanceof DOMException && err.name === "AbortError";
-          if (aborted) return;
-          void copyText(absoluteUrl).then((ok) => flash(ok ? "copied" : "failed"));
-        });
+        // Must call share synchronously from the tap handler (keep user gesture).
+        void share(payload)
+          .then(() => {
+            busyRef.current = false;
+          })
+          .catch((err: unknown) => {
+            const aborted =
+              err instanceof DOMException && err.name === "AbortError";
+            if (aborted) {
+              busyRef.current = false;
+              return;
+            }
+            fallbackCopy(absoluteUrl);
+          });
         return;
       }
     }
 
-    void copyText(absoluteUrl).then((ok) => flash(ok ? "copied" : "failed"));
+    fallbackCopy(absoluteUrl);
   }
 
   const buttonLabel =

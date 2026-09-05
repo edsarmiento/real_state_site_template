@@ -192,6 +192,8 @@ body {
   background: color-mix(in srgb, var(--luxury-ivory) 88%, transparent);
   backdrop-filter: blur(14px);
   box-shadow: none;
+  /* backdrop-filter makes some mobile browsers clip absolute descendants */
+  overflow: visible;
 }
 
 [data-site-theme="luxury"] .luxury-header__inner {
@@ -304,21 +306,31 @@ body {
 
 [data-site-theme="luxury"] .luxury-mobile-nav {
   position: relative;
+  z-index: 1;
 }
 
 [data-site-theme="luxury"] .luxury-mobile-nav__toggle {
+  position: relative;
+  z-index: 52;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 44px;
   height: 44px;
   border: 1px solid var(--luxury-line);
   border-radius: var(--luxury-radius-md);
   background: var(--luxury-surface);
   box-shadow: var(--luxury-shadow-sm);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
 }
 
 [data-site-theme="luxury"] .luxury-mobile-nav__bars {
   display: grid;
   gap: 5px;
   justify-items: center;
+  pointer-events: none;
 }
 
 [data-site-theme="luxury"] .luxury-mobile-nav__bars span {
@@ -329,12 +341,30 @@ body {
   border-radius: var(--luxury-radius-pill);
 }
 
-[data-site-theme="luxury"] .luxury-mobile-nav__panel {
-  position: absolute;
+/* Fixed: sticky + backdrop-filter headers clip absolute dropdowns on real phones */
+[data-site-theme="luxury"] .luxury-mobile-nav__backdrop {
+  position: fixed;
+  top: 4.75rem;
   right: 0;
-  top: calc(100% + 0.6rem);
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--luxury-ink) 28%, transparent);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-site-theme="luxury"] .luxury-mobile-nav__panel {
+  position: fixed;
+  top: max(4.75rem, calc(env(safe-area-inset-top) + 4.25rem));
+  right: max(0.75rem, env(safe-area-inset-right));
+  left: auto;
+  z-index: 51;
   display: grid;
-  min-width: min(18rem, calc(100% - 1rem));
+  width: min(18rem, calc(100vw - 1.5rem));
   gap: 0.25rem;
   padding: 0.75rem;
   border: 1px solid var(--luxury-line);
@@ -2170,6 +2200,8 @@ body {
 }
 
 [data-site-theme="luxury"] .luxury-share-button {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -2177,12 +2209,14 @@ body {
   border-radius: 999px;
   background: color-mix(in srgb, var(--luxury-ivory) 88%, white);
   padding: 0.5rem 0.95rem;
+  min-height: 44px;
   font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--luxury-ink);
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   cursor: pointer;
   transition: background 160ms ease, border-color 160ms ease;
 }
@@ -2530,6 +2564,12 @@ body {
 }
 
 @media (max-width: 767px) {
+  [data-site-theme="luxury"] .luxury-header {
+    /* Avoid compositing bugs that swallow taps / clip menus on real devices */
+    backdrop-filter: none;
+    background: var(--luxury-ivory);
+  }
+
   [data-site-theme="luxury"] .luxury-contact-card,
   [data-site-theme="luxury"] .luxury-form-panel {
     width: 100%;
