@@ -1,13 +1,17 @@
 import Link from "next/link";
 import { catalogTotalPages } from "@/lib/catalog-pagination";
 import { locationsFromListings } from "@/lib/public-site-content";
-import { fillTemplate, localizedHref } from "@/lib/site-i18n";
+import {
+  fillTemplate,
+  localizeSiteHref,
+  localizedHref,
+} from "@/lib/site-i18n";
 import type { CatalogThemeProps } from "@/themes/theme-types";
-import { getBeigeCopy, resolveBeigeHeroCopy } from "@/themes/beige/beige-copy";
+import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
-import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeHeroCollage } from "@/themes/beige/beige-hero-collage";
+import { beigeHeroTitleParts } from "@/themes/beige/beige-hero-title";
 import { BeigeListingCard } from "@/themes/beige/beige-listing-card";
 import { BeigePagination } from "@/themes/beige/beige-pagination";
 import { BeigeReveal } from "@/themes/beige/beige-reveal";
@@ -15,32 +19,12 @@ import { BeigeSearch } from "@/themes/beige/beige-search";
 import {
   BeigeAbout,
   BeigeContact,
+  BeigeFinalCta,
   BeigeLocations,
   BeigeProcess,
-  BeigeTestimonials,
 } from "@/themes/beige/beige-sections";
 import { BeigeShell } from "@/themes/beige/beige-shell";
 import { getBeigeUi } from "@/themes/beige/beige-ui";
-
-function catalogHeading(
-  dict: Awaited<ReturnType<typeof getBeigeUi>>["dict"],
-  oferta: CatalogThemeProps["oferta"],
-  city: string,
-  total: number,
-): string {
-  const count =
-    total === 1
-      ? dict.results.one
-      : fillTemplate(dict.results.many, { count: total });
-  const kind =
-    oferta === "sale"
-      ? dict.results.forSale
-      : oferta === "rent"
-        ? dict.results.forRent
-        : dict.results.available;
-  const place = city ? ` ${fillTemplate(dict.results.inPlace, { city })}` : "";
-  return `${count} ${kind}${place}`;
-}
 
 export async function BeigeCatalog({
   oferta,
@@ -51,14 +35,14 @@ export async function BeigeCatalog({
   total,
   page = 1,
   pageSize = 12,
+  heading,
+  typeLabel,
   catalogOk,
   catalogStatus,
   lang,
   heroPhotoUrls,
 }: CatalogThemeProps) {
   const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
-  const copy = getBeigeCopy(locale);
-  const hero = resolveBeigeHeroCopy(content, locale);
   const collage = (heroPhotoUrls ?? []).slice(0, 3);
   const locations =
     content.locations.length > 0
@@ -73,168 +57,157 @@ export async function BeigeCatalog({
       : { oferta: oferta === "sale" ? "venta" : "renta" },
     defaultLocale,
   );
-  const availableLabel =
-    total === 1
-      ? copy.availableOne
-      : fillTemplate(copy.availableMany, { count: total });
   const totalPages = catalogTotalPages(total, pageSize);
-  const hasFilters = Boolean(
-    propertyType || bedrooms || city || oferta !== "all",
-  );
+  const hasFilters = Boolean(propertyType || bedrooms || city);
+  const emptyKind =
+    oferta === "sale"
+      ? dict.results.emptySale
+      : oferta === "rent"
+        ? dict.results.emptyRent
+        : "";
+  const localizedType =
+    dict.propertyTypes[propertyType as keyof typeof dict.propertyTypes] ??
+    typeLabel;
+  const primaryHref = content.hero.primaryCta
+    ? localizeSiteHref(content.hero.primaryCta.href, locale, defaultLocale)
+    : localizedHref("/#catalogo", locale, null, defaultLocale);
+  const secondaryHref = content.hero.secondaryCta
+    ? localizeSiteHref(content.hero.secondaryCta.href, locale, defaultLocale)
+    : localizedHref("/#about", locale, null, defaultLocale);
+  const heroTitle = beigeHeroTitleParts(dict.hero.title);
+  const countLabel =
+    total === 1
+      ? dict.results.one
+      : fillTemplate(dict.results.many, { count: total });
 
   return (
     <BeigeShell lang={lang}>
-      <BeigeHeader lang={lang} variant="home" />
+      <BeigeHeader lang={lang} />
 
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#FBF9F5] via-[#F4EFE6]/30 to-[#FBF9F5] pb-8 pt-16">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-10 [background-image:radial-gradient(#8A7759_1px,transparent_1px)] [background-size:24px_24px]"
-          aria-hidden
-        />
-        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center justify-between gap-12 px-6 lg:flex-row">
-          <div className="max-w-xl space-y-6">
-            <span className="inline-flex items-center rounded-full border border-[#A4B494]/30 bg-[#A4B494]/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-[#2D2A26]">
-              {hero.heroEyebrow}
-            </span>
-            <h1 className="beige-hero__title text-4xl font-normal leading-tight tracking-tight text-[#2D2A26] sm:text-6xl">
-              {hero.heroTitle.includes(hero.heroTitleAccent) ? (
-                <>
-                  {hero.heroTitle.slice(
-                    0,
-                    hero.heroTitle.indexOf(hero.heroTitleAccent),
-                  )}
-                  <em className="italic text-[#8F9F81]">
-                    {hero.heroTitleAccent}
-                  </em>
-                  {hero.heroTitle.slice(
-                    hero.heroTitle.indexOf(hero.heroTitleAccent) +
-                      hero.heroTitleAccent.length,
-                  )}
-                </>
-              ) : (
-                hero.heroTitle
-              )}
-            </h1>
-            <p className="text-base font-light leading-relaxed text-[#8A7759] sm:text-lg">
-              {hero.heroSubtitle}
-            </p>
+      <section className="beige-hero">
+        <div className="beige-shell">
+          <div className="beige-hero__grid">
+            <div className="beige-hero__copy">
+              <div className="beige-hero__block beige-hero__block--1">
+                <p className="beige-hero__badge">{content.hero.eyebrow}</p>
+                <h1 className="beige-hero__title">
+                  {heroTitle.lead ? `${heroTitle.lead} ` : null}
+                  <em className="beige-hero__accent">{heroTitle.accent}</em>
+                </h1>
+              </div>
+              <p className="beige-hero__block beige-hero__block--2 beige-hero__subtitle">
+                {dict.hero.subtitle}
+              </p>
+              <div className="beige-hero__block beige-hero__block--3 beige-hero__actions">
+                <Link href={primaryHref} className="beige-btn">
+                  {dict.hero.primaryCta}
+                </Link>
+                <Link
+                  href={secondaryHref}
+                  className="beige-btn beige-btn--ghost"
+                >
+                  {dict.hero.secondaryCta}
+                </Link>
+              </div>
+            </div>
+            <div className="beige-hero__media">
+              <BeigeHeroCollage
+                urls={collage}
+                title={displayListingTitle(listings[0]?.title ?? "")}
+                photoAltTemplate={dict.listing.gallery.photoAlt}
+              />
+            </div>
           </div>
-          <BeigeHeroCollage
-            urls={collage}
-            title={displayListingTitle(listings[0]?.title ?? "")}
-            photoAltTemplate={dict.listing.gallery.photoAlt}
-          />
-        </div>
-        <div className="relative z-20 mx-auto mt-16 max-w-5xl px-6">
-          <BeigeSearch
-            oferta={oferta}
-            city={city}
-            propertyType={propertyType}
-            bedrooms={bedrooms}
-            locale={locale}
-            defaultLocale={defaultLocale}
-            dict={dict}
-          />
+
+          <BeigeReveal variant="up" className="beige-search-shell">
+            <BeigeSearch
+              oferta={oferta}
+              city={city}
+              propertyType={propertyType}
+              bedrooms={bedrooms}
+              locale={locale}
+              defaultLocale={defaultLocale}
+              dict={dict}
+            />
+          </BeigeReveal>
         </div>
       </section>
 
-      <main id="propiedades" className="pb-24 pt-16" tabIndex={-1}>
-        <BeigeReveal>
-          <div className="mx-auto max-w-7xl px-6">
-            {!catalogOk ? (
-              <p className="text-[#8A7759]">
-                {fillTemplate(dict.results.catalogError, {
-                  status: catalogStatus,
-                })}
-              </p>
-            ) : listings.length === 0 ? (
-              <div className="rounded-2xl border border-[#E5D9C5] bg-[#F4EFE6] p-10 text-center">
-                <h2
-                  className="beige-section__title text-xl text-[#2D2A26] sm:text-3xl"
-                  tabIndex={-1}
-                >
-                  {copy.catalogTitle}
+      <main id="catalogo" className="beige-catalog" tabIndex={-1}>
+        <div className="beige-shell">
+          {!catalogOk ? (
+            <p className="beige-lead">
+              {fillTemplate(dict.results.catalogError, {
+                status: catalogStatus,
+              })}
+            </p>
+          ) : listings.length === 0 ? (
+            <BeigeReveal variant="up">
+              <div className="beige-state">
+                <h2 className="beige-section__title">
+                  {dict.results.emptyTitle}
                 </h2>
-                <p className="mt-3 text-sm text-[#8A7759]">
-                  {hasFilters ? copy.emptyFilters : dict.results.emptyCopy}
+                <p className="beige-lead">
+                  {dict.results.emptyCopy}
+                  {emptyKind ? ` ${emptyKind}` : ""}
+                  {city ? ` ${fillTemplate(dict.results.inPlace, { city })}` : ""}
+                  {localizedType ? ` · ${localizedType}` : ""}
+                  {bedrooms
+                    ? ` · ${fillTemplate(dict.results.bedroomsFilter, { count: bedrooms })}`
+                    : ""}
+                  .
                 </p>
-                <Link
-                  href={homeHref}
-                  className="mt-6 inline-flex rounded-full bg-[#A4B494] px-5 py-3 text-sm font-semibold text-[#2D2A26]"
-                >
-                  {copy.clearFilters}
+                <Link href={homeHref} className="beige-btn beige-state__cta">
+                  {dict.results.viewAll}
                 </Link>
-                <BeigePagination
-                  page={page}
-                  totalPages={totalPages}
-                  total={total}
-                  oferta={oferta}
-                  city={city}
-                  propertyType={propertyType}
-                  bedrooms={bedrooms}
-                  locale={locale}
-                  defaultLocale={defaultLocale}
-                />
               </div>
-            ) : (
-              <section>
-                <div className="mb-16 flex flex-col justify-between md:flex-row md:items-end">
+            </BeigeReveal>
+          ) : (
+            <section>
+              <BeigeReveal variant="up">
+                <div className="beige-catalog__head">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A39073]">
-                      {copy.catalogEyebrow}
-                    </p>
-                    <h2
-                      className="beige-section__title mt-2 text-3xl text-[#2D2A26] sm:text-5xl"
-                      tabIndex={-1}
-                    >
-                      {copy.catalogTitle}
-                    </h2>
-                    <p className="mt-3 max-w-xl text-sm font-light text-[#8A7759]">
-                      {copy.catalogDescription}
-                    </p>
-                    <p className="mt-2 text-sm font-medium text-[#2D2A26]">
-                      {availableLabel}
-                      {city || oferta !== "all"
-                        ? ` · ${catalogHeading(dict, oferta, city, total)}`
-                        : ""}
-                    </p>
+                    <div className="beige-catalog__meta">
+                      <p className="beige-eyebrow">{dict.results.kicker}</p>
+                      <p className="beige-catalog__count">{countLabel}</p>
+                    </div>
+                    <h2 className="beige-section__title">{heading}</h2>
+                    <hr className="beige-rule" />
                   </div>
                   {hasFilters ? (
-                    <Link
-                      href={clearHref}
-                      className="mt-4 text-sm font-semibold text-[#2D2A26] transition-colors hover:text-[#A39073] md:mt-0"
-                    >
-                      {copy.clearFilters}
+                    <Link href={clearHref} className="beige-inline-link">
+                      {dict.results.clearFilters}
                     </Link>
                   ) : null}
                 </div>
-                <ul className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                  {listings.map((listing) => (
-                    <li key={listing.slug}>
-                      <BeigeListingCard
-                        listing={listing}
-                        locale={locale}
-                        defaultLocale={defaultLocale}
-                        dict={dict}
-                      />
-                    </li>
-                  ))}
-                </ul>
-                <BeigePagination
-                  page={page}
-                  totalPages={totalPages}
-                  total={total}
-                  oferta={oferta}
-                  city={city}
-                  propertyType={propertyType}
-                  bedrooms={bedrooms}
-                  locale={locale}
-                  defaultLocale={defaultLocale}
-                />
-              </section>
-            )}
-          </div>
-        </BeigeReveal>
+              </BeigeReveal>
+              <ul className="beige-grid">
+                {listings.map((listing, index) => (
+                  <li key={listing.slug}>
+                    <BeigeListingCard
+                      listing={listing}
+                      locale={locale}
+                      defaultLocale={defaultLocale}
+                      dict={dict}
+                      index={index}
+                    />
+                  </li>
+                ))}
+              </ul>
+              <BeigePagination
+                page={page}
+                totalPages={totalPages}
+                total={total}
+                oferta={oferta}
+                city={city}
+                propertyType={propertyType}
+                bedrooms={bedrooms}
+                locale={locale}
+                defaultLocale={defaultLocale}
+              />
+            </section>
+          )}
+        </div>
       </main>
 
       <BeigeLocations
@@ -242,7 +215,7 @@ export async function BeigeCatalog({
         listings={listings}
         locale={locale}
         defaultLocale={defaultLocale}
-        copy={copy}
+        dict={dict}
       />
       <BeigeAbout
         content={content}
@@ -250,15 +223,14 @@ export async function BeigeCatalog({
         locale={locale}
         defaultLocale={defaultLocale}
       />
-      <BeigeTestimonials content={content} dict={dict} locale={locale} />
-      <BeigeProcess dict={dict} content={content} locale={locale} />
+      <BeigeProcess dict={dict} />
       <BeigeContact
         content={content}
         dict={dict}
         locale={locale}
         defaultLocale={defaultLocale}
-        listingSlug={listings[0]?.slug ?? null}
       />
+      <BeigeFinalCta content={content} dict={dict} />
       <BeigeFooter lang={lang} />
     </BeigeShell>
   );

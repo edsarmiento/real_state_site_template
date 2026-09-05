@@ -6,27 +6,25 @@ import {
   type PublicLocation,
 } from "@/lib/public-site-content";
 import {
+  fillTemplate,
   localizeSiteHref,
   localizedHref,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
 import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
-import {
-  getBeigeCopy,
-  resolveBeigeAboutCopy,
-  resolveBeigeContactCopy,
-  resolveBeigeProcessCopy,
-  type BeigeCopy,
-} from "@/themes/beige/beige-copy";
 import { BeigeContactForm } from "@/themes/beige/beige-contact-form";
 import { BeigeCoverImage } from "@/themes/beige/beige-cover-image";
 import {
   BeigeIconArrowRight,
+  BeigeIconCalendar,
+  BeigeIconMail,
+  BeigeIconMapPin,
   BeigeIconPhone,
   BeigeIconWhatsApp,
 } from "@/themes/beige/beige-icons";
 import { BeigeReveal } from "@/themes/beige/beige-reveal";
+import { BeigeSocialLinks } from "@/themes/beige/beige-social-links";
 
 type Shared = {
   content: PublicSiteContent;
@@ -35,35 +33,59 @@ type Shared = {
   defaultLocale: SiteLocale;
 };
 
+function normalizeCity(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function cityKey(value: string): string {
+  return normalizeCity(value).split(",")[0]?.trim() || "";
+}
+
+function representativeListingPhoto(
+  city: string | undefined,
+  listings: PublicListingCard[],
+): string | null {
+  if (!city) return null;
+  const needle = cityKey(city);
+  if (!needle) return null;
+  const match = listings.find((listing) => {
+    if (cityKey(listing.city || "") !== needle) return false;
+    return Boolean(listing.photo_url?.trim());
+  });
+  return match?.photo_url?.trim() || null;
+}
+
 export function BeigeLocations({
   locations,
   listings,
   locale,
   defaultLocale,
-  copy,
+  dict,
 }: {
   locations: PublicLocation[];
   listings: PublicListingCard[];
   locale: SiteLocale;
   defaultLocale: SiteLocale;
-  copy: BeigeCopy;
+  dict: SiteDictionary;
 }) {
   const items = locations
     .map((location) => {
       const city = location.filter.city?.trim();
       if (!city) return null;
-      const href =
-        localizedHref("/", locale, { city }, defaultLocale) + "#propiedades";
-      const listingPhoto =
-        listings.find(
-          (listing) =>
-            listing.city.trim().toLowerCase() === city.toLowerCase() &&
-            listing.photo_url,
-        )?.photo_url ?? null;
+      const href = localizedHref("/", locale, { city }, defaultLocale);
+      const configured = location.imageUrl?.trim() || null;
+      const listingPhoto = configured
+        ? null
+        : representativeListingPhoto(location.filter.city, listings);
       return {
         location,
         href,
-        imageSrc: location.imageUrl?.trim() || listingPhoto,
+        imageSrc: configured || listingPhoto,
+        fromListing: Boolean(!configured && listingPhoto),
       };
     })
     .filter(
@@ -73,243 +95,300 @@ export function BeigeLocations({
         location: PublicLocation;
         href: string;
         imageSrc: string | null;
+        fromListing: boolean;
       } => Boolean(item),
     );
 
   if (items.length === 0) return null;
 
+  const isSingle = items.length === 1;
+
   return (
-    <section id="ubicaciones" className="border-y border-[#E5D9C5] bg-white py-24">
-      <BeigeReveal>
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#A39073]">
-              {copy.locationsEyebrow}
-            </p>
-            <h2 className="beige-section__title mt-2 text-3xl text-[#2D2A26] sm:text-5xl">
-              {copy.locationsTitle}
-            </h2>
-            <p className="mt-4 font-light text-[#8A7759]">
-              {copy.locationsDescription}
-            </p>
-          </div>
-          <ul
-            className={`grid grid-cols-1 gap-6 ${
-              items.length === 1
-                ? "mx-auto max-w-md"
-                : items.length === 2
-                  ? "mx-auto max-w-3xl md:grid-cols-2"
-                  : "md:grid-cols-2 lg:grid-cols-3"
-            }`}
+    <section
+      className={
+        isSingle ? "beige-locations beige-locations--single" : "beige-locations"
+      }
+      aria-labelledby="beige-locations-title"
+    >
+      <div
+        className={
+          isSingle ? "beige-shell beige-locations__split" : "beige-shell"
+        }
+      >
+        <BeigeReveal variant="up">
+          <div
+            className={
+              isSingle
+                ? "beige-locations__copy"
+                : "beige-section__head--center"
+            }
           >
-            {items.map(({ location, href, imageSrc }) => (
-              <li key={location.id}>
-                <Link
-                  href={href}
-                  className="beige-location-card beige-card-hover group relative block min-h-[18rem] overflow-hidden rounded-3xl bg-[#2D2A26] shadow-md"
-                >
-                  {imageSrc ? (
-                    <BeigeCoverImage
-                      src={imageSrc}
-                      alt=""
-                      className="beige-img-zoom absolute inset-0 h-full w-full object-cover"
-                      placeholderClassName="absolute inset-0 bg-[#E5D9C5]"
-                      placeholder=""
-                    />
-                  ) : (
-                    <div className="absolute inset-0 bg-[#E5D9C5]" />
-                  )}
-                  <div
-                    className="absolute inset-0 bg-gradient-to-t from-[#2D2A26]/90 via-[#2D2A26]/35 to-transparent"
-                    aria-hidden
-                  />
-                  <div className="relative z-10 flex min-h-[18rem] flex-col justify-end p-6 text-white">
-                    <h3 className="text-2xl font-medium">{location.name}</h3>
-                    {pickLocalized(location.shortDescription, locale) ? (
-                      <p className="mt-1 line-clamp-2 text-xs font-light text-[#E5D9C5]">
-                        {pickLocalized(location.shortDescription, locale)}
-                      </p>
-                    ) : null}
-                    <span className="beige-location-cta mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/30 bg-white/95 px-4 py-2 text-xs font-semibold text-[#2D2A26]">
-                      {copy.locationsCta}
-                      <BeigeIconArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-1" />
-                    </span>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </BeigeReveal>
+            <p className="beige-eyebrow">{dict.locations.eyebrow}</p>
+            <h2 id="beige-locations-title" className="beige-section__title">
+              {dict.locations.title}
+            </h2>
+            <p className="beige-lead">{dict.locations.description}</p>
+            <hr className="beige-rule" />
+          </div>
+        </BeigeReveal>
+        <ul
+          className={`beige-locations__grid ${
+            isSingle
+              ? "beige-locations__grid--single"
+              : "beige-locations__grid--multi"
+          }`}
+        >
+          {items.map(({ location, href, imageSrc, fromListing }, index) => {
+              const description = pickLocalized(
+                location.shortDescription,
+                locale,
+              );
+              const alt = fromListing
+                ? fillTemplate(dict.locations.representativeAlt, {
+                    name: location.name,
+                  })
+                : pickLocalized(location.imageAlt, locale) ||
+                  fillTemplate(dict.locations.fallbackAlt, {
+                    name: location.name,
+                  });
+
+              return (
+                <li key={location.id}>
+                  <BeigeReveal variant="zoom" delayMs={(index % 3) * 100}>
+                    <Link href={href} className="beige-location-card group">
+                      <div className="beige-location-card__media">
+                        {imageSrc ? (
+                          <BeigeCoverImage
+                            src={imageSrc}
+                            alt={alt}
+                            className="beige-img-zoom absolute inset-0 h-full w-full object-cover"
+                            placeholderClassName="beige-hero-frame__placeholder"
+                            placeholder=""
+                          />
+                        ) : (
+                          <div className="beige-hero-frame__placeholder" />
+                        )}
+                      </div>
+                      <div className="beige-location-card__overlay" aria-hidden />
+                      <div className="beige-location-card__body">
+                        <h3 className="beige-location-card__name">
+                          {location.name}
+                        </h3>
+                        {description ? (
+                          <p className="beige-location-card__excerpt line-clamp-2">
+                            {description}
+                          </p>
+                        ) : null}
+                        <span className="beige-location-cta">
+                          {dict.locations.cta}
+                          <BeigeIconArrowRight className="h-3.5 w-3.5" />
+                        </span>
+                      </div>
+                    </Link>
+                  </BeigeReveal>
+                </li>
+              );
+            })}
+        </ul>
+      </div>
     </section>
   );
 }
 
+
 export function BeigeAbout({
   content,
+  dict,
   locale,
   defaultLocale,
 }: Shared) {
   const { about } = content;
-  const copy = resolveBeigeAboutCopy(content, locale);
-  const ctaHref =
-    about.cta?.href === "#catalogo" || !about.cta?.href
-      ? localizedHref("/#propiedades", locale, null, defaultLocale)
-      : localizeSiteHref(about.cta.href, locale, defaultLocale);
+  const ctaHref = about.cta
+    ? localizeSiteHref(about.cta.href, locale, defaultLocale)
+    : localizedHref("/#catalogo", locale, null, defaultLocale);
+
   return (
-    <section id="nosotros" className="border-y border-[#E5D9C5] bg-white py-24">
-      <BeigeReveal>
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 md:grid-cols-2">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A39073]">
-              {copy.kicker}
-            </p>
-            <h2 className="beige-section__title mt-2 text-3xl sm:text-5xl">
-              {copy.title}
-            </h2>
-            <p className="mt-4 font-light leading-relaxed text-[#8A7759]">
-              {copy.description}
-            </p>
-            <ul className="mt-6 space-y-3 text-sm font-medium text-[#2D2A26]">
-              {copy.benefits.map((benefit) => (
-                <li key={benefit} className="flex items-center gap-2">
-                  {benefit}
-                </li>
-              ))}
-            </ul>
-            {about.cta ? (
-              <Link
-                href={ctaHref}
-                className="beige-btn mt-8 inline-flex rounded-full bg-[#A4B494] px-8 py-3.5 text-sm font-medium text-[#2D2A26] shadow-md"
-              >
-                {copy.cta}
-              </Link>
-            ) : null}
-          </div>
-          <div className="aspect-[4/5] overflow-hidden rounded-3xl border-4 border-white bg-[#E5D9C5] shadow-2xl">
-            {about.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={about.imageUrl}
-                alt={copy.title}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center px-8 text-center text-[#A39073]">
-                {content.brand.name}
-              </div>
-            )}
-          </div>
+    <section id="about" className="beige-about">
+      <div className="beige-shell">
+        <div className="beige-about__grid">
+          <BeigeReveal variant="left">
+            <div className="beige-about__copy">
+              <p className="beige-eyebrow">{dict.about.kicker}</p>
+              <h2 className="beige-section__title">{dict.about.title}</h2>
+              <p className="beige-lead">{dict.about.description}</p>
+              <ul className="beige-about__benefits">
+                <li>{dict.about.benefit1}</li>
+                <li>{dict.about.benefit2}</li>
+                <li>{dict.about.benefit3}</li>
+              </ul>
+              {about.cta ? (
+                <Link href={ctaHref} className="beige-btn beige-about__cta">
+                  {dict.about.cta}
+                </Link>
+              ) : null}
+            </div>
+          </BeigeReveal>
+          <BeigeReveal variant="right">
+            <div className="beige-about__media">
+              {about.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={about.imageUrl}
+                  alt={dict.about.title}
+                  className="beige-about__image"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="beige-about__placeholder" aria-hidden="true" />
+              )}
+            </div>
+          </BeigeReveal>
         </div>
-      </BeigeReveal>
+      </div>
     </section>
   );
 }
 
-export function BeigeTestimonials({
-  content,
-  dict,
-  locale,
-}: Pick<Shared, "content" | "dict" | "locale">) {
-  const resolved = content.testimonials.flatMap((item) => {
-    const quote = pickLocalized(item.quote, locale);
-    if (!quote) return [];
-    return [
-      {
-        id: item.id,
-        quote,
-        name: item.name,
-        role: pickLocalized(item.role, locale),
-        preview: item.preview === true,
-      },
-    ];
-  });
-  if (resolved.length === 0) return null;
-  const isPreview = resolved.some((item) => item.preview);
-
-  return (
-    <section className="py-16">
-      <BeigeReveal>
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#A39073]">
-            {dict.testimonials.eyebrow}
-          </p>
-          <h2 className="beige-section__title mt-3 text-3xl">{dict.testimonials.title}</h2>
-          {isPreview ? (
-            <p className="mt-2 text-sm text-[#A39073]" role="note">
-              {dict.testimonials.previewNote}
-            </p>
-          ) : null}
-          <ul className="mt-8 grid gap-6 md:grid-cols-3">
-            {resolved.map((item) => (
-              <li
-                key={item.id}
-                className="beige-card-hover rounded-3xl border border-[#E5D9C5] bg-[#FBF9F5] p-8 shadow-sm"
-              >
-                <blockquote>
-                  <p className="text-sm leading-relaxed text-[#2D2A26]">
-                    {item.quote}
-                  </p>
-                  <footer className="mt-4 text-xs uppercase tracking-wider text-[#A39073]">
-                    {item.name}
-                    {item.role ? ` · ${item.role}` : ""}
-                  </footer>
-                </blockquote>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </BeigeReveal>
-    </section>
-  );
-}
-
-export function BeigeProcess({
-  dict,
-  content,
-  locale,
-}: Pick<Shared, "dict" | "content" | "locale">) {
-  const processCopy = resolveBeigeProcessCopy(content, locale);
+export function BeigeProcess({ dict }: Pick<Shared, "dict">) {
   const steps = [
-    { n: "01", title: dict.process.step1Title, copy: dict.process.step1Description },
-    { n: "02", title: dict.process.step2Title, copy: dict.process.step2Description },
-    { n: "03", title: dict.process.step3Title, copy: dict.process.step3Description },
+    {
+      number: "01",
+      title: dict.process.step1Title,
+      description: dict.process.step1Description,
+    },
+    {
+      number: "02",
+      title: dict.process.step2Title,
+      description: dict.process.step2Description,
+    },
+    {
+      number: "03",
+      title: dict.process.step3Title,
+      description: dict.process.step3Description,
+    },
   ];
+
   return (
-    <section id="proceso" className="bg-[#FBF9F5] py-24">
-      <BeigeReveal>
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A39073]">
+    <section id="process" className="beige-process">
+      <div className="beige-shell">
+        <BeigeReveal variant="up" className="beige-process__head">
+          <div className="beige-section__head--center">
+            <p className="beige-eyebrow beige-eyebrow--on-dark">
               {dict.process.kicker}
             </p>
-            <h2 className="beige-section__title mt-2 text-3xl sm:text-5xl">
-              {processCopy.title}
+            <h2 className="beige-section__title beige-section__title--on-dark">
+              {dict.process.title}
             </h2>
-            <p className="mt-4 font-light text-[#8A7759]">
-              {processCopy.subtitle}
+            <p className="beige-lead beige-lead--on-dark">
+              {dict.process.subtitle}
             </p>
+            <hr className="beige-rule" />
           </div>
-          <ol className="grid gap-8 md:grid-cols-3">
-            {steps.map((step) => (
-              <li
-                key={step.n}
-                className="beige-card-hover group relative rounded-3xl border border-[#E5D9C5] bg-white p-8 shadow-sm"
+        </BeigeReveal>
+        <ol className="beige-process__steps">
+          {steps.map((step, index) => (
+            <li key={step.number} className="beige-process__step">
+              <BeigeReveal
+                variant="up"
+                delayMs={index * 100}
+                className="beige-process__reveal"
               >
-                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#A4B494]/20 font-bold text-[#2D2A26] transition-colors duration-300 group-hover:bg-[#A4B494] group-hover:text-white">
-                  {step.n}
+                <div className="beige-process-card">
+                  <p className="beige-process-card__mark">{step.number}</p>
+                  <h3 className="beige-process-card__title">{step.title}</h3>
+                  <p className="beige-process-card__copy">{step.description}</p>
                 </div>
-                <h3 className="mb-2 text-lg font-medium">{step.title}</h3>
-                <p className="text-xs font-light leading-relaxed text-[#8A7759]">
-                  {step.copy}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </BeigeReveal>
+              </BeigeReveal>
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
+  );
+}
+
+type Channel = {
+  key: string;
+  eyebrow: string;
+  value: string;
+  href: string | null;
+  external?: boolean;
+  icon: "whatsapp" | "phone" | "email" | "schedule" | "location";
+};
+
+function collectChannels(
+  content: PublicSiteContent,
+  dict: SiteDictionary,
+): Channel[] {
+  const contact = content.contact;
+  const whatsappHref = beigeContactChannels(content).whatsappHref;
+  const channels: Channel[] = [];
+  if (whatsappHref) {
+    channels.push({
+      key: "whatsapp",
+      eyebrow: dict.contact.writeUs,
+      value: dict.whatsapp.label,
+      href: whatsappHref,
+      external: true,
+      icon: "whatsapp",
+    });
+  }
+  if (contact.phoneHref) {
+    channels.push({
+      key: "phone",
+      eyebrow: dict.contact.callUs,
+      value: contact.phone || dict.contact.callUs,
+      href: contact.phoneHref,
+      icon: "phone",
+    });
+  }
+  if (contact.emailHref && contact.email) {
+    channels.push({
+      key: "email",
+      eyebrow: dict.contact.email,
+      value: contact.email,
+      href: contact.emailHref,
+      icon: "email",
+    });
+  }
+  if (contact.scheduleCallUrl) {
+    channels.push({
+      key: "schedule",
+      eyebrow: dict.contact.schedule,
+      value: dict.contact.scheduleValue,
+      href: contact.scheduleCallUrl,
+      external: true,
+      icon: "schedule",
+    });
+  }
+  if (contact.location) {
+    channels.push({
+      key: "location",
+      eyebrow: dict.contact.location,
+      value: contact.location,
+      href: null,
+      icon: "location",
+    });
+  }
+  return channels;
+}
+
+function ChannelIcon({ name }: { name: Channel["icon"] }) {
+  if (name === "whatsapp") return <BeigeIconWhatsApp className="h-5 w-5" />;
+  if (name === "phone") return <BeigeIconPhone className="h-5 w-5" />;
+  if (name === "email") return <BeigeIconMail className="h-5 w-5" />;
+  if (name === "schedule") return <BeigeIconCalendar className="h-5 w-5" />;
+  return <BeigeIconMapPin className="h-5 w-5" />;
+}
+
+function hasContactChannels(content: PublicSiteContent): boolean {
+  const contact = content.contact;
+  return Boolean(
+    beigeContactChannels(content).whatsappHref ||
+      contact.phoneHref ||
+      (contact.emailHref && contact.email) ||
+      contact.scheduleCallUrl ||
+      contact.location,
   );
 }
 
@@ -318,72 +397,162 @@ export function BeigeContact({
   dict,
   locale,
   defaultLocale,
-  listingSlug,
-}: Shared & { listingSlug: string | null }) {
-  const copy = getBeigeCopy(locale);
-  const headings = resolveBeigeContactCopy(content, locale);
-  const channels = beigeContactChannels(content);
-  const whatsappHref = channels.whatsappHref;
-  const phoneHref = channels.phoneHref;
-  const showWhatsApp = Boolean(whatsappHref);
-  const showCall = Boolean(phoneHref && channels.phone);
+}: Shared) {
+  const { contact, legal, social } = content;
+  const catalogHref = localizeSiteHref("#catalogo", locale, defaultLocale);
+  const channels = collectChannels(content, dict);
+  const hasChannels = hasContactChannels(content);
 
   return (
-    <section id="contacto" className="bg-[#2D2A26] py-24 text-[#FBF9F5]">
-      <BeigeReveal>
-        <div className="mx-auto max-w-3xl px-6">
-          <div className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#C4D3A2]">
-              {copy.contactKicker}
+    <section id="contact" className="beige-contact">
+      <div className="beige-shell">
+        <div className="beige-contact__grid">
+          <div className="beige-contact__copy">
+            <p className="beige-eyebrow beige-eyebrow--on-dark">
+              {dict.contact.kicker}
             </p>
-            <h2 className="beige-section__title mt-3 text-3xl sm:text-5xl">
-              {headings.title}
+            <h2 className="beige-section__title beige-section__title--on-dark">
+              {dict.contact.heading}
             </h2>
-            <p className="mx-auto mt-4 max-w-xl font-light text-[#E5D9C5]">
-              {headings.subtitle}
+            <p className="beige-lead beige-lead--on-dark">
+              {dict.contact.description}
             </p>
-            {showWhatsApp || showCall ? (
-              <div
-                data-beige-contact-actions
-                className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center"
-              >
-                {showWhatsApp && whatsappHref ? (
-                  <a
-                    href={whatsappHref}
-                    className="beige-contact-cta beige-contact-cta--primary"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-beige-cta="form-whatsapp"
-                    aria-label={`${copy.openWhatsApp}. ${dict.a11y.opensInNewTab}`}
-                  >
-                    <BeigeIconWhatsApp className="h-5 w-5 shrink-0" />
-                    {copy.openWhatsApp}
-                  </a>
-                ) : null}
-                {showCall && phoneHref ? (
-                  <a
-                    href={phoneHref}
-                    className="beige-contact-cta beige-contact-cta--outline"
-                    data-beige-cta="form-call"
-                  >
-                    <BeigeIconPhone className="h-5 w-5 shrink-0" />
-                    {copy.callNow}
-                  </a>
-                ) : null}
+            <BeigeReveal variant="up">
+            {channels.length > 0 ? (
+              <ul className="beige-channels">
+                {channels.map((channel) => {
+                  const body = (
+                    <>
+                      <span className="beige-channel__icon" aria-hidden>
+                        <ChannelIcon name={channel.icon} />
+                      </span>
+                      <span className="beige-channel__copy">
+                        <span className="beige-channel__eyebrow">
+                          {channel.eyebrow}
+                        </span>
+                        <span className="beige-channel__value">{channel.value}</span>
+                      </span>
+                    </>
+                  );
+                  return (
+                    <li key={channel.key}>
+                      {channel.href ? (
+                        <a
+                          href={channel.href}
+                          className="beige-channel"
+                          aria-label={
+                            channel.external
+                              ? `${channel.eyebrow}: ${channel.value}. ${dict.a11y.opensInNewTab}`
+                              : `${channel.eyebrow}: ${channel.value}`
+                          }
+                          {...(channel.external
+                            ? { target: "_blank", rel: "noopener noreferrer" }
+                            : {})}
+                        >
+                          {body}
+                        </a>
+                      ) : (
+                        <p className="beige-channel beige-channel--static">{body}</p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : null}
+            <div className="beige-contact__social">
+              <BeigeSocialLinks
+                social={social}
+                dict={dict}
+                heading={dict.footer.follow}
+              />
+            </div>
+            {!hasChannels ? (
+              <div className="mt-8">
+                <Link href={catalogHref} className="beige-btn">
+                  {dict.contact.viewProperties}
+                </Link>
               </div>
             ) : null}
+            {contact.attentionNote ? (
+              <p className="beige-contact__note">{contact.attentionNote}</p>
+            ) : null}
+            {contact.imageUrl ? (
+              <div className="mt-8 overflow-hidden rounded-3xl">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={contact.imageUrl}
+                  alt=""
+                  className="h-48 w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            ) : null}
+            </BeigeReveal>
           </div>
-          <div className="mt-12 rounded-[2rem] bg-white p-6 text-[#2D2A26] shadow-2xl sm:p-10">
+          <BeigeReveal variant="up" delayMs={100}>
             <BeigeContactForm
-              listingSlug={listingSlug}
-              legal={content.legal}
+              contact={contact}
+              legal={legal}
               dict={dict}
               locale={locale}
               defaultLocale={defaultLocale}
             />
-          </div>
+          </BeigeReveal>
         </div>
-      </BeigeReveal>
+      </div>
+    </section>
+  );
+}
+
+export function BeigeFinalCta({
+  content,
+  dict,
+}: Pick<Shared, "content" | "dict">) {
+  const whatsapp = beigeContactChannels(content).whatsappHref;
+  const schedule = content.contact.scheduleCallUrl;
+  if (!whatsapp && !schedule) return null;
+
+  return (
+    <section
+      className="beige-final-cta"
+      aria-label={dict.contact.finalCtaAria}
+    >
+      <div className="beige-shell">
+        <BeigeReveal variant="up">
+          <div className="beige-final-cta__panel">
+            <h2 className="beige-section__title">{dict.finalCta.title}</h2>
+            <p className="beige-lead">
+              {fillTemplate(dict.finalCta.description, {
+                name: content.brand.name,
+              })}
+            </p>
+            <div className="beige-final-cta__actions">
+              {whatsapp ? (
+                <a
+                  href={whatsapp}
+                  className="beige-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${dict.whatsapp.label}. ${dict.a11y.opensInNewTab}`}
+                >
+                  <BeigeIconWhatsApp className="h-4 w-4" />
+                  {dict.whatsapp.label}
+                </a>
+              ) : null}
+              {schedule ? (
+                <a
+                  href={schedule}
+                  className="beige-btn beige-btn--ghost"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {dict.contact.scheduleCall}
+                </a>
+              ) : null}
+            </div>
+          </div>
+        </BeigeReveal>
+      </div>
     </section>
   );
 }

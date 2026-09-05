@@ -5,7 +5,7 @@ import type { CatalogOfferFilter } from "@/lib/listing-types";
 import type { SiteLocale } from "@/lib/site-i18n";
 import { getBeigeCopy } from "@/themes/beige/beige-copy";
 
-const CATALOG_HASH = "#propiedades";
+const CATALOG_HASH = "#catalogo";
 
 type Props = {
   page: number;
@@ -69,10 +69,14 @@ export function BeigePagination({
   const items = catalogPageItems(page, totalPages);
 
   return (
-    <nav className="beige-pagination mt-12" aria-label={copy.paginationAria}>
+    <nav className="beige-pagination" aria-label={copy.paginationAria}>
       <div className="flex items-center justify-between gap-3 md:hidden">
         {canPrev ? (
-          <Link href={hrefFor(page - 1)} className="beige-page-btn">
+          <Link
+            href={hrefFor(page - 1)}
+            className="beige-page-btn"
+            aria-label={copy.paginationPrev}
+          >
             {copy.paginationPrev}
           </Link>
         ) : (
@@ -80,14 +84,18 @@ export function BeigePagination({
             {copy.paginationPrev}
           </span>
         )}
-        <p className="min-w-0 flex-1 text-center text-sm font-medium text-[#2D2A26]">
+        <p className="beige-pagination__status min-w-0 flex-1 text-center">
           {fillTemplate(copy.paginationPageOf, {
             current: page,
             total: totalPages,
           })}
         </p>
         {canNext ? (
-          <Link href={hrefFor(page + 1)} className="beige-page-btn">
+          <Link
+            href={hrefFor(page + 1)}
+            className="beige-page-btn"
+            aria-label={copy.paginationNext}
+          >
             {copy.paginationNext}
           </Link>
         ) : (
@@ -111,7 +119,7 @@ export function BeigePagination({
           item === "ellipsis" ? (
             <span
               key={`e-${index}`}
-              className="px-1 text-sm text-[#A39073]"
+              className="beige-pagination__ellipsis"
               aria-hidden
             >
               …

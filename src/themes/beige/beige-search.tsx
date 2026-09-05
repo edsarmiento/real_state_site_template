@@ -42,7 +42,7 @@ function catalogHref(
   if (bedrooms) params.recamaras = bedrooms;
   const resolved =
     langFromForm === "en" || langFromForm === "es" ? langFromForm : locale;
-  return localizedHref("/", resolved, params, defaultLocale);
+  return `${localizedHref("/", resolved, params, defaultLocale)}#catalogo`;
 }
 
 export function BeigeSearch({
@@ -85,39 +85,40 @@ export function BeigeSearch({
   return (
     <form
       id="inventario"
-      className="beige-glow rounded-3xl border border-[#E5D9C5]/80 bg-white/95 p-6 shadow-2xl backdrop-blur-md sm:p-8"
+      className="beige-search"
       method="get"
-      action="/"
+      action="/#catalogo"
       onSubmit={onSubmit}
     >
       <input type="hidden" name="lang" value={locale} />
       <input type="hidden" name="oferta" value={offerQuery} />
-      <div className="grid items-end gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <fieldset className="space-y-2">
-          <legend className="text-xs font-semibold uppercase tracking-wider text-[#8A7759]">
+      <div className="beige-search__grid">
+        <fieldset>
+          <legend className="beige-search__label">
             {dict.search.operation}
           </legend>
-          <div className="flex rounded-2xl border border-[#E5D9C5] bg-[#FBF9F5] p-1 shadow-inner">
+          <div className="beige-search__pills">
             {pills.map((pill) => (
               <button
                 key={pill.id}
                 type="button"
                 onClick={() => setOffer(pill.id)}
-                className={`flex-1 rounded-xl py-2 text-xs font-medium transition-all duration-300 ${
+                aria-pressed={offer === pill.id}
+                className={
                   offer === pill.id
-                    ? "bg-white text-[#2D2A26] shadow-sm"
-                    : "text-[#A39073] hover:text-[#2D2A26]"
-                }`}
+                    ? "beige-search__pill is-active"
+                    : "beige-search__pill"
+                }
               >
                 {pill.label}
               </button>
             ))}
           </div>
         </fieldset>
-        <label className="space-y-2 text-xs font-semibold uppercase tracking-wider text-[#8A7759]">
-          {dict.search.location}
-          <span className="relative mt-2 block">
-            <BeigeIconMapPin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#A39073]" />
+        <label>
+          <span className="beige-search__label">{dict.search.location}</span>
+          <span className="relative block">
+            <BeigeIconMapPin className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--beige-olive)]" />
             <input
               id={`${id}-city`}
               name="city"
@@ -127,12 +128,12 @@ export function BeigeSearch({
             />
           </span>
         </label>
-        <label className="space-y-2 text-xs font-semibold uppercase tracking-wider text-[#8A7759]">
-          {dict.search.propertyType}
+        <label>
+          <span className="beige-search__label">{dict.search.propertyType}</span>
           <select
             name="tipo"
             defaultValue={propertyType}
-            className="beige-field mt-2 cursor-pointer"
+            className="beige-field cursor-pointer"
           >
             <option value="">{dict.search.allTypes}</option>
             {PROPERTY_TYPES.map((type) => (
@@ -142,12 +143,12 @@ export function BeigeSearch({
             ))}
           </select>
         </label>
-        <label className="space-y-2 text-xs font-semibold uppercase tracking-wider text-[#8A7759]">
-          {dict.search.bedrooms}
+        <label>
+          <span className="beige-search__label">{dict.search.bedrooms}</span>
           <select
             name="recamaras"
             defaultValue={bedrooms}
-            className="beige-field mt-2 cursor-pointer"
+            className="beige-field cursor-pointer"
           >
             <option value="">{dict.search.any}</option>
             {(["1", "2", "3", "4"] as const).map((count) => (
@@ -158,11 +159,8 @@ export function BeigeSearch({
           </select>
         </label>
       </div>
-      <div className="mt-6 flex justify-end border-t border-[#F4EFE6] pt-6">
-        <button
-          type="submit"
-          className="beige-btn inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#A4B494] px-8 py-3.5 text-sm font-medium text-[#2D2A26] shadow-md md:w-auto"
-        >
+      <div className="beige-search__footer">
+        <button type="submit" className="beige-btn beige-search__submit">
           <BeigeIconSearch className="h-4 w-4" />
           {dict.search.submit}
         </button>

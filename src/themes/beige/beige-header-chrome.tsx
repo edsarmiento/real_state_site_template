@@ -3,46 +3,41 @@
 import { useEffect, useState, type ReactNode } from "react";
 
 type Props = {
-  light: boolean;
-  topBar: ReactNode;
   brand: ReactNode;
   nav: ReactNode;
   tools: ReactNode;
 };
 
-export function BeigeHeaderChrome({
-  light,
-  topBar,
-  brand,
-  nav,
-  tools,
-}: Props) {
+export function BeigeHeaderChrome({ brand, nav, tools }: Props) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    function onScroll() {
-      setScrolled(window.scrollY > 12);
+    let frame = 0;
+    function update() {
+      frame = 0;
+      setScrolled(window.scrollY > 16);
     }
-    onScroll();
+    function onScroll() {
+      if (frame) return;
+      frame = window.requestAnimationFrame(update);
+    }
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
-
-  const navClass = light
-    ? "beige-glass-nav beige-glass-nav--light"
-    : "beige-glass-nav";
-  const textClass = light ? "text-[#2D2A26]" : "text-white";
 
   return (
     <header
-      className={`beige-header sticky top-0 z-50 ${scrolled ? "is-scrolled" : ""}`}
+      className={`beige-header${scrolled ? " is-scrolled" : ""}`}
     >
-      {topBar}
-      <div className={`relative ${navClass} ${textClass}`}>
-        <div className="mx-auto flex h-24 max-w-7xl items-center justify-between gap-4 px-6 lg:h-28">
-          {brand}
+      <div className="beige-header__bar">
+        <div className="beige-header__inner">
+          <div className="beige-header__brand">{brand}</div>
           {nav}
-          {tools}
+          <div className="beige-header__tools">{tools}</div>
         </div>
       </div>
     </header>

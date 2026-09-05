@@ -94,21 +94,21 @@ export function BeigeInquiryForm({
 
   if (sent) {
     return (
-      <p className="text-sm text-[#8F9F81]" role="status">
+      <p className="beige-form-hint" role="status">
         {dict.inquiry.success}
       </p>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="beige-inquiry">
       {error ? (
-        <p className="text-sm text-red-700" role="alert">
+        <p className="beige-inquiry__error" role="alert">
           {error}
         </p>
       ) : null}
       <div>
-        <label htmlFor="beige-inquiry-name" className="mb-1 block text-xs uppercase tracking-wider text-[#5C4E3A]">
+        <label htmlFor="beige-inquiry-name" className="beige-search__label">
           {dict.inquiry.name}
         </label>
         <input
@@ -120,7 +120,7 @@ export function BeigeInquiryForm({
         />
       </div>
       <div>
-        <label htmlFor="beige-inquiry-phone" className="mb-1 block text-xs uppercase tracking-wider text-[#5C4E3A]">
+        <label htmlFor="beige-inquiry-phone" className="beige-search__label">
           {dict.inquiry.phone}
         </label>
         <input
@@ -135,7 +135,7 @@ export function BeigeInquiryForm({
         />
       </div>
       <div>
-        <label htmlFor="beige-inquiry-message" className="mb-1 block text-xs uppercase tracking-wider text-[#5C4E3A]">
+        <label htmlFor="beige-inquiry-message" className="beige-search__label">
           {dict.inquiry.message}
         </label>
         <textarea
@@ -151,11 +151,11 @@ export function BeigeInquiryForm({
           }
         />
       </div>
-      <label className="flex items-start gap-2 text-xs leading-relaxed text-[#4A4035]">
-        <input type="checkbox" name="privacyAccepted" required className="mt-0.5" />
+      <label className="beige-form-consent">
+        <input type="checkbox" name="privacyAccepted" required />
         <span>
           {dict.contact.privacyConsent}{" "}
-          <a href={privacyUrl} className="underline underline-offset-2">
+          <a href={privacyUrl} className="beige-inline-link">
             {dict.contact.privacyLink}
           </a>
         </span>
@@ -163,7 +163,7 @@ export function BeigeInquiryForm({
       <button
         type="submit"
         disabled={pending}
-        className="beige-btn w-full rounded-2xl bg-[#A4B494] px-4 py-3.5 text-sm font-medium text-[#2D2A26] disabled:opacity-60"
+        className="beige-btn beige-form-submit"
       >
         {pending ? dict.inquiry.sending : dict.inquiry.send}
       </button>

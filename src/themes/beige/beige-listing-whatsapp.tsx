@@ -42,10 +42,7 @@ export function BeigeListingWhatsAppButton({
   return (
     <a
       href={href}
-      className={
-        className ??
-        "inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white"
-      }
+      className={className ?? "beige-btn beige-detail__whatsapp"}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${text}. ${dict.a11y.opensInNewTab}`}

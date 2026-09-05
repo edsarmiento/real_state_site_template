@@ -15,14 +15,14 @@ export async function BeigeLegalPage({ kind, lang }: LegalPageThemeProps) {
 
   return (
     <BeigeShell lang={lang}>
-      <BeigeHeader lang={lang} variant="detail" />
-      <main className="mx-auto max-w-3xl px-6 py-16">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#A39073]">
-          {dict.legal.kicker}
-        </p>
-        <h1 className="beige-serif mt-3 text-4xl">{title}</h1>
-        <p className="mt-6 text-[#8A7759]">{dict.legal.disclaimer}</p>
-        <p className="mt-4 leading-relaxed">{dict.legal.body}</p>
+      <BeigeHeader lang={lang} />
+      <main className="beige-legal">
+        <div className="beige-shell beige-legal__inner">
+          <p className="beige-eyebrow">{dict.legal.kicker}</p>
+          <h1 className="beige-section__title">{title}</h1>
+          <p className="beige-lead">{dict.legal.disclaimer}</p>
+          <p className="beige-legal__body">{dict.legal.body}</p>
+        </div>
       </main>
       <BeigeFooter lang={lang} />
     </BeigeShell>

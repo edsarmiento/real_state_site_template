@@ -32,20 +32,20 @@ export function beigeNavLinks(
 ): { href: string; label: string }[] {
   return [
     {
-      href: localizedHref("/#propiedades", locale, null, defaultLocale),
+      href: localizedHref("/#catalogo", locale, null, defaultLocale),
       label: dict.nav.properties,
     },
     {
-      href: localizedHref("/#ubicaciones", locale, null, defaultLocale),
-      label: dict.nav.locations,
-    },
-    {
-      href: localizedHref("/#nosotros", locale, null, defaultLocale),
+      href: localizedHref("/#about", locale, null, defaultLocale),
       label: dict.nav.about,
     },
     {
-      href: localizedHref("/#proceso", locale, null, defaultLocale),
+      href: localizedHref("/#process", locale, null, defaultLocale),
       label: dict.nav.process,
+    },
+    {
+      href: localizedHref("/#contact", locale, null, defaultLocale),
+      label: dict.nav.contact,
     },
   ];
 }

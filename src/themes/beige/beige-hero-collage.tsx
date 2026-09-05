@@ -7,9 +7,9 @@ type Props = {
   photoAltTemplate: string;
 };
 
-const PLACEHOLDER = "absolute inset-0 bg-[#E5D9C5]";
-const MAIN_SIZES = "(max-width: 1023px) 92vw, 40vw";
-const SIDE_SIZES = "(max-width: 1023px) 45vw, 20vw";
+const PLACEHOLDER = "beige-hero-frame__placeholder";
+const MAIN_SIZES = "(max-width: 767px) 92vw, (max-width: 1023px) 90vw, 62vw";
+const SIDE_SIZES = "(max-width: 767px) 46vw, (max-width: 1023px) 44vw, 28vw";
 
 function frameAlt(
   url: string | undefined,
@@ -27,41 +27,41 @@ export function BeigeHeroCollage({ urls, title, photoAltTemplate }: Props) {
   const count = urls.length;
 
   return (
-    <div className="beige-hero-collage grid w-full grid-cols-2 gap-4 lg:w-1/2">
-      <div className="beige-hero-frame beige-hero-frame--1 beige-hero-hover group relative col-span-2 h-52 overflow-hidden rounded-3xl border-2 border-white shadow-2xl md:h-64">
+    <div className="beige-hero-collage">
+      <div className="beige-hero-frame beige-hero-frame--1 beige-hero-frame--main beige-hero-hover group">
         {frames[0] ? (
           <BeigeHeroFrameImage
             src={frames[0]}
             alt={frameAlt(frames[0], title, 1, count, photoAltTemplate)}
             sizes={MAIN_SIZES}
             preload
-            className="beige-img-zoom object-cover"
+            className="beige-hero-photo beige-img-zoom"
             placeholderClassName={PLACEHOLDER}
           />
         ) : (
           <div className={PLACEHOLDER} aria-hidden />
         )}
       </div>
-      <div className="beige-hero-frame beige-hero-frame--2 beige-hero-hover group relative h-36 overflow-hidden rounded-2xl border-2 border-white shadow-xl">
+      <div className="beige-hero-frame beige-hero-frame--2 beige-hero-frame--side beige-hero-hover group">
         {frames[1] ? (
           <BeigeHeroFrameImage
             src={frames[1]}
             alt={frameAlt(frames[1], title, 2, count, photoAltTemplate)}
             sizes={SIDE_SIZES}
-            className="beige-img-zoom object-cover"
+            className="beige-hero-photo beige-img-zoom"
             placeholderClassName={PLACEHOLDER}
           />
         ) : (
           <div className={PLACEHOLDER} aria-hidden />
         )}
       </div>
-      <div className="beige-hero-frame beige-hero-frame--3 beige-hero-hover group relative h-36 overflow-hidden rounded-2xl border-2 border-white shadow-xl">
+      <div className="beige-hero-frame beige-hero-frame--3 beige-hero-frame--side beige-hero-hover group">
         {frames[2] ? (
           <BeigeHeroFrameImage
             src={frames[2]}
             alt={frameAlt(frames[2], title, 3, count, photoAltTemplate)}
             sizes={SIDE_SIZES}
-            className="beige-img-zoom object-cover"
+            className="beige-hero-photo beige-img-zoom"
             placeholderClassName={PLACEHOLDER}
           />
         ) : (

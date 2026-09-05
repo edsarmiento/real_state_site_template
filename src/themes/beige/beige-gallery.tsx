@@ -67,7 +67,7 @@ export function BeigeGallery({
 
   if (urls.length === 0) {
     return (
-      <div className="flex h-[400px] items-center justify-center rounded-2xl bg-[#F4EFE6] text-sm text-[#A39073] sm:h-[500px]">
+      <div className="beige-gallery beige-gallery--empty">
         {labels.empty}
       </div>
     );
@@ -75,12 +75,12 @@ export function BeigeGallery({
 
   return (
     <div
-      className="space-y-4 rounded-3xl border border-[#E5D9C5] bg-white p-4 shadow-sm"
+      className="beige-gallery"
       role="region"
       aria-roledescription={labels.carouselRole}
       aria-label={fillTemplate(labels.photosOf, { title })}
     >
-      <div className="relative h-[400px] overflow-hidden rounded-2xl shadow-md sm:h-[500px]">
+      <div className="beige-gallery__stage">
         <BeigeCoverImage
           src={current}
           alt={fillTemplate(labels.photoAlt, {
@@ -91,19 +91,17 @@ export function BeigeGallery({
           className={`beige-gallery__main h-full w-full object-cover ${
             visible ? "opacity-100" : "opacity-40"
           }`}
-          placeholderClassName="flex h-full items-center justify-center text-sm text-[#A39073]"
+          placeholderClassName="beige-gallery__placeholder"
           placeholder={dict.listing.noPhoto}
         />
         {offerLabel ? (
-          <span className="absolute left-4 top-4 rounded-full bg-[#2D2A26] px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-white">
-            {offerLabel}
-          </span>
+          <span className="beige-card__badge">{offerLabel}</span>
         ) : null}
         {urls.length > 1 ? (
           <>
             <button
               type="button"
-              className="absolute left-3 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#2D2A26] shadow-md transition hover:scale-105"
+              className="beige-gallery__nav beige-gallery__nav--prev"
               onClick={() => go(index - 1)}
               aria-label={labels.prev}
             >
@@ -111,7 +109,7 @@ export function BeigeGallery({
             </button>
             <button
               type="button"
-              className="absolute right-3 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#2D2A26] shadow-md transition hover:scale-105"
+              className="beige-gallery__nav beige-gallery__nav--next"
               onClick={() => go(index + 1)}
               aria-label={labels.next}
             >
@@ -121,7 +119,7 @@ export function BeigeGallery({
         ) : null}
       </div>
       {thumbs.length > 1 ? (
-        <div className="grid grid-cols-5 gap-3" role="tablist" aria-label={labels.indicators}>
+        <div className="beige-gallery__thumbs" role="tablist" aria-label={labels.indicators}>
           {thumbs.map((url, i) => (
             <button
               key={url}
@@ -129,11 +127,7 @@ export function BeigeGallery({
               role="tab"
               aria-selected={i === index}
               aria-label={fillTemplate(labels.goTo, { index: i + 1 })}
-              className={
-                i === index
-                  ? "beige-thumb is-active h-20 overflow-hidden rounded-xl"
-                  : "beige-thumb h-20 overflow-hidden rounded-xl"
-              }
+              className={i === index ? "beige-thumb is-active" : "beige-thumb"}
               onClick={() => go(i)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

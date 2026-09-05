@@ -161,7 +161,7 @@ export default async function CatalogPage({
             page: resolved.page,
           }),
           config.locale.defaultLocale,
-        ),
+        ) + "#catalogo",
       );
     }
   }
