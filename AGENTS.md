@@ -184,25 +184,27 @@ Ops guarda layout_key
         ↓
 getResolvedSiteConfig()
         ↓
-themeNameFromLayoutKey(layout_key)   ← src/themes/resolve-site-theme.ts
+themeNameFromLayoutKey(layout_key)   ← src/themes/theme-definitions.ts
         ↓
 THEME_REGISTRY[name]                 ← src/themes/theme-registry.ts
         ↓
-theme.Catalog / theme.ListingDetail
+theme.Catalog / theme.ListingDetail / theme.LegalPage
 ```
 
-Las rutas `src/app/page.tsx` e `src/app/inmueble/[slug]/page.tsx` **solo** hacen fetch de datos y metadata; **delegan** el markup al theme. No duplicar JSX de catálogo/ficha en `app/`.
+Las rutas `src/app/page.tsx`, `src/app/inmueble/[slug]/page.tsx` y las legales **solo** hacen fetch / metadata y **delegan** al theme. No `if (theme.name === …)` en `app/`.
 
 **Themes = skins, no dominio.** Cada theme recibe valores ya resueltos (listings, `SiteConfig`, locale, copy) y solo pinta. Inquiry, WhatsApp, specs, href de ficha y labels salen de `src/lib/` + `src/components/`. **Prohibido** copiar `ListingInquiryForm` / `ListingWhatsAppButton` / helpers de specs en `src/themes/<nombre>/`. El look se configura con `classNames`, tokens CSS o markup propio alrededor de esos widgets.
 
 ### Mapeo actual (`layout_key` → theme)
 
+Fuente de verdad: `THEME_DEFINITIONS` en `src/themes/theme-definitions.ts` (keys sin React) + `THEME_REGISTRY` (componentes).
+
 | `layout_key` (Ops/API) | Theme en código | Superficies |
 |------------------------|-----------------|-------------|
-| `default` | `default` | `DefaultCatalog`, `DefaultListingDetail` — hero vía `CatalogHero` + `default-catalog-hero` |
-| `deo` | `luxury` | `LuxuryCatalog`, `LuxuryListingDetail` — shell/header/footer en `src/themes/luxury/` |
+| `default` | `default` | Catalog, ListingDetail, LegalPage |
+| `deo` / `luxury` | `luxury` | Catalog, ListingDetail, LegalPage |
 
-Regla en código: `themeNameFromLayoutKey()` — `deo` y `luxury` → tema `luxury`; todo lo demás → `default`.
+Unknown `layout_key` → `default`.
 
 **Legacy:** `deo-catalog-hero.tsx` es de la Fase 3; con `layout_key: deo` **no** se usa (Luxury reemplaza el catálogo). No crear plantillas nuevas solo como hero.
 
@@ -248,7 +250,7 @@ Reglas en template:
 - `src/themes/luxury/` — catálogo con secciones, ficha, header/footer propios. Inquiry / WhatsApp / specs: mismos widgets y helpers que default (`classNames` luxury).
 - i18n: mismo `site-i18n.ts` que default; `getLuxuryUi(lang)` para copy + locale.
 - CSS: `[data-site-theme="luxury"]`, variables `--luxury-*` (`luxuryThemeCssVars()` en `globals.css`).
-- Legales: `LuxuryLegalPage` cuando `resolveSiteThemeFromConfig().name === "luxury"`.
+- Legales: `theme.LegalPage` (registrado como `LuxuryLegalPage`).
 - Gaps API: [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md).
 
 ### Admin / login vs theme público
@@ -321,21 +323,19 @@ Usa este flujo cuando pidan **una plantilla nueva** (visual distinta de default/
 
 1. `SiteConfig::LAYOUT_KEYS` en `real_state_api/app/models/site_config.rb`.
 2. Specs + `BUSINESS_RULES.md` §SiteConfig.
-3. Select en Ops (`real_state_frontend`).
+3. Select en Ops (`real_state_frontend`) — hasta que exista `layout_options` desde el API (paso 3 del plan DRY).
 
 **Template:**
 
-1. `SiteLayoutKey` → `site-config-types.ts`.
-2. `LAYOUT_KEYS` → `resolved-site-config.ts`.
-3. `SiteThemeName` → `theme-types.ts` (si theme nuevo).
-4. Mapeo → `themeNameFromLayoutKey()`.
-5. `src/themes/<nombre>/` con `<nombre>-catalog.tsx`, `<nombre>-listing-detail.tsx`, shell/header/footer.
-6. Registro → `theme-registry.ts`.
-7. Legales → ramas en `terminos/`, `cookies/`, `aviso-de-privacidad/` o factory.
-8. CSS → `[data-site-theme="<nombre>"]` en `globals.css`; variables desde config.
-9. Marketing → extender `getPublicSiteContent()` o `<nombre>-content.ts` leyendo **primero** `getResolvedSiteConfig()`.
-10. `npm run build` + `npm run lint`.
-11. Smoke: Ops `layout_key` → `/`, ficha, legales, login.
+1. `src/themes/<nombre>/` — Catalog, ListingDetail, LegalPage (o reusar `DefaultLegalPage`).
+2. `theme-definitions.ts` — fila `{ name, layoutKeys: ["<slug>"] }` (fuente de `SiteLayoutKey` / mapeo).
+3. `theme-registry.ts` — entrada con Catalog, ListingDetail, LegalPage.
+4. CSS → `[data-site-theme="<nombre>"]` (bloque o archivo del theme); no clonar CSS luxury.
+5. Marketing → extender `getPublicSiteContent()` o content del theme leyendo **primero** `getResolvedSiteConfig()`.
+6. `npm run build` + `npm run lint`.
+7. Smoke: Ops `layout_key` → `/`, ficha, legales, login.
+
+**No** tocar `app/page.tsx`, `app/inmueble/[slug]`, ni las rutas legales (ya delegan al registry).
 
 ### 3. Estructura de carpetas
 
@@ -343,9 +343,7 @@ Usa este flujo cuando pidan **una plantilla nueva** (visual distinta de default/
 src/themes/<nombre>/
   <nombre>-catalog.tsx
   <nombre>-listing-detail.tsx
-  <nombre>-shell.tsx
-  <nombre>-header.tsx
-  <nombre>-footer.tsx
+  <nombre>-legal-page.tsx   # o reusar DefaultLegalPage en el registry
   …
 ```
 
@@ -356,10 +354,18 @@ Sin fetch de listings en el theme — props desde `page.tsx`. Tipos: `PublicList
 ### 4. Contrato (`theme-types.ts`)
 
 ```ts
-{ name, Catalog: (CatalogThemeProps) => ReactNode, ListingDetail: (ListingDetailThemeProps) => ReactNode }
+{
+  name,
+  layoutKeys,
+  Catalog: (CatalogThemeProps) => ReactNode,
+  ListingDetail: (ListingDetailThemeProps) => ReactNode,
+  LegalPage: (LegalPageThemeProps) => ReactNode,
+}
 ```
 
 Reutilizar **siempre** `PublicCatalogSearch` (o el search del theme si el markup es otro), `ListingInquiryForm`, `ListingWhatsAppButton`, `publicListingCardModel` / `listingPublicSpecsLocalized`. El theme solo pasa valores + `classNames` / CSS. No reimplementar POST de inquiry, `wa.me` ni el armado de specs.
+
+Clonar **default**, no Luxury, como scaffold de un theme fino.
 
 ### 5. Verificación antes de merge
 
@@ -464,7 +470,7 @@ Reutilizar helpers existentes antes de copiar lógica:
 | Inquiry pública | `useListingInquiry` / `ListingInquiryForm` | `fetch` + validación de teléfono en un form del theme |
 | WhatsApp listing | `parseWhatsAppNumber`, `buildWhatsAppHref`, `ListingWhatsAppButton` | Otro `wa.me` / parseo de dígitos por theme |
 | Card / specs | `publicListingCardModel`, `listingPublicSpecsLocalized`, `listingCardSpecLine` | Remapear `listing` → href/precio/specs en cada card |
-| Layout keys / themes | `SiteLayoutKey`, `LAYOUT_KEYS`, `theme-registry.ts`, `themeNameFromLayoutKey()` | Strings sueltos; JSX duplicado en `app/page.tsx` |
+| Layout keys / themes | `theme-definitions.ts`, `theme-registry.ts` | Strings sueltos; JSX duplicado en `app/page.tsx` |
 
 **Cuándo extraer:** si la misma lógica aparece **2+ veces** con el mismo significado (p. ej. armar URL pública, mapear branding, validar teléfono). **No** crear util de una línea solo “por si acaso”.
 
@@ -481,7 +487,7 @@ Reutilizar helpers existentes antes de copiar lógica:
 | **Fetch en client innecesario** | `useEffect` + `fetch` para datos que puede cargar el `page.tsx` | Server Component + props |
 | **Estado espejo de props** | `useEffect(() => setX(props.x), [props.x])` | Derivar en render o `key` en el hijo para reset |
 | **God file** | `page.tsx` > ~150 líneas con JSX anidado | Extraer bloques a `components/` con nombres de dominio |
-| **Magic strings** | `"deo"`, `"published"`, rutas hardcodeadas sin constante | Tipos union + arrays como `LAYOUT_KEYS` |
+| **Magic strings** | `"deo"`, `"published"`, rutas hardcodeadas sin constante | `THEME_DEFINITIONS` / `SITE_LAYOUT_KEYS` |
 | **Copy de cliente en código genérico** | Ciudad/marca fija en un layout compartido | Campo de `branding` o `tagline` desde API |
 | **Doble fuente de config** | Nuevo helper que lee env ignorando `SiteConfig` | Extender `mergeApiPayload` / tipos |
 | **Abstracción prematura** | Wrapper genérico usado una sola vez | Inline hasta que haya segunda repetición real |

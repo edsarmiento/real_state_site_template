@@ -13,6 +13,7 @@ import { getSessionContext } from "@/lib/session-context";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import { fillTemplate, getDictionary, resolveRequestLocale } from "@/lib/site-i18n";
+import { firstSearchParam } from "@/lib/search-params";
 import { LuxuryShell } from "@/themes/luxury/luxury-shell";
 import {
   resolveSiteThemeFromConfig,
@@ -23,11 +24,6 @@ type Props = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
-
-function param(v: string | string[] | undefined): string {
-  if (Array.isArray(v)) return v[0] ?? "";
-  return v ?? "";
-}
 
 function listingShareImage(
   listing: PublicListingDetail,
@@ -58,7 +54,7 @@ export async function generateMetadata({
   searchParams,
 }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const lang = param((await searchParams).lang);
+  const lang = firstSearchParam((await searchParams).lang);
   const config = await getResolvedSiteConfig();
   const themeName = themeNameFromLayoutKey(config.layoutKey);
   const path = `/inmueble/${encodeURIComponent(slug)}`;
@@ -129,7 +125,7 @@ export default async function ListingDetailPage({
   searchParams,
 }: Props) {
   const { slug } = await params;
-  const lang = param((await searchParams).lang);
+  const lang = firstSearchParam((await searchParams).lang);
   const theme = await resolveSiteThemeFromConfig();
   const result = await publicApiFetch<PublicListingDetail>(
     `/api/public/listings/${encodeURIComponent(slug)}`,

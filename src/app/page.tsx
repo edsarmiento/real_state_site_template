@@ -10,17 +10,13 @@ import {
 import type { PropertyType } from "@/lib/property-types";
 import { getPublicSiteContent } from "@/lib/public-site-content";
 import { getDictionary, fillTemplate, resolveRequestLocale } from "@/lib/site-i18n";
+import { firstSearchParam } from "@/lib/search-params";
 import {
   resolveSiteThemeFromConfig,
   themeNameFromLayoutKey,
 } from "@/themes/resolve-site-theme";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
-
-function param(v: string | string[] | undefined): string {
-  if (Array.isArray(v)) return v[0] ?? "";
-  return v ?? "";
-}
 
 function resultsHeading(
   oferta: CatalogOfferFilter,
@@ -50,13 +46,13 @@ export async function generateMetadata({
   searchParams: SearchParams;
 }): Promise<Metadata> {
   const sp = await searchParams;
-  const oferta = parseCatalogOfferFilter(param(sp.oferta));
+  const oferta = parseCatalogOfferFilter(firstSearchParam(sp.oferta));
   const config = await getResolvedSiteConfig();
   const themeName = themeNameFromLayoutKey(config.layoutKey);
 
   if (themeName === "luxury") {
     const content = await getPublicSiteContent();
-    const locale = resolveRequestLocale(param(sp.lang), content.locale);
+    const locale = resolveRequestLocale(firstSearchParam(sp.lang), content.locale);
     const dict = getDictionary(locale);
     const title =
       oferta === "sale"
@@ -67,13 +63,13 @@ export async function generateMetadata({
     return {
       title,
       description: config.siteTagline,
-      ...(oferta === "all" && !param(sp.city)
+      ...(oferta === "all" && !firstSearchParam(sp.city)
         ? { alternates: { canonical: "/" } }
         : {}),
     };
   }
 
-  const locale = resolveRequestLocale(param(sp.lang), config.locale);
+  const locale = resolveRequestLocale(firstSearchParam(sp.lang), config.locale);
   const dict = getDictionary(locale);
   const title =
     oferta === "sale"
@@ -96,10 +92,10 @@ export default async function CatalogPage({
   const sp = await searchParams;
   const config = await getResolvedSiteConfig();
   const theme = await resolveSiteThemeFromConfig();
-  const city = param(sp.city).trim();
-  const oferta = parseCatalogOfferFilter(param(sp.oferta));
-  const propertyType = param(sp.tipo).trim();
-  const bedrooms = param(sp.recamaras).trim();
+  const city = firstSearchParam(sp.city).trim();
+  const oferta = parseCatalogOfferFilter(firstSearchParam(sp.oferta));
+  const propertyType = firstSearchParam(sp.tipo).trim();
+  const bedrooms = firstSearchParam(sp.recamaras).trim();
 
   const qs = new URLSearchParams();
   if (city) qs.set("city", city);
@@ -122,13 +118,13 @@ export default async function CatalogPage({
 
   const typeLabel = propertyType
     ? (getDictionary(
-        resolveRequestLocale(param(sp.lang), config.locale),
+        resolveRequestLocale(firstSearchParam(sp.lang), config.locale),
       ).propertyTypes[propertyType as PropertyType] ?? propertyType)
     : null;
 
   const session = await getSessionContext();
   const Catalog = theme.Catalog;
-  const locale = resolveRequestLocale(param(sp.lang), config.locale);
+  const locale = resolveRequestLocale(firstSearchParam(sp.lang), config.locale);
   const dict = getDictionary(locale);
 
   return (
@@ -144,7 +140,7 @@ export default async function CatalogPage({
       catalogOk={result.ok}
       catalogStatus={result.status}
       isAdmin={session?.isStaffUser === true}
-      lang={param(sp.lang)}
+      lang={firstSearchParam(sp.lang)}
     />
   );
 }

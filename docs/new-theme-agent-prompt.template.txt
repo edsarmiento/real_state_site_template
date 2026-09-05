@@ -84,9 +84,9 @@ Minimo obligatorio en src/themes/<slug>/
 
   <slug>-catalog.tsx           OBLIGATORIO — pagina /
   <slug>-listing-detail.tsx    OBLIGATORIO — pagina /inmueble/[slug]
+  <slug>-legal-page.tsx        OBLIGATORIO (o registrar DefaultLegalPage)
 
 Recomendado:
-  <slug>-legal-page.tsx        legales con el mismo shell
   <slug>-catalog-hero.tsx      solo si el hero no va inline en catalog
 
 Catalog debe incluir:
@@ -107,17 +107,12 @@ Listing detail debe incluir:
 Cableado obligatorio (template)
 -------------------------------
 
-  1. theme-types.ts          — "<THEME_NAME>" en SiteThemeName
-  2. theme-registry.ts       — entrada <THEME_NAME>: { Catalog, ListingDetail }
-  3. resolve-site-theme.ts   — layout_key "<slug>" -> "<THEME_NAME>" en themeNameFromLayoutKey()
-  4. site-config-types.ts    — "<slug>" en SiteLayoutKey
-  5. resolved-site-config.ts — "<slug>" en LAYOUT_KEYS
+  1. theme-definitions.ts    — { name: "<THEME_NAME>", layoutKeys: ["<slug>"] }
+  2. theme-registry.ts       — entrada con Catalog, ListingDetail, LegalPage
+     (LegalPage propio o DefaultLegalPage)
 
-Recomendado:
-  6. Legales: aviso-de-privacidad, terminos, cookies — rama theme.name === "<THEME_NAME>"
-  7. AGENTS.md — fila en tabla layout_key -> theme
-
-NO modificar app/page.tsx ni app/inmueble/[slug]/page.tsx (salvo bug).
+NO modificar app/page.tsx, app/inmueble/[slug]/page.tsx ni rutas legales
+(terminos/cookies/aviso) — delegan al registry.
 NO usar site-config.ts legacy. NO fetch al Rails desde el browser.
 
 

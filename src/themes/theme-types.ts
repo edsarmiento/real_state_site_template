@@ -4,8 +4,9 @@ import type {
   PublicListingCard,
   PublicListingDetail,
 } from "@/lib/listing-types";
+import type { SiteThemeName } from "@/themes/theme-definitions";
 
-export type SiteThemeName = "default" | "luxury";
+export type { SiteThemeName } from "@/themes/theme-definitions";
 
 export type CatalogThemeProps = {
   oferta: CatalogOfferFilter;
@@ -28,10 +29,20 @@ export type ListingDetailThemeProps = {
   lang?: string;
 };
 
+export type LegalPageKind = "privacy" | "terms" | "cookies";
+
+export type LegalPageThemeProps = {
+  kind: LegalPageKind;
+  lang?: string;
+};
+
 export type SiteTheme = {
   name: SiteThemeName;
+  /** Ops/API layout_key values that resolve to this theme. */
+  layoutKeys: readonly string[];
   Catalog: (props: CatalogThemeProps) => Promise<ReactNode> | ReactNode;
   ListingDetail: (
     props: ListingDetailThemeProps,
   ) => Promise<ReactNode> | ReactNode;
+  LegalPage: (props: LegalPageThemeProps) => Promise<ReactNode> | ReactNode;
 };

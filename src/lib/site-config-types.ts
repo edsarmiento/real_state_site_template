@@ -1,6 +1,7 @@
 import type { SiteLocaleConfig } from "@/lib/site-i18n";
+import type { SiteLayoutKey } from "@/themes/theme-definitions";
 
-export type SiteLayoutKey = "default" | "deo";
+export type { SiteLayoutKey } from "@/themes/theme-definitions";
 
 export type SiteConfigBranding = {
   site_name: string;

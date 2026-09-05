@@ -2,21 +2,20 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getPublicSiteContent } from "@/lib/public-site-content";
+import type { LegalPageThemeProps } from "@/themes/theme-types";
 
-type Kind = "privacy" | "terms" | "cookies";
-
-const TITLES: Record<Kind, string> = {
+const TITLES: Record<LegalPageThemeProps["kind"], string> = {
   privacy: "Aviso de privacidad",
   terms: "Términos de uso",
   cookies: "Política de cookies",
 };
 
-export async function DefaultLegalPage({ kind }: { kind: Kind }) {
+export async function DefaultLegalPage({ kind, lang }: LegalPageThemeProps) {
   const { legal } = await getPublicSiteContent();
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <SiteHeader />
+      <SiteHeader lang={lang} />
       <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
           Documento pendiente
@@ -38,7 +37,7 @@ export async function DefaultLegalPage({ kind }: { kind: Kind }) {
           </Link>
         </p>
       </main>
-      <SiteFooter />
+      <SiteFooter lang={lang} />
     </div>
   );
 }

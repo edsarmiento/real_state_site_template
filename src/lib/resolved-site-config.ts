@@ -4,19 +4,9 @@ import { envSiteConfig } from "@/lib/site-config-env";
 import type {
   ResolvedSiteConfig,
   SiteConfigApiPayload,
-  SiteLayoutKey,
 } from "@/lib/site-config-types";
 import { parseSiteLocaleConfig, type SiteLocaleConfig } from "@/lib/site-i18n";
-
-const LAYOUT_KEYS: SiteLayoutKey[] = ["default", "deo"];
-
-function normalizeLayoutKey(raw: string | undefined | null): SiteLayoutKey {
-  const value = raw?.trim().toLowerCase();
-  if (value && LAYOUT_KEYS.includes(value as SiteLayoutKey)) {
-    return value as SiteLayoutKey;
-  }
-  return "default";
-}
+import { normalizeLayoutKey } from "@/themes/theme-definitions";
 
 function localeFromApi(
   api: SiteConfigApiPayload,
