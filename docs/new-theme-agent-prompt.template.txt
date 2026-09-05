@@ -63,7 +63,9 @@ Reglas:
   - Server Components; sin fetch de listings dentro del theme.
   - i18n: getSiteUi(lang) + site-i18n.ts.
   - Marca: getSiteUi().config (SiteConfig via getResolvedSiteConfig).
-  - Reutilizar componentes compartidos; no duplicar dominio.
+  - Theme = skin: recibe valores y pinta. Inquiry, WhatsApp, specs y href
+    salen de ListingInquiryForm, ListingWhatsAppButton, publicListingCardModel,
+    listingPublicSpecsLocalized. NO copiar esos flujos en src/themes/<slug>/.
 
 
 Alcance v1 — theme <ThemeName>
@@ -97,7 +99,9 @@ Catalog debe incluir:
 
 Listing detail debe incluir:
   - Paridad funcional con default-listing-detail (galeria, specs, inquiry, WhatsApp, maps)
-  - listingUrl con ui.config.siteOrigin
+  - listingUrl con listingPublicUrl(slug, ui.config.siteOrigin, localizedHref(...))
+  - ListingInquiryForm + ListingWhatsAppButton (classNames del theme; sin form propio)
+  - listingPublicSpecsLocalized / publicListingCardModel; sin *-specs.ts del theme
 
 
 Cableado obligatorio (template)

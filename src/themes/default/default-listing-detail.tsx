@@ -3,6 +3,7 @@ import { ListingInquiryForm } from "@/components/listing-inquiry-form";
 import { ListingOfferBadge } from "@/components/listing-offer-badge";
 import { ListingPhotoGallery } from "@/components/listing-photo-gallery";
 import { ListingWhatsAppButton } from "@/components/listing-whatsapp-button";
+import { ListingShareButton } from "@/components/listing-share-button";
 import { OpenInMapsLink } from "@/components/open-in-maps-link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -12,6 +13,8 @@ import {
   parseOfferType,
 } from "@/lib/listing-types";
 import type { PropertyType } from "@/lib/property-types";
+import { listingPublicUrl } from "@/lib/site-config-env";
+import { localizedHref } from "@/lib/site-i18n";
 import { getSiteUi } from "@/lib/site-ui";
 import type { ListingDetailThemeProps } from "@/themes/theme-types";
 
@@ -44,10 +47,16 @@ export async function DefaultListingDetail({
   lang,
 }: ListingDetailThemeProps) {
   const ui = await getSiteUi(lang);
-  const listingUrl = new URL(
-    `/inmueble/${encodeURIComponent(listing.slug)}`,
+  const listingUrl = listingPublicUrl(
+    listing.slug,
     ui.config.siteOrigin,
-  ).href;
+    localizedHref(
+      `/inmueble/${encodeURIComponent(listing.slug)}`,
+      ui.locale,
+      null,
+      ui.defaultLocale,
+    ),
+  );
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const priceSuffix =
@@ -91,6 +100,17 @@ export async function DefaultListingDetail({
               {listing.title}
             </h1>
 
+            {ui.config.showShareButton ? (
+              <div className="mt-4">
+                <ListingShareButton
+                  url={listingUrl}
+                  title={listing.title}
+                  label={ui.dict.listing.share}
+                  copiedLabel={ui.dict.listing.shareCopied}
+                />
+              </div>
+            ) : null}
+
             <p className="mt-5 text-3xl font-semibold tabular-nums tracking-tight text-zinc-950 sm:text-4xl">
               {formatRentCents(listing.rent_cents, listing.currency)}
               {priceSuffix ? (
@@ -102,7 +122,7 @@ export async function DefaultListingDetail({
 
             <dl className="mt-8 flex flex-wrap gap-2.5 sm:gap-3">
               {specs.map((spec) => (
-                <Spec key={spec.label} label={spec.label} value={spec.value} />
+                <Spec key={spec.key} label={spec.label} value={spec.value} />
               ))}
             </dl>
 

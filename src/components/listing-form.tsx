@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@/components/ui";
 import { notify, notifyApiResponseFailure } from "@/lib/notifications";
-import { toMxLocalPhone } from "@/lib/phone";
+import { isMxLocalPhone, onlyPhoneDigits, toMxLocalPhone } from "@/lib/phone";
 import { parseApiFailureMessage } from "@/lib/validation";
 import {
   parseOfferType,
@@ -29,12 +29,6 @@ type Props = {
   units: ListingUnitOption[];
   emailConfirmed?: boolean;
 };
-
-const PHONE_DIGITS = /^\d{10}$/;
-
-function onlyPhoneDigits(value: string): string {
-  return value.replace(/\D/g, "").slice(0, 10);
-}
 
 function unitsForOffer(
   units: ListingUnitOption[],
@@ -76,13 +70,13 @@ export function ListingForm({ listing, units, emailConfirmed = true }: Props) {
       String(fd.get("contact_phone") || contactPhone),
     );
 
-    if (status === "published" && !PHONE_DIGITS.test(phoneDigits)) {
+    if (status === "published" && !isMxLocalPhone(phoneDigits)) {
       setError(
         "El teléfono de contacto (WhatsApp) es obligatorio para publicar (10 dígitos).",
       );
       return;
     }
-    if (phoneDigits && !PHONE_DIGITS.test(phoneDigits)) {
+    if (phoneDigits && !isMxLocalPhone(phoneDigits)) {
       setError("El teléfono de contacto debe tener exactamente 10 dígitos.");
       return;
     }

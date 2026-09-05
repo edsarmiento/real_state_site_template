@@ -2165,6 +2165,31 @@ body {
   max-width: none;
 }
 
+[data-site-theme="luxury"] .luxury-detail__share {
+  margin: -0.5rem 0 1.25rem;
+}
+
+[data-site-theme="luxury"] .luxury-share-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--luxury-gold-deep) 28%, var(--luxury-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--luxury-ivory) 88%, white);
+  padding: 0.5rem 0.95rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--luxury-ink);
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+[data-site-theme="luxury"] .luxury-share-button:hover {
+  background: white;
+  border-color: color-mix(in srgb, var(--luxury-gold-deep) 48%, var(--luxury-border));
+}
+
 [data-site-theme="luxury"] .luxury-detail__price {
   margin-top: 0;
   font-size: clamp(2rem, 2.2vw, 2.25rem);

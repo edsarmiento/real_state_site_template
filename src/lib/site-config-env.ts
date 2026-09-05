@@ -51,6 +51,7 @@ export function envSiteConfig(): ResolvedSiteConfig {
     siteLogoUrl: process.env.NEXT_PUBLIC_SITE_LOGO_URL?.trim() || null,
     primaryColor: primaryFromEnv,
     showPoweredBy: process.env.NEXT_PUBLIC_SHOW_POWERED_BY !== "false",
+    showShareButton: process.env.NEXT_PUBLIC_SHOW_SHARE_BUTTON !== "false",
     siteOrigin: envSiteOrigin(),
     locale: parseSiteLocaleConfig(
       process.env.SITE_DEFAULT_LOCALE,
@@ -64,7 +65,8 @@ export function envSiteConfig(): ResolvedSiteConfig {
 export function listingPublicUrl(
   slug: string,
   origin: string = envSiteOrigin(),
+  localizedPath?: string,
 ): string {
-  const path = `/inmueble/${encodeURIComponent(slug)}`;
+  const path = localizedPath ?? `/inmueble/${encodeURIComponent(slug)}`;
   return new URL(path, origin).href;
 }

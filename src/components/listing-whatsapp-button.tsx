@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import { fillTemplate } from "@/lib/site-i18n";
+import { buildWhatsAppHref, parseWhatsAppNumber } from "@/lib/whatsapp";
 
 type Props = {
   phone: string;
@@ -6,9 +8,12 @@ type Props = {
   offerType?: "rent" | "sale";
   listingUrl: string;
   className?: string;
+  unstyled?: boolean;
   saleLabel?: string;
   rentLabel?: string;
   messageTemplate?: string;
+  ariaLabel?: string;
+  icon?: ReactNode;
 };
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -34,18 +39,21 @@ export function ListingWhatsAppButton({
   listingUrl,
   offerType = "rent",
   className,
+  unstyled = false,
   saleLabel,
   rentLabel,
   messageTemplate,
+  ariaLabel,
+  icon,
 }: Props) {
-  const digits = phone.replace(/\D/g, "");
-  if (!/^\d{10}$/.test(digits)) return null;
+  const number = parseWhatsAppNumber(phone);
+  if (!number) return null;
 
   const message =
     messageTemplate != null
       ? fillTemplate(messageTemplate, { title, url: listingUrl })
       : listingWhatsAppMessage(title, listingUrl);
-  const href = `https://wa.me/52${digits}?text=${encodeURIComponent(message)}`;
+  const href = buildWhatsAppHref(number, message);
   const label =
     offerType === "sale"
       ? (saleLabel ?? "WhatsApp: me interesa comprar")
@@ -56,14 +64,19 @@ export function ListingWhatsAppButton({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={[
-        "listing-whatsapp-button inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3.5 text-base font-semibold text-white transition hover:bg-[#1ebe57] sm:text-sm",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      aria-label={ariaLabel}
+      className={
+        unstyled
+          ? className
+          : [
+              "listing-whatsapp-button inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3.5 text-base font-semibold text-white transition hover:bg-[#1ebe57] sm:text-sm",
+              className,
+            ]
+              .filter(Boolean)
+              .join(" ")
+      }
     >
-      <WhatsAppIcon className="h-5 w-5 shrink-0" />
+      {icon ?? <WhatsAppIcon className="h-5 w-5 shrink-0" />}
       {label}
     </a>
   );

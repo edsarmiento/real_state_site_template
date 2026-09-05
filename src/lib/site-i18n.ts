@@ -94,6 +94,8 @@ export type SiteDictionary = {
     location: string;
     viewMap: string;
     listedBy: string;
+    share: string;
+    shareCopied: string;
     specs: {
       bedrooms: string;
       bathrooms: string;
@@ -493,6 +495,8 @@ const dictionaries = {
       location: "Ubicación",
       viewMap: "Ver en el mapa",
       listedBy: "Anunciado por",
+      share: "Compartir",
+      shareCopied: "Enlace copiado",
       specs: {
         bedrooms: "Recámaras",
         bathrooms: "Baños",
@@ -759,6 +763,8 @@ const dictionaries = {
       location: "Location",
       viewMap: "Open in maps",
       listedBy: "Listed by",
+      share: "Share",
+      shareCopied: "Link copied",
       specs: {
         bedrooms: "Bedrooms",
         bathrooms: "Bathrooms",

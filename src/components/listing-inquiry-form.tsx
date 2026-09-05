@@ -1,138 +1,133 @@
 "use client";
 
-import { useState, type ChangeEvent, type SubmitEvent } from "react";
+import { parseOfferType, type ListingOfferType } from "@/lib/listing-types";
 import {
-  parseOfferType,
-  parseApiFailureMessage,
-  type ListingOfferType,
-} from "@/lib/listing-types";
-import type { SiteDictionary } from "@/lib/site-i18n";
+  useListingInquiry,
+  type ListingInquiryCopy,
+} from "@/lib/listing-inquiry";
+
+export type ListingInquiryFormClassNames = {
+  form?: string;
+  field?: string;
+  label?: string;
+  control?: string;
+  textarea?: string;
+  error?: string;
+  success?: string;
+  submit?: string;
+  submitPending?: string;
+  submitLabel?: string;
+};
 
 type Props = {
   slug: string;
   offerType?: ListingOfferType | string | null;
   styledLayout?: boolean;
-  copy?: SiteDictionary["inquiry"];
+  copy?: ListingInquiryCopy;
+  classNames?: ListingInquiryFormClassNames;
+  inputIdPrefix?: string;
 };
-
-const PHONE_DIGITS = /^\d{10}$/;
-
-function onlyPhoneDigits(value: string): string {
-  return value.replace(/\D/g, "").slice(0, 10);
-}
 
 export function ListingInquiryForm({
   slug,
   offerType,
   styledLayout = true,
   copy,
+  classNames,
+  inputIdPrefix = "",
 }: Props) {
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [phone, setPhone] = useState("");
+  const { error, pending, sent, phone, onPhoneChange, onSubmit } =
+    useListingInquiry(slug, copy);
   const isSale = parseOfferType(offerType) === "sale";
-
-  function onPhoneChange(e: ChangeEvent<HTMLInputElement>) {
-    setPhone(onlyPhoneDigits(e.target.value));
-  }
-
-  async function onSubmit(e: SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const phoneDigits = onlyPhoneDigits(String(fd.get("phone") || phone));
-    if (!PHONE_DIGITS.test(phoneDigits)) {
-      setError(copy?.phoneError ?? "El teléfono debe tener exactamente 10 dígitos.");
-      return;
-    }
-
-    setError(null);
-    setPending(true);
-    try {
-      const res = await fetch(
-        `/api/public/listings/${encodeURIComponent(slug)}/inquiries`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            inquiry: {
-              name: String(fd.get("name") || "").trim(),
-              phone: phoneDigits,
-              message: String(fd.get("message") || "").trim(),
-            },
-          }),
-        },
-      );
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(parseApiFailureMessage(data));
-        return;
-      }
-      setSent(true);
-      setPhone("");
-      e.currentTarget.reset();
-    } finally {
-      setPending(false);
-    }
-  }
+  const fieldId = (name: string) =>
+    inputIdPrefix ? `${inputIdPrefix}-${name}` : name;
 
   const fieldFocus = styledLayout
     ? "focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
     : "focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20";
-  const submitClass = styledLayout
+  const defaultSubmit = styledLayout
     ? "bg-blue-700 hover:bg-blue-600"
     : "bg-zinc-900 hover:bg-zinc-800";
-  const successClass = styledLayout
+  const defaultSuccess = styledLayout
     ? "bg-emerald-50 text-emerald-900 ring-emerald-200"
     : "bg-zinc-100 text-zinc-900 ring-zinc-200";
 
+  const formClass = classNames?.form ?? "space-y-4";
+  const fieldClass = classNames?.field;
+  const labelClass =
+    classNames?.label ?? "mb-1 block text-sm font-medium text-zinc-700";
+  const controlClass =
+    classNames?.control ??
+    `w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none ${fieldFocus}`;
+  const textareaClass =
+    classNames?.textarea ?? controlClass;
+  const errorClass =
+    classNames?.error ??
+    "rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-200";
+  const successClass =
+    classNames?.success ??
+    `rounded-xl px-4 py-3 text-sm ring-1 ${defaultSuccess}`;
+  const submitClass = [
+    classNames?.submit ??
+      `w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition disabled:opacity-60 ${defaultSubmit}`,
+    pending ? classNames?.submitPending : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   if (sent) {
     return (
-      <p className={`rounded-xl px-4 py-3 text-sm ring-1 ${successClass}`}>
+      <p className={successClass} role="status">
         {copy?.success ??
           "Tu mensaje fue enviado. La inmobiliaria se pondrá en contacto contigo."}
       </p>
     );
   }
 
+  const submitLabel = pending
+    ? (copy?.sending ?? "Enviando…")
+    : (copy?.send ?? "Enviar mensaje");
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className={formClass}>
       {error ? (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 ring-1 ring-red-200">
+        <p className={errorClass} role="alert">
           {error}
         </p>
       ) : null}
-      <div>
-        <label htmlFor="name" className="mb-1 block text-sm font-medium text-zinc-700">
+      <div className={fieldClass}>
+        <label htmlFor={fieldId("name")} className={labelClass}>
           {copy?.name ?? "Nombre"}
         </label>
         <input
-          id="name"
+          id={fieldId("name")}
           name="name"
           required
-          className={`w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none ${fieldFocus}`}
+          autoComplete="name"
+          className={controlClass}
         />
       </div>
-      <div>
-        <label htmlFor="phone" className="mb-1 block text-sm font-medium text-zinc-700">
+      <div className={fieldClass}>
+        <label htmlFor={fieldId("phone")} className={labelClass}>
           {copy?.phone ?? "Teléfono (10 dígitos)"}
         </label>
         <input
-          id="phone"
+          id={fieldId("phone")}
           name="phone"
           inputMode="numeric"
           required
+          autoComplete="tel"
           value={phone}
           onChange={onPhoneChange}
-          className={`w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none ${fieldFocus}`}
+          className={controlClass}
         />
       </div>
-      <div>
-        <label htmlFor="message" className="mb-1 block text-sm font-medium text-zinc-700">
+      <div className={fieldClass}>
+        <label htmlFor={fieldId("message")} className={labelClass}>
           {copy?.message ?? "Mensaje"}
         </label>
         <textarea
-          id="message"
+          id={fieldId("message")}
           name="message"
           required
           rows={4}
@@ -141,15 +136,15 @@ export function ListingInquiryForm({
               ? (copy?.placeholderSale ?? "Me interesa este inmueble en venta…")
               : (copy?.placeholderRent ?? "Me interesa rentar este inmueble…")
           }
-          className={`w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm outline-none ${fieldFocus}`}
+          className={textareaClass}
         />
       </div>
-      <button
-        type="submit"
-        disabled={pending}
-        className={`w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition disabled:opacity-60 ${submitClass}`}
-      >
-        {pending ? (copy?.sending ?? "Enviando…") : (copy?.send ?? "Enviar mensaje")}
+      <button type="submit" disabled={pending} className={submitClass}>
+        {classNames?.submitLabel ? (
+          <span className={classNames.submitLabel}>{submitLabel}</span>
+        ) : (
+          submitLabel
+        )}
       </button>
     </form>
   );

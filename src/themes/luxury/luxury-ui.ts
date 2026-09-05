@@ -1,4 +1,5 @@
 import { getPublicSiteContent } from "@/lib/public-site-content";
+import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import {
   getDictionary,
   localizedHref,
@@ -12,16 +13,23 @@ export type LuxuryUi = {
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   dict: SiteDictionary;
+  showShareButton: boolean;
+  siteOrigin: string;
 };
 
 export async function getLuxuryUi(lang?: string): Promise<LuxuryUi> {
-  const content = await getPublicSiteContent();
+  const [content, config] = await Promise.all([
+    getPublicSiteContent(),
+    getResolvedSiteConfig(),
+  ]);
   const locale = resolveRequestLocale(lang, content.locale);
   return {
     content,
     locale,
     defaultLocale: content.locale.defaultLocale,
     dict: getDictionary(locale),
+    showShareButton: config.showShareButton,
+    siteOrigin: config.siteOrigin,
   };
 }
 

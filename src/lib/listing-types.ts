@@ -1,4 +1,9 @@
-import type { SiteDictionary } from "@/lib/site-i18n";
+import { localizedPropertyTypeLabel } from "@/lib/property-labels";
+import {
+  localizedHref,
+  type SiteDictionary,
+  type SiteLocale,
+} from "@/lib/site-i18n";
 
 export type ListingStatus = "draft" | "published" | "paused";
 export type ListingOfferType = "rent" | "sale";
@@ -123,7 +128,16 @@ export function listingPriceSuffix(offerType: ListingOfferType): string | null {
   return offerType === "rent" ? "/ mes" : null;
 }
 
-export type ListingSpec = { label: string; value: string };
+export type ListingSpecKey = "bedrooms" | "bathrooms" | "land" | "built";
+
+export type ListingSpec = { key: ListingSpecKey; label: string; value: string };
+
+function isAbsentSpecValue(value: string): boolean {
+  const trimmed = value.trim().toLowerCase();
+  if (!trimmed || trimmed === "undefined" || trimmed === "null") return true;
+  const numeric = Number.parseFloat(trimmed.replace(",", "."));
+  return Number.isFinite(numeric) && numeric === 0;
+}
 
 export function listingPublicSpecsLocalized(
   listing: {
@@ -140,30 +154,44 @@ export function listingPublicSpecsLocalized(
 
   if (!land && listing.bedrooms != null) {
     specs.push({
+      key: "bedrooms",
       label: dict.listing.specs.bedrooms,
       value: String(listing.bedrooms),
     });
   }
   if (!land && listing.bathrooms?.trim()) {
     specs.push({
+      key: "bathrooms",
       label: dict.listing.specs.bathrooms,
       value: listing.bathrooms.trim(),
     });
   }
-  if (listing.land_area) {
+  if (listing.land_area && !isAbsentSpecValue(String(listing.land_area))) {
     specs.push({
+      key: "land",
       label: dict.listing.specs.land,
       value: `${listing.land_area} m²`,
     });
   }
-  if (listing.built_area && !land) {
+  if (
+    listing.built_area &&
+    !land &&
+    !isAbsentSpecValue(String(listing.built_area))
+  ) {
     specs.push({
+      key: "built",
       label: dict.listing.specs.built,
       value: `${listing.built_area} m²`,
     });
   }
-  if (land && listing.built_area && !listing.land_area) {
+  if (
+    land &&
+    listing.built_area &&
+    !listing.land_area &&
+    !isAbsentSpecValue(String(listing.built_area))
+  ) {
     specs.push({
+      key: "land",
       label: dict.listing.specs.land,
       value: `${listing.built_area} m²`,
     });
@@ -172,29 +200,75 @@ export function listingPublicSpecsLocalized(
   return specs;
 }
 
-export function listingCardSpecLine(listing: {
-  property_type: string;
-  bedrooms: number | null;
-  bathrooms: string | null;
-  built_area: string | null;
-  land_area?: string | null;
-}): string {
+export function listingCardSpecLine(
+  listing: {
+    property_type: string;
+    bedrooms: number | null;
+    bathrooms: string | null;
+    built_area: string | null;
+    land_area?: string | null;
+  },
+  specBedroomsShort?: string,
+): string {
   const parts: string[] = [];
   const land = listing.property_type === "land";
 
   if (!land && listing.bedrooms != null) {
-    parts.push(`${listing.bedrooms} rec.`);
+    parts.push(
+      specBedroomsShort
+        ? specBedroomsShort.replace("{count}", String(listing.bedrooms))
+        : `${listing.bedrooms} rec.`,
+    );
   }
   if (!land && listing.bathrooms?.trim()) {
     parts.push(listing.bathrooms.trim());
   }
-  if (listing.land_area) {
+  if (listing.land_area && !isAbsentSpecValue(String(listing.land_area))) {
     parts.push(`${listing.land_area} m²`);
-  } else if (listing.built_area) {
+  } else if (
+    listing.built_area &&
+    !isAbsentSpecValue(String(listing.built_area))
+  ) {
     parts.push(`${listing.built_area} m²`);
   }
 
   return parts.join(" · ");
+}
+
+export function publicListingCardModel(
+  listing: PublicListingCard,
+  options: {
+    dict?: SiteDictionary;
+    locale?: SiteLocale;
+    defaultLocale?: SiteLocale;
+  } = {},
+) {
+  const { dict, locale, defaultLocale } = options;
+  const offerType = parseOfferType(listing.offer_type);
+  const href =
+    locale && defaultLocale
+      ? localizedHref(
+          `/inmueble/${listing.slug}`,
+          locale,
+          null,
+          defaultLocale,
+        )
+      : `/inmueble/${listing.slug}`;
+
+  return {
+    offerType,
+    href,
+    suffix:
+      offerType === "rent"
+        ? (dict?.listing.perMonth ?? listingPriceSuffix(offerType))
+        : null,
+    typeLabel: localizedPropertyTypeLabel(dict, listing.property_type),
+    specLine: listingCardSpecLine(listing, dict?.listing.specBedroomsShort),
+    offerLabel:
+      offerType === "sale"
+        ? (dict?.listing.sale ?? OFFER_TYPE_LABEL.sale)
+        : (dict?.listing.rent ?? OFFER_TYPE_LABEL.rent),
+  };
 }
 
 export function parseApiFailureMessage(data: unknown): string {

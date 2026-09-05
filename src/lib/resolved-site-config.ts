@@ -59,6 +59,7 @@ function mergeApiPayload(
     siteLogoUrl: branding.logo_url?.trim() || env.siteLogoUrl,
     primaryColor: branding.primary_color?.trim() || env.primaryColor,
     showPoweredBy: branding.show_powered_by ?? env.showPoweredBy,
+    showShareButton: branding.show_share_button ?? env.showShareButton,
     siteOrigin: api.public_url?.trim() || env.siteOrigin,
     locale: localeFromApi(api, env),
     source: "api",

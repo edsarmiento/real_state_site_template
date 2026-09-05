@@ -8,6 +8,7 @@ export type SiteConfigBranding = {
   logo_url: string | null;
   primary_color: string | null;
   show_powered_by: boolean;
+  show_share_button?: boolean;
   default_locale?: string;
   supported_locales?: string[];
   show_locale_switcher?: boolean;
@@ -36,6 +37,7 @@ export type ResolvedSiteConfig = {
   siteLogoUrl: string | null;
   primaryColor: string | null;
   showPoweredBy: boolean;
+  showShareButton: boolean;
   siteOrigin: string;
   locale: SiteLocaleConfig;
   /** Whether values came from the API or env fallbacks only. */

@@ -2,20 +2,16 @@ import Link from "next/link";
 import { ListingOfferBadge } from "@/components/listing-offer-badge";
 import {
   formatRentCents,
-  listingCardSpecLine,
-  listingPriceSuffix,
-  parseOfferType,
-  type PublicListingCard,
+  publicListingCardModel,
+  type PublicListingCard as PublicListingCardType,
 } from "@/lib/listing-types";
-import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import {
-  localizedHref,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
 
 type Props = {
-  listing: PublicListingCard;
+  listing: PublicListingCardType;
   styledLayout?: boolean;
   dict?: SiteDictionary;
   locale?: SiteLocale;
@@ -29,20 +25,10 @@ export function PublicListingCard({
   locale,
   defaultLocale,
 }: Props) {
-  const offerType = parseOfferType(listing.offer_type);
-  const suffix =
-    offerType === "rent" ? (dict?.listing.perMonth ?? listingPriceSuffix(offerType)) : null;
-  const typeLabel = localizedPropertyTypeLabel(dict, listing.property_type);
-  const specLine = listingCardSpecLine(listing);
-  const href =
-    locale && defaultLocale
-      ? localizedHref(
-          `/inmueble/${listing.slug}`,
-          locale,
-          null,
-          defaultLocale,
-        )
-      : `/inmueble/${listing.slug}`;
+  const { offerType, href, suffix, typeLabel, specLine } = publicListingCardModel(
+    listing,
+    { dict, locale, defaultLocale },
+  );
 
   const cardRing = styledLayout
     ? "ring-blue-950/10 hover:ring-blue-600/25"

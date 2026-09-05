@@ -146,6 +146,9 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | i18n + locale (todos los themes) | `src/lib/site-i18n.ts`, `src/lib/site-ui.ts` (`getSiteUi`) |
 | Selector ES \| EN | `src/components/locale-switcher-base.tsx`, `site-locale-switcher.tsx`; Luxury: `luxury-locale-switcher.tsx` |
 | Auth JWT + workspace | `src/lib/api-auth.ts`, `session-cookies.ts` |
+| Inquiry (POST + hook) | `src/lib/listing-inquiry.ts` → `ListingInquiryForm` |
+| WhatsApp `wa.me` | `src/lib/whatsapp.ts` → `ListingWhatsAppButton` |
+| Card/ficha listing values | `publicListingCardModel`, `listingPublicSpecsLocalized` en `listing-types.ts` |
 | Guards | `src/proxy.ts`, `src/lib/route-guards.ts` |
 | Admin shell | `src/components/admin-shell.tsx` (`styledLayout` desde `(admin)/layout.tsx`) |
 | Login shell | `src/components/auth-page-shell.tsx` (`styledLayout` desde `login/page.tsx`) |
@@ -189,6 +192,8 @@ theme.Catalog / theme.ListingDetail
 ```
 
 Las rutas `src/app/page.tsx` e `src/app/inmueble/[slug]/page.tsx` **solo** hacen fetch de datos y metadata; **delegan** el markup al theme. No duplicar JSX de catálogo/ficha en `app/`.
+
+**Themes = skins, no dominio.** Cada theme recibe valores ya resueltos (listings, `SiteConfig`, locale, copy) y solo pinta. Inquiry, WhatsApp, specs, href de ficha y labels salen de `src/lib/` + `src/components/`. **Prohibido** copiar `ListingInquiryForm` / `ListingWhatsAppButton` / helpers de specs en `src/themes/<nombre>/`. El look se configura con `classNames`, tokens CSS o markup propio alrededor de esos widgets.
 
 ### Mapeo actual (`layout_key` → theme)
 
@@ -234,13 +239,13 @@ Reglas en template:
 ### Tema `default` (estructura)
 
 - Catálogo: `DefaultCatalog` → `CatalogHero` (solo `layout_key: default` en producción hoy).
-- Ficha: `DefaultListingDetail` — galería, specs, inquiry, WhatsApp con `listingPublicUrl` desde `config.siteOrigin`.
+- Ficha: `DefaultListingDetail` — galería, `listingPublicSpecsLocalized`, `ListingInquiryForm`, `ListingWhatsAppButton`, `listingPublicUrl` desde `config.siteOrigin`.
 - i18n vía `getSiteUi` + `site-i18n.ts` (mismo contrato que Luxury para locale).
 - **`layout_key: default`:** sin `--site-primary`; paleta zinc/blanco.
 
 ### Tema `luxury` (plantilla premium, piloto `deo`)
 
-- `src/themes/luxury/` — catálogo con secciones, ficha, header/footer propios.
+- `src/themes/luxury/` — catálogo con secciones, ficha, header/footer propios. Inquiry / WhatsApp / specs: mismos widgets y helpers que default (`classNames` luxury).
 - i18n: mismo `site-i18n.ts` que default; `getLuxuryUi(lang)` para copy + locale.
 - CSS: `[data-site-theme="luxury"]`, variables `--luxury-*` (`luxuryThemeCssVars()` en `globals.css`).
 - Legales: `LuxuryLegalPage` cuando `resolveSiteThemeFromConfig().name === "luxury"`.
@@ -346,18 +351,21 @@ src/themes/<nombre>/
 
 Sin fetch de listings en el theme — props desde `page.tsx`. Tipos: `PublicListingCard`, `PublicListingDetail`.
 
+**No** crear `*-inquiry-form.tsx`, `*-listing-whatsapp.tsx` ni `*-specs.ts` en el theme. Usar `ListingInquiryForm`, `ListingWhatsAppButton`, `publicListingCardModel`, `listingPublicSpecsLocalized`.
+
 ### 4. Contrato (`theme-types.ts`)
 
 ```ts
 { name, Catalog: (CatalogThemeProps) => ReactNode, ListingDetail: (ListingDetailThemeProps) => ReactNode }
 ```
 
-Reutilizar `PublicCatalogSearch`, `ListingInquiryForm`, `ListingWhatsAppButton` cuando aplique.
+Reutilizar **siempre** `PublicCatalogSearch` (o el search del theme si el markup es otro), `ListingInquiryForm`, `ListingWhatsAppButton`, `publicListingCardModel` / `listingPublicSpecsLocalized`. El theme solo pasa valores + `classNames` / CSS. No reimplementar POST de inquiry, `wa.me` ni el armado de specs.
 
 ### 5. Verificación antes de merge
 
 - [ ] `layout_key` en API y Ops.
 - [ ] Sin JSX duplicado en `app/page.tsx` / `inmueble/[slug]/page.tsx`.
+- [ ] Sin form/WhatsApp/specs de listing copiados en `src/themes/` — widgets + helpers compartidos.
 - [ ] Branding desde SiteConfig; Vercel solo `ACCOUNT_ID` + `API_URL`.
 - [ ] Sin `site-config.ts` legacy ni exports muertos.
 - [ ] `npm run build` y `npm run lint`.
@@ -453,17 +461,21 @@ Reutilizar helpers existentes antes de copiar lógica:
 | Tipos | `src/lib/*-types.ts` | Interfaces inline repetidas en varios archivos |
 | Labels UI | `src/lib/*-labels.ts`, `localizedPropertyTypeLabel` | Mapas `{ draft: "Borrador" }` copiados en componentes |
 | Locale / i18n | `site-i18n.ts`, `getSiteUi`, `locale-switcher-base` | Lógica duplicada de `?lang=` o selector por theme |
+| Inquiry pública | `useListingInquiry` / `ListingInquiryForm` | `fetch` + validación de teléfono en un form del theme |
+| WhatsApp listing | `parseWhatsAppNumber`, `buildWhatsAppHref`, `ListingWhatsAppButton` | Otro `wa.me` / parseo de dígitos por theme |
+| Card / specs | `publicListingCardModel`, `listingPublicSpecsLocalized`, `listingCardSpecLine` | Remapear `listing` → href/precio/specs en cada card |
 | Layout keys / themes | `SiteLayoutKey`, `LAYOUT_KEYS`, `theme-registry.ts`, `themeNameFromLayoutKey()` | Strings sueltos; JSX duplicado en `app/page.tsx` |
 
 **Cuándo extraer:** si la misma lógica aparece **2+ veces** con el mismo significado (p. ej. armar URL pública, mapear branding, validar teléfono). **No** crear util de una línea solo “por si acaso”.
 
-**Cuándo no forzar DRY:** rutas BFF de una línea; themes con markup distinto (`default` vs `luxury`) no fusionar en un mega-componente con flags — usar `theme-registry`.
+**Cuándo no forzar DRY:** rutas BFF de una línea; **markup** distinto entre themes (`default` vs `luxury`) no fusionar en un mega-componente con `if (theme === …)` — usar `theme-registry`. El **comportamiento** (inquiry, WhatsApp, specs, href) sí es compartido: el theme solo recibe valores y aplica skin.
 
 #### Code smells a evitar
 
 | Smell | Señal | Corrección |
 |-------|-------|------------|
 | **Theme bypass** | Markup de catálogo/ficha inline en `app/page.tsx` | Delegar a `theme.Catalog` / `theme.ListingDetail` |
+| **Theme-local domain** | `LuxuryInquiryForm` (u otro) copia el POST / teléfono / `wa.me` | Usar el widget compartido + `classNames` |
 | **Lógica en el lugar equivocado** | Validar estado de anuncio o permisos en React | Mover al API; el front solo muestra `message` / `errors` |
 | **Env en client** | `"use client"` + `process.env.NEXT_PUBLIC_SITE_NAME` | Props desde server con `pickSiteBranding` |
 | **Fetch en client innecesario** | `useEffect` + `fetch` para datos que puede cargar el `page.tsx` | Server Component + props |
@@ -505,6 +517,7 @@ Si eliminas un campo de branding o layout en el API, borrar también del templat
 | Llamar Rails desde el browser | BFF o `publicApiFetch` en SSR |
 | Duplicar reglas de anuncios / SiteConfig | Leer `BUSINESS_RULES.md` y el API |
 | Nuevo layout solo en front | Coordinar `layout_key` en API + Ops + `theme-registry` |
+| Copiar inquiry / WhatsApp / specs en el theme | `ListingInquiryForm`, `ListingWhatsAppButton`, helpers en `listing-types.ts` |
 | `getResolvedSiteConfig` en `"use client"` | Props desde server parent |
 | Commits con secretos en `.env` | Solo `.env.example` documentado |
 | Util/helper de 1 uso “por limpieza” | Inline hasta segunda repetición |

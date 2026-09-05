@@ -1,12 +1,23 @@
 import Link from "next/link";
+import { ListingInquiryForm } from "@/components/listing-inquiry-form";
 import { ListingPhotoGallery } from "@/components/listing-photo-gallery";
-import { parseOfferType } from "@/lib/listing-types";
+import { ListingShareButton } from "@/components/listing-share-button";
+import { ListingWhatsAppButton } from "@/components/listing-whatsapp-button";
+import {
+  listingPublicSpecsLocalized,
+  parseOfferType,
+  type ListingSpecKey,
+} from "@/lib/listing-types";
+import { localizedPropertyTypeLabel } from "@/lib/property-labels";
+import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref } from "@/lib/site-i18n";
 import type { ListingDetailThemeProps } from "@/themes/theme-types";
-import { LuxuryButton } from "@/themes/luxury/luxury-button";
+import {
+  LuxuryButton,
+  luxuryButtonClassName,
+} from "@/themes/luxury/luxury-button";
 import { LuxuryFooter } from "@/themes/luxury/luxury-footer";
 import { LuxuryHeader } from "@/themes/luxury/luxury-header";
-import { LuxuryInquiryForm } from "@/themes/luxury/luxury-inquiry-form";
 import {
   LuxuryIconArea,
   LuxuryIconArrowLeft,
@@ -14,18 +25,17 @@ import {
   LuxuryIconBedrooms,
   LuxuryIconHome,
   LuxuryIconLocation,
+  LuxuryIconWhatsApp,
 } from "@/themes/luxury/luxury-icons";
 import { LuxuryListingDescription } from "@/themes/luxury/luxury-listing-description";
 import { LuxuryListingTitle } from "@/themes/luxury/luxury-listing-title";
-import { LuxuryListingWhatsAppButton } from "@/themes/luxury/luxury-listing-whatsapp";
 import { LuxuryLogo } from "@/themes/luxury/luxury-logo";
 import { LuxuryMapsButton } from "@/themes/luxury/luxury-maps-button";
-import { luxuryVisibleSpecs } from "@/themes/luxury/luxury-specs";
 import { LuxuryPrice } from "@/themes/luxury/luxury-price";
 import { LuxuryShell } from "@/themes/luxury/luxury-shell";
 import { getLuxuryUi } from "@/themes/luxury/luxury-ui";
 
-function specIcon(key: string) {
+function specIcon(key: ListingSpecKey) {
   if (key === "bedrooms") return <LuxuryIconBedrooms />;
   if (key === "bathrooms") return <LuxuryIconBath />;
   if (key === "land" || key === "built") return <LuxuryIconArea />;
@@ -47,20 +57,42 @@ export async function LuxuryListingDetail({
   listing,
   lang,
 }: ListingDetailThemeProps) {
-  const { content, dict, locale, defaultLocale } = await getLuxuryUi(lang);
+  const { content, dict, locale, defaultLocale, showShareButton, siteOrigin } =
+    await getLuxuryUi(lang);
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const priceSuffix = offerType === "rent" ? dict.listing.perMonth : null;
-  const specs = luxuryVisibleSpecs(listing);
-  const typeLabel =
-    dict.propertyTypes[
-      listing.property_type as keyof typeof dict.propertyTypes
-    ] ?? listing.property_type;
+  const specs = listingPublicSpecsLocalized(listing, dict);
+  const typeLabel = localizedPropertyTypeLabel(dict, listing.property_type);
   const isSale = offerType === "sale";
   const agency = listing.agency_name || content.brand.name;
   const hasMap = listing.latitude != null && listing.longitude != null;
   const hasLocation = Boolean(listing.address_label) || hasMap;
   const backHref = localizedHref("/#catalogo", locale, null, defaultLocale);
+  const listingUrl = listingPublicUrl(
+    listing.slug,
+    siteOrigin,
+    localizedHref(
+      `/inmueble/${encodeURIComponent(listing.slug)}`,
+      locale,
+      null,
+      defaultLocale,
+    ),
+  );
+  const inquirySubmitClass = luxuryButtonClassName({
+    variant: "gold",
+    size: "md",
+    surface: "light",
+    fullWidth: true,
+    loading: false,
+  });
+  const inquirySubmitPendingClass = luxuryButtonClassName({
+    variant: "gold",
+    size: "md",
+    surface: "light",
+    fullWidth: true,
+    loading: true,
+  });
 
   return (
     <LuxuryShell floatRaised lang={lang}>
@@ -98,6 +130,17 @@ export async function LuxuryListingDetail({
             decorate={false}
             className="luxury-detail__title"
           />
+          {showShareButton ? (
+            <div className="luxury-detail__share">
+              <ListingShareButton
+                url={listingUrl}
+                title={listing.title}
+                label={dict.listing.share}
+                copiedLabel={dict.listing.shareCopied}
+                className="luxury-share-button"
+              />
+            </div>
+          ) : null}
           <p className="luxury-detail__price">
             <LuxuryPrice
               cents={listing.rent_cents}
@@ -188,14 +231,18 @@ export async function LuxuryListingDetail({
             </p>
             {listing.contact_phone ? (
               <div className="luxury-inquiry__whatsapp">
-                <LuxuryListingWhatsAppButton
+                <ListingWhatsAppButton
                   phone={listing.contact_phone}
                   title={listing.title}
-                  slug={listing.slug}
+                  listingUrl={listingUrl}
                   offerType={offerType}
-                  locale={locale}
-                  defaultLocale={defaultLocale}
-                  dict={dict}
+                  saleLabel={dict.inquiry.whatsappSale}
+                  rentLabel={dict.inquiry.whatsappRent}
+                  messageTemplate={dict.inquiry.whatsappMessage}
+                  unstyled
+                  className="luxury-whatsapp-cta"
+                  ariaLabel={`${isSale ? dict.inquiry.whatsappSale : dict.inquiry.whatsappRent}. ${dict.a11y.opensInNewTab}`}
+                  icon={<LuxuryIconWhatsApp />}
                 />
               </div>
             ) : null}
@@ -205,10 +252,24 @@ export async function LuxuryListingDetail({
               </div>
             ) : null}
             <div className="luxury-inquiry__form">
-              <LuxuryInquiryForm
+              <ListingInquiryForm
                 slug={listing.slug}
                 offerType={offerType}
-                dict={dict}
+                copy={dict.inquiry}
+                inputIdPrefix="luxury-inquiry"
+                classNames={{
+                  form: "luxury-inquiry__fields",
+                  field: "luxury-field",
+                  label: "luxury-field__label",
+                  control: "luxury-field__control",
+                  textarea:
+                    "luxury-field__control luxury-field__control--area",
+                  error: "luxury-field__error",
+                  success: "luxury-field__hint luxury-inquiry__success",
+                  submit: inquirySubmitClass,
+                  submitPending: inquirySubmitPendingClass,
+                  submitLabel: "luxury-button__label",
+                }}
               />
             </div>
           </aside>

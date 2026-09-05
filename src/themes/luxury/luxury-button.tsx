@@ -37,7 +37,7 @@ function isInternalHref(href: string): boolean {
   return href.startsWith("/") && !href.startsWith("//");
 }
 
-function buttonClassName({
+export function luxuryButtonClassName({
   variant,
   size,
   surface,
@@ -85,7 +85,7 @@ export function LuxuryButton({
   onClick,
   "aria-label": ariaLabel,
 }: Props) {
-  const classNames = buttonClassName({
+  const classNames = luxuryButtonClassName({
     variant,
     size,
     surface,

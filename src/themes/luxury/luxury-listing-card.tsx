@@ -1,16 +1,13 @@
 import Link from "next/link";
-import { parseOfferType, type PublicListingCard } from "@/lib/listing-types";
 import {
-  fillTemplate,
-  localizedHref,
-  type SiteDictionary,
-  type SiteLocale,
-} from "@/lib/site-i18n";
+  publicListingCardModel,
+  type PublicListingCard,
+} from "@/lib/listing-types";
+import { fillTemplate, type SiteDictionary, type SiteLocale } from "@/lib/site-i18n";
 import { LuxuryCoverImage } from "@/themes/luxury/luxury-cover-image";
 import { LuxuryIconArrowRight } from "@/themes/luxury/luxury-icons";
 import { LuxuryListingTitle } from "@/themes/luxury/luxury-listing-title";
 import { LuxuryPrice } from "@/themes/luxury/luxury-price";
-import { luxuryCardSpecLine } from "@/themes/luxury/luxury-specs";
 
 type Props = {
   listing: PublicListingCard;
@@ -25,19 +22,9 @@ export function LuxuryListingCard({
   defaultLocale,
   dict,
 }: Props) {
-  const offerType = parseOfferType(listing.offer_type);
-  const suffix = offerType === "rent" ? dict.listing.perMonth : null;
-  const typeLabel =
-    dict.propertyTypes[
-      listing.property_type as keyof typeof dict.propertyTypes
-    ] ?? listing.property_type;
-  const specLine = luxuryCardSpecLine(listing, dict.listing);
-  const offerLabel = offerType === "sale" ? dict.listing.sale : dict.listing.rent;
-  const href = localizedHref(
-    `/inmueble/${listing.slug}`,
-    locale,
-    null,
-    defaultLocale,
+  const { href, suffix, typeLabel, specLine, offerLabel } = publicListingCardModel(
+    listing,
+    { dict, locale, defaultLocale },
   );
 
   return (
