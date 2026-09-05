@@ -8,8 +8,11 @@ type Props = {
   text?: string;
   label: string;
   copiedLabel: string;
+  failedLabel?: string;
   className?: string;
 };
+
+type ShareStatus = "idle" | "copied" | "failed";
 
 function ShareIcon({ className }: { className?: string }) {
   return (
@@ -32,9 +35,54 @@ function ShareIcon({ className }: { className?: string }) {
   );
 }
 
+function resolveShareUrl(raw: string): string {
+  if (typeof window === "undefined") return raw;
+  const current = window.location.href.split("#")[0] ?? window.location.href;
+  try {
+    const configured = new URL(raw, window.location.href);
+    // Prefer the live page host/path so LAN / tunnels / custom domains share correctly.
+    if (configured.pathname === window.location.pathname) {
+      return current;
+    }
+    return configured.href;
+  } catch {
+    return current;
+  }
+}
+
+async function copyText(value: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch {
+    /* fall through to execCommand */
+  }
+
+  try {
+    const input = document.createElement("textarea");
+    input.value = value;
+    input.setAttribute("readonly", "");
+    input.style.position = "fixed";
+    input.style.top = "0";
+    input.style.left = "0";
+    input.style.opacity = "0";
+    document.body.appendChild(input);
+    input.focus();
+    input.select();
+    input.setSelectionRange(0, value.length);
+    const ok = document.execCommand("copy");
+    document.body.removeChild(input);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Mobile / supporting browsers: native share sheet (Web Share API).
- * Fallback: copy listing URL to clipboard.
+ * Mobile: Web Share API (native sheet).
+ * Fallback: copy URL (clipboard / execCommand) with visible status — never silent.
  */
 export function ListingShareButton({
   url,
@@ -42,44 +90,66 @@ export function ListingShareButton({
   text,
   label,
   copiedLabel,
+  failedLabel = "No se pudo compartir",
   className,
 }: Props) {
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<ShareStatus>("idle");
 
-  async function onShare() {
-    const payload = { title, text: text ?? title, url };
+  function flash(next: Exclude<ShareStatus, "idle">) {
+    setStatus(next);
+    window.setTimeout(() => setStatus("idle"), 2500);
+  }
 
-    try {
-      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-        await navigator.share(payload);
+  function onShare() {
+    const absoluteUrl = resolveShareUrl(url);
+    const payload = {
+      title,
+      text: text ? `${text}\n${absoluteUrl}` : `${title}\n${absoluteUrl}`,
+      url: absoluteUrl,
+    };
+
+    const share =
+      typeof navigator !== "undefined" && typeof navigator.share === "function"
+        ? navigator.share.bind(navigator)
+        : null;
+
+    if (share) {
+      const canShare =
+        typeof navigator.canShare !== "function" || navigator.canShare(payload);
+
+      if (canShare) {
+        // Keep share as the first async call so mobile keeps the user gesture.
+        void share(payload).catch((err: unknown) => {
+          const aborted =
+            err instanceof DOMException && err.name === "AbortError";
+          if (aborted) return;
+          void copyText(absoluteUrl).then((ok) => flash(ok ? "copied" : "failed"));
+        });
         return;
       }
-    } catch (err) {
-      // User cancelled the share sheet — do nothing.
-      if (err instanceof DOMException && err.name === "AbortError") return;
     }
 
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Last resort: prompt so the user can still copy.
-      window.prompt(label, url);
-    }
+    void copyText(absoluteUrl).then((ok) => flash(ok ? "copied" : "failed"));
   }
+
+  const buttonLabel =
+    status === "copied"
+      ? copiedLabel
+      : status === "failed"
+        ? failedLabel
+        : label;
 
   return (
     <button
       type="button"
-      onClick={() => void onShare()}
+      onClick={onShare}
       className={
         className ??
-        "inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-800 transition hover:border-zinc-300 hover:bg-zinc-50"
+        "inline-flex touch-manipulation items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-800 transition hover:border-zinc-300 hover:bg-zinc-50"
       }
     >
       <ShareIcon className="h-4 w-4 shrink-0" />
-      {copied ? copiedLabel : label}
+      {buttonLabel}
     </button>
   );
 }

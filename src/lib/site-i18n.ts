@@ -96,6 +96,7 @@ export type SiteDictionary = {
     listedBy: string;
     share: string;
     shareCopied: string;
+    shareFailed: string;
     specs: {
       bedrooms: string;
       bathrooms: string;
@@ -497,6 +498,7 @@ const dictionaries = {
       listedBy: "Anunciado por",
       share: "Compartir",
       shareCopied: "Enlace copiado",
+      shareFailed: "No se pudo compartir. Copia el enlace manualmente.",
       specs: {
         bedrooms: "Recámaras",
         bathrooms: "Baños",
@@ -765,6 +767,7 @@ const dictionaries = {
       listedBy: "Listed by",
       share: "Share",
       shareCopied: "Link copied",
+      shareFailed: "Couldn’t share. Copy the link manually.",
       specs: {
         bedrooms: "Bedrooms",
         bathrooms: "Bathrooms",

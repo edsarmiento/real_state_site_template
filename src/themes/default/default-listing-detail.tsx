@@ -107,6 +107,7 @@ export async function DefaultListingDetail({
                   title={listing.title}
                   label={ui.dict.listing.share}
                   copiedLabel={ui.dict.listing.shareCopied}
+                  failedLabel={ui.dict.listing.shareFailed}
                 />
               </div>
             ) : null}

@@ -2182,6 +2182,8 @@ body {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--luxury-ink);
+  touch-action: manipulation;
+  cursor: pointer;
   transition: background 160ms ease, border-color 160ms ease;
 }
 
