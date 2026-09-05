@@ -136,8 +136,10 @@ export async function LuxuryListingDetail({
                 url={listingUrl}
                 title={listing.title}
                 label={dict.listing.share}
+                copyLabel={dict.listing.shareCopy}
                 copiedLabel={dict.listing.shareCopied}
                 failedLabel={dict.listing.shareFailed}
+                closeLabel={dict.listing.shareClose}
                 className="luxury-share-button"
               />
             </div>

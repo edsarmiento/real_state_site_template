@@ -1,14 +1,16 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 type Props = {
   url: string;
   title: string;
   text?: string;
   label: string;
+  copyLabel?: string;
   copiedLabel: string;
   failedLabel?: string;
+  closeLabel?: string;
   className?: string;
 };
 
@@ -40,7 +42,6 @@ function resolveShareUrl(raw: string): string {
   const current = window.location.href.split("#")[0] ?? window.location.href;
   try {
     const configured = new URL(raw, window.location.href);
-    // Prefer the live page host/path so LAN / tunnels / custom domains share correctly.
     if (configured.pathname === window.location.pathname) {
       return current;
     }
@@ -57,7 +58,7 @@ async function copyText(value: string): Promise<boolean> {
       return true;
     }
   } catch {
-    /* fall through to execCommand */
+    /* fall through */
   }
 
   try {
@@ -80,76 +81,123 @@ async function copyText(value: string): Promise<boolean> {
   }
 }
 
+function canUseNativeShare(): boolean {
+  return typeof navigator !== "undefined" && typeof navigator.share === "function";
+}
+
 /**
- * Mobile: Web Share API (native sheet).
- * Fallback: copy URL (clipboard / execCommand) with visible status — never silent.
+ * WhatsApp works as a plain link; share often fails silently on phones when
+ * navigator.share hangs/aborts. Strategy:
+ * 1) Try native share sync with the tap (URL-only payload).
+ * 2) On missing/blocked/failed share → bottom sheet with copy + selectable URL
+ *    (second tap has a fresh gesture for clipboard).
  */
 export function ListingShareButton({
   url,
   title,
   text,
   label,
+  copyLabel = "Copiar enlace",
   copiedLabel,
   failedLabel = "No se pudo compartir",
+  closeLabel = "Cerrar",
   className,
 }: Props) {
+  const titleId = useId();
   const [status, setStatus] = useState<ShareStatus>("idle");
-  const busyRef = useRef(false);
+  const [sheetUrl, setSheetUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!sheetUrl) return;
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setSheetUrl(null);
+    }
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [sheetUrl]);
 
   function flash(next: Exclude<ShareStatus, "idle">) {
     setStatus(next);
     window.setTimeout(() => setStatus("idle"), 2500);
   }
 
-  function fallbackCopy(absoluteUrl: string) {
-    void copyText(absoluteUrl)
-      .then((ok) => flash(ok ? "copied" : "failed"))
-      .finally(() => {
-        busyRef.current = false;
-      });
+  function openSheet(absoluteUrl: string) {
+    setSheetUrl(absoluteUrl);
   }
 
   function onShare() {
-    if (busyRef.current) return;
-    busyRef.current = true;
-
     const absoluteUrl = resolveShareUrl(url);
-    // URL-only payload is the most compatible on real iOS / Android browsers.
-    const payload: ShareData = {
+
+    // Real phones often expose navigator.share but the sheet never appears
+    // (or aborts immediately). WhatsApp works because it is a plain link.
+    // On touch devices, always show our sheet first so the tap is never silent.
+    const touchUi =
+      typeof window !== "undefined" &&
+      (window.matchMedia("(pointer: coarse)").matches ||
+        window.matchMedia("(hover: none)").matches);
+
+    if (touchUi) {
+      openSheet(absoluteUrl);
+      return;
+    }
+
+    const minimal: ShareData = { url: absoluteUrl };
+    const full: ShareData = {
       title,
       text: text ?? title,
       url: absoluteUrl,
     };
 
-    const share =
-      typeof navigator !== "undefined" && typeof navigator.share === "function"
-        ? navigator.share.bind(navigator)
-        : null;
-
-    if (share) {
-      const canShare =
-        typeof navigator.canShare !== "function" || navigator.canShare(payload);
-
-      if (canShare) {
-        // Must call share synchronously from the tap handler (keep user gesture).
-        void share(payload)
-          .then(() => {
-            busyRef.current = false;
-          })
-          .catch((err: unknown) => {
-            const aborted =
-              err instanceof DOMException && err.name === "AbortError";
-            if (aborted) {
-              busyRef.current = false;
-              return;
-            }
-            fallbackCopy(absoluteUrl);
-          });
-        return;
-      }
+    if (!canUseNativeShare()) {
+      openSheet(absoluteUrl);
+      return;
     }
 
-    fallbackCopy(absoluteUrl);
+    const payload =
+      typeof navigator.canShare === "function"
+        ? navigator.canShare(minimal)
+          ? minimal
+          : navigator.canShare(full)
+            ? full
+            : null
+        : minimal;
+
+    if (!payload) {
+      openSheet(absoluteUrl);
+      return;
+    }
+
+    void navigator.share(payload).catch((err: unknown) => {
+      const aborted =
+        err instanceof DOMException && err.name === "AbortError";
+      if (aborted) return;
+      openSheet(absoluteUrl);
+    });
+  }
+
+  async function onCopyFromSheet() {
+    if (!sheetUrl) return;
+    const ok = await copyText(sheetUrl);
+    if (ok) {
+      flash("copied");
+      setSheetUrl(null);
+      return;
+    }
+    flash("failed");
+  }
+
+  function onNativeFromSheet() {
+    if (!sheetUrl || !canUseNativeShare()) return;
+    void navigator.share({ title, url: sheetUrl }).catch((err: unknown) => {
+      const aborted =
+        err instanceof DOMException && err.name === "AbortError";
+      if (!aborted) flash("failed");
+    });
   }
 
   const buttonLabel =
@@ -160,16 +208,72 @@ export function ListingShareButton({
         : label;
 
   return (
-    <button
-      type="button"
-      onClick={onShare}
-      className={
-        className ??
-        "inline-flex touch-manipulation items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-800 transition hover:border-zinc-300 hover:bg-zinc-50"
-      }
-    >
-      <ShareIcon className="h-4 w-4 shrink-0" />
-      {buttonLabel}
-    </button>
+    <div className="relative inline-flex flex-col items-start gap-2">
+      <button
+        type="button"
+        onClick={onShare}
+        className={
+          className ??
+          "inline-flex touch-manipulation items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-800 transition hover:border-zinc-300 hover:bg-zinc-50"
+        }
+      >
+        <ShareIcon className="h-4 w-4 shrink-0" />
+        {buttonLabel}
+      </button>
+
+      {sheetUrl ? (
+        <div className="fixed inset-0 z-[80]" role="presentation">
+          <button
+            type="button"
+            className="absolute inset-0 bg-zinc-950/45"
+            aria-label={closeLabel}
+            onClick={() => setSheetUrl(null)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            className="absolute inset-x-0 bottom-0 z-[81] rounded-t-2xl border border-zinc-200 bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl"
+          >
+            <h2
+              id={titleId}
+              className="text-base font-semibold text-zinc-900"
+            >
+              {label}
+            </h2>
+            <p className="mt-3 break-all rounded-lg bg-zinc-50 px-3 py-2.5 text-sm text-zinc-700 ring-1 ring-zinc-200">
+              <a href={sheetUrl} className="underline-offset-2 hover:underline">
+                {sheetUrl}
+              </a>
+            </p>
+            <div className="mt-4 flex flex-col gap-2">
+              {canUseNativeShare() ? (
+                <button
+                  type="button"
+                  className="inline-flex min-h-11 touch-manipulation items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm font-semibold text-white"
+                  onClick={onNativeFromSheet}
+                >
+                  {label}
+                </button>
+              ) : null}
+              <button
+                type="button"
+                className="inline-flex min-h-11 touch-manipulation items-center justify-center rounded-xl border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-900"
+                onClick={() => void onCopyFromSheet()}
+              >
+                {copyLabel}
+              </button>
+              <button
+                type="button"
+                className="inline-flex min-h-11 touch-manipulation items-center justify-center rounded-xl px-4 text-sm font-medium text-zinc-600"
+                onClick={() => setSheetUrl(null)}
+              >
+                {closeLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }

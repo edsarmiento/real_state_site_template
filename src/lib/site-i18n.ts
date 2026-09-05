@@ -95,8 +95,10 @@ export type SiteDictionary = {
     viewMap: string;
     listedBy: string;
     share: string;
+    shareCopy: string;
     shareCopied: string;
     shareFailed: string;
+    shareClose: string;
     specs: {
       bedrooms: string;
       bathrooms: string;
@@ -497,8 +499,10 @@ const dictionaries = {
       viewMap: "Ver en el mapa",
       listedBy: "Anunciado por",
       share: "Compartir",
+      shareCopy: "Copiar enlace",
       shareCopied: "Enlace copiado",
       shareFailed: "No se pudo compartir. Copia el enlace manualmente.",
+      shareClose: "Cerrar",
       specs: {
         bedrooms: "Recámaras",
         bathrooms: "Baños",
@@ -766,8 +770,10 @@ const dictionaries = {
       viewMap: "Open in maps",
       listedBy: "Listed by",
       share: "Share",
+      shareCopy: "Copy link",
       shareCopied: "Link copied",
       shareFailed: "Couldn’t share. Copy the link manually.",
+      shareClose: "Close",
       specs: {
         bedrooms: "Bedrooms",
         bathrooms: "Bathrooms",
