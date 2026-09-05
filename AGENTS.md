@@ -162,6 +162,8 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | Tema default (catálogo + ficha) | `src/themes/default/` |
 | Tema Luxury (piloto `deo`) | `src/themes/luxury/` |
 | Tema Beige | `src/themes/beige/` |
+| Tema Elegant | `src/themes/elegant/` |
+| Tema Orange | `src/themes/orange/` |
 | Contenido marketing del tema | `src/lib/public-site-content.ts` (lee `getResolvedSiteConfig` + env `SITE_*`) |
 | Páginas legales | `src/app/terminos/`, `cookies/`, `aviso-de-privacidad/` + `*-legal-page.tsx` por theme |
 | Admin anuncios | `src/app/(admin)/listings/` |
@@ -205,6 +207,8 @@ Fuente de verdad: `THEME_DEFINITIONS` en `src/themes/theme-definitions.ts` (keys
 | `default` | `default` | Catalog, ListingDetail, LegalPage |
 | `deo` / `luxury` | `luxury` | Catalog, ListingDetail, LegalPage |
 | `beige` | `beige` | Catalog, ListingDetail, LegalPage |
+| `elegant` | `elegant` | Catalog, ListingDetail, LegalPage |
+| `orange` | `orange` | Catalog, ListingDetail, LegalPage |
 
 Unknown `layout_key` → `default` (nunca beige).
 

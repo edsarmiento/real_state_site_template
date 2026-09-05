@@ -24,10 +24,20 @@ const PUBLIC_LEGAL_PATHS = new Set([
   "/aviso-de-privacidad",
 ]);
 
-/** Public catalog pages (no auth). */
+function catalogPathname(pathname: string): string {
+  const withoutQuery = pathname.split("?")[0] ?? pathname;
+  const withoutHash = withoutQuery.split("#")[0] ?? withoutQuery;
+  if (withoutHash.length > 1 && withoutHash.endsWith("/")) {
+    return withoutHash.slice(0, -1);
+  }
+  return withoutHash;
+}
+
+/** Public catalog and legal pages (no auth). */
 export function isPublicCatalogPath(pathname: string): boolean {
-  if (pathname === "/robots.txt" || pathname === "/sitemap.xml") return true;
-  if (pathname === "/" || pathname.startsWith("/inmueble/")) return true;
-  if (pathname === "/inmueble") return true;
-  return PUBLIC_LEGAL_PATHS.has(pathname);
+  const path = catalogPathname(pathname);
+  if (path === "/robots.txt" || path === "/sitemap.xml") return true;
+  if (path === "/" || path.startsWith("/inmueble/")) return true;
+  if (path === "/inmueble") return true;
+  return PUBLIC_LEGAL_PATHS.has(path);
 }

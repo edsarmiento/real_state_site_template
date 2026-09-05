@@ -13,6 +13,9 @@ import { LuxuryCatalog } from "@/themes/luxury/luxury-catalog";
 import { LuxuryListingDetail } from "@/themes/luxury/luxury-listing-detail";
 import { LuxuryListingLoadError } from "@/themes/luxury/luxury-listing-load-error";
 import { LuxuryLegalPage } from "@/themes/luxury/luxury-legal-page";
+import { OrangeCatalog } from "@/themes/orange/orange-catalog";
+import { OrangeListingDetail } from "@/themes/orange/orange-listing-detail";
+import { OrangeLegalPage } from "@/themes/orange/orange-legal-page";
 import {
   THEME_DEFINITIONS,
   type SiteThemeName,
@@ -26,6 +29,7 @@ const LAYOUT_KEYS_BY_THEME = Object.fromEntries(
 const DEFAULT_CATALOG = { pageSize: 24, heroGallery: false } as const;
 const BEIGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ELEGANT_CATALOG = { pageSize: 12, heroGallery: true } as const;
+const ORANGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
 
 /**
  * Public themes. Add a theme: folder under src/themes/<name>/ + entry here
@@ -66,6 +70,14 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     ListingDetail: ElegantListingDetail,
     ListingLoadError: ElegantListingLoadError,
     LegalPage: ElegantLegalPage,
+  },
+  orange: {
+    name: "orange",
+    layoutKeys: LAYOUT_KEYS_BY_THEME.orange,
+    catalog: ORANGE_CATALOG,
+    Catalog: OrangeCatalog,
+    ListingDetail: OrangeListingDetail,
+    LegalPage: OrangeLegalPage,
   },
 };
 

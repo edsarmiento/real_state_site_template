@@ -104,3 +104,92 @@ export function catalogSearchParams(input: {
   if (input.page && input.page > 1) params.page = String(input.page);
   return params;
 }
+
+/** @deprecated Prefer theme.catalog.pageSize; kept for orange theme modules. */
+export const ORANGE_CATALOG_PAGE_SIZE = 12;
+
+export function catalogPageOffset(page: number, pageSize: number): number {
+  if (
+    !Number.isSafeInteger(page) ||
+    page < 1 ||
+    !Number.isSafeInteger(pageSize) ||
+    pageSize < 1 ||
+    page - 1 > Math.floor(Number.MAX_SAFE_INTEGER / pageSize)
+  ) {
+    return 0;
+  }
+  return (page - 1) * pageSize;
+}
+
+export type CatalogPagination = {
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  offset: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+  previousPage: number | null;
+  nextPage: number | null;
+  outOfRange: boolean;
+};
+
+export function getCatalogPagination({
+  page,
+  pageSize,
+  total,
+}: {
+  page: number;
+  pageSize: number;
+  total: number;
+}): CatalogPagination {
+  const safePageSize =
+    Number.isSafeInteger(pageSize) && pageSize > 0 ? pageSize : 0;
+  const totalItems = Number.isSafeInteger(total) && total > 0 ? total : 0;
+  const totalPages = catalogTotalPages(totalItems, safePageSize);
+  const requestedPage = Number.isSafeInteger(page) && page > 0 ? page : 1;
+  const outOfRange = totalPages > 0 && requestedPage > totalPages;
+  const currentPage =
+    totalPages === 0 ? 1 : Math.min(requestedPage, totalPages);
+  const hasPreviousPage = totalPages > 0 && currentPage > 1;
+  const hasNextPage = totalPages > 0 && currentPage < totalPages;
+
+  return {
+    currentPage,
+    pageSize: safePageSize,
+    totalItems,
+    totalPages,
+    offset: catalogPageOffset(currentPage, safePageSize),
+    hasPreviousPage,
+    hasNextPage,
+    previousPage: hasPreviousPage ? currentPage - 1 : null,
+    nextPage: hasNextPage ? currentPage + 1 : null,
+    outOfRange,
+  };
+}
+
+/** Orange catalog search params (oferta as Spanish slug when set). */
+export function orangeCatalogSearchParams(input: {
+  oferta: string;
+  city: string;
+  propertyType: string;
+  bedrooms: string;
+}): Record<string, string> {
+  const params: Record<string, string> = {};
+  if (input.oferta && input.oferta !== "todas") {
+    params.oferta = input.oferta;
+  }
+  if (input.city.trim()) params.city = input.city.trim();
+  if (input.propertyType) params.tipo = input.propertyType;
+  if (input.bedrooms) params.recamaras = input.bedrooms;
+  return params;
+}
+
+/** Changes only `page` and always returns to the catalog anchor. */
+export function catalogPageHref(baseHref: string, page: number): string {
+  const url = new URL(baseHref, "https://catalog.invalid");
+  if (page > 1) url.searchParams.set("page", String(page));
+  else url.searchParams.delete("page");
+  url.hash = "propiedades";
+  return `${url.pathname}${url.search}${url.hash}`;
+}

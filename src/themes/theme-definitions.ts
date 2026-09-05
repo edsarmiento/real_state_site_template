@@ -10,6 +10,7 @@ export const THEME_DEFINITIONS = [
   { name: "luxury", layoutKeys: ["deo", "luxury"] },
   { name: "beige", layoutKeys: ["beige"] },
   { name: "elegant", layoutKeys: ["elegant"] },
+  { name: "orange", layoutKeys: ["orange"] },
 ] as const;
 
 export type SiteThemeName = (typeof THEME_DEFINITIONS)[number]["name"];
@@ -36,10 +37,9 @@ export function themeNameFromLayoutKey(
   return "default";
 }
 
-export function normalizeLayoutKey(
-  raw: string | undefined | null,
-): SiteLayoutKey {
-  const value = raw?.trim().toLowerCase();
-  if (value && isSiteLayoutKey(value)) return value;
+/** Normalize unknown layout keys to a known key (fallback: default). */
+export function normalizeLayoutKey(layoutKey: string): SiteLayoutKey {
+  const value = layoutKey.trim().toLowerCase();
+  if (isSiteLayoutKey(value)) return value;
   return "default";
 }

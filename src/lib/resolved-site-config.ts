@@ -79,7 +79,7 @@ export const getResolvedSiteConfig = cache(
   async (): Promise<ResolvedSiteConfig> => {
     const env = envSiteConfig();
     const api = await fetchSiteConfigFromApi(env.accountId);
-    if (!api) return env;
-    return mergeApiPayload(api, env);
+    const config = api ? mergeApiPayload(api, env) : env;
+    return config;
   },
 );
