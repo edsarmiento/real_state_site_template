@@ -1,0 +1,60 @@
+# Requests GitHub Copilot code review on every new PR and on each new commit.
+# This file only asks the bot to review. Copilot then auto-reads from the PR head:
+#   AGENTS.md, .github/copilot-instructions.md
+name: Copilot code review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: copilot-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  request-review:
+    name: Request Copilot review
+    runs-on: ubuntu-latest
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      github.actor != 'copilot-pull-request-reviewer[bot]'
+    steps:
+      - name: Request or re-request Copilot
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = context.payload.pull_request.number;
+            const reviewer = "copilot-pull-request-reviewer[bot]";
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number,
+            });
+
+            const requested = (pr.requested_reviewers || []).some((r) =>
+              ["copilot-pull-request-reviewer", "copilot-pull-request-reviewer[bot]"].includes(r.login)
+            );
+
+            if (requested) {
+              await github.rest.pulls.removeRequestedReviewers({
+                owner,
+                repo,
+                pull_number,
+                reviewers: [reviewer],
+              });
+            }
+
+            await github.rest.pulls.requestReviewers({
+              owner,
+              repo,
+              pull_number,
+              reviewers: [reviewer],
+            });

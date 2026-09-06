@@ -2,6 +2,8 @@
 
 Plantilla **Next.js** para sitios white-label de una inmobiliaria: catálogo público + **admin lite** en el mismo dominio (login, anuncios, leads, mi cuenta). Usa el mismo **`real_state_api`**; cada deploy apunta a un workspace con `ACCOUNT_ID`.
 
+**Arquitectura, capas, themes y reglas de código:** [`AGENTS.md`](./AGENTS.md) es la **única fuente de verdad**. Este README solo cubre cómo correr y desplegar.
+
 ## Inicio rápido
 
 ```bash
@@ -37,8 +39,9 @@ El BFF inyecta `account_id` en `/api/public/*`. Las rutas staff (`/api/v1/*`) en
 | `/login` | Inicio de sesión (solo usuarios del workspace `ACCOUNT_ID`) |
 | `/listings` | CRUD de anuncios |
 | `/listings/setup` | Crear propiedad + unidad (onboarding) |
-| `/properties` | Listado de propiedades; agregar unidades |
 | `/listings/inquiries` | Leads del catálogo |
+| `/properties` | Listado de propiedades; agregar unidades |
+| `/properties/[id]/units` | Crear y editar unidades |
 | `/account` | Perfil, logo y datos de la inmobiliaria |
 
 El header público muestra «Acceder» o «Administrar» según la sesión. No hay sidebar CRM: solo anuncios + mi cuenta.
@@ -52,29 +55,11 @@ El header público muestra «Acceder» o «Administrar» según la sesión. No h
 5. Agregar dominio a `FRONTEND_ORIGINS` en el API si el browser llama al API directamente (con BFF no suele hacer falta)
 6. Smoke: `/`, `/inmueble/:slug`, formulario, WhatsApp, `/login`, `/listings`
 
-## Estructura
-
-```
-src/
-  app/                  Catálogo (/) y ficha (/inmueble/[slug])
-  app/(admin)/          Listings + account (shell mínimo)
-  app/login/            Auth JWT scoped a ACCOUNT_ID
-  app/api/public/       BFF catálogo (account_id)
-  app/api/v1/           BFF staff (JWT + X-Account-Id)
-  components/           Header, forms, admin-shell
-  lib/
-    resolved-site-config.ts  SiteConfig API + merge con env
-    site-config-env.ts       ACCOUNT_ID y fallbacks NEXT_PUBLIC_*
-    site-branding.ts         Helpers para props de marca
-    api-auth.ts         JWT + header de workspace
-    public-api-fetch.ts
-  proxy.ts              Protege /listings, /account, /api/v1/*
-```
-
 ## Docs relacionados
 
-- Reglas de anuncios: [`../real_state_api/BUSINESS_RULES.md`](../real_state_api/BUSINESS_RULES.md) §6b
-- Guía para agentes: [`AGENTS.md`](./AGENTS.md)
+- Arquitectura (fuente de verdad): [`AGENTS.md`](./AGENTS.md)
+- Reglas de anuncios / SiteConfig: [`../real_state_api/BUSINESS_RULES.md`](../real_state_api/BUSINESS_RULES.md) §6b y §SiteConfig
+- Revisión automática de PRs: [`.github/workflows/copilot-review.yml`](./.github/workflows/copilot-review.yml) (pide el review) + [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) (cómo revisar)
 
 ## Producción
 
@@ -96,4 +81,3 @@ SITE_HEADING_FONT=cormorant-garamond
 SITE_BODY_FONT=manrope
 NEXT_PUBLIC_SITE_HERO_IMAGE_URL=https://…
 ```
-

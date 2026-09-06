@@ -378,11 +378,13 @@ Clonar **default**, no Luxury, como scaffold de un theme fino.
 
 | Doc | Uso |
 |-----|-----|
-| Este `AGENTS.md` | Arquitectura y playbook (reglas permanentes) |
+| Este `AGENTS.md` | **Única fuente de verdad** de arquitectura, capas, themes y playbook |
+| [`README.md`](README.md) | Deploy / quickstart — no duplicar arquitectura aquí |
+| [`.github/workflows/copilot-review.yml`](.github/workflows/copilot-review.yml) | Pide a Copilot revisar al abrir un PR y en cada commit |
+| [`.github/copilot-instructions.md`](.github/copilot-instructions.md) | Cómo Copilot revisa (lee este `AGENTS.md`) |
 | [`docs/new-theme-agent-prompt.template.txt`](docs/new-theme-agent-prompt.template.txt) | Plantilla de brief por theme; copiar y rellenar `<slug>` / `<ThemeName>` |
 | [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md) | Gaps API, env `SITE_*` |
 | [`docs/architecture/luxury-layout-implementation.md`](docs/architecture/luxury-layout-implementation.md) | Contexto histórico — no fuente del registry actual |
-| [`README.md`](README.md) | Deploy Vercel |
 
 ---
 
@@ -398,6 +400,7 @@ Clonar **default**, no Luxury, como scaffold de un theme fino.
 ### React y Next.js
 
 - **Server Components por defecto.** `"use client"` solo si hay estado, efectos, event handlers o hooks de navegación.
+- **Componentes reutilizables:** extraer UI compartida a `src/components/` (o `src/lib/` si no hay JSX). Un componente declara **solo las props que lee y renderiza** — nada de props “por si acaso” ni campos muertos en el tipo. Themes reciben valores ya resueltos; no fetch ni dominio dentro del theme.
 - **Config y fetch en servidor:** `getResolvedSiteConfig()`, `publicApiFetch()` desde `page.tsx` / layouts async; pasar datos a client components vía props (ej. `pickSiteBranding`).
 - **No** leer `process.env.NEXT_PUBLIC_*` en componentes de UI para marca — usar config resuelta.
 - **`ACCOUNT_ID` nunca en el cliente** ni en URLs del browser; solo en servidor/BFF.
@@ -555,4 +558,4 @@ npm run lint
 - **Nueva plantilla pública (theme):** seguir [Nueva plantilla pública — playbook para agentes](#nueva-plantilla-pública--playbook-para-agentes).
 - **Página contacto:** nueva ruta bajo `src/app/contacto/`; si es parte del theme, integrar en `src/themes/<nombre>/`.
 - **Nuevo campo de branding:** API (`SiteConfig` + presenter + Ops form) → `site-config-types.ts` → `mergeApiPayload` / `localeFromApi` → componentes que lo consuman (`getPublicSiteContent().brand`, `config.locale`, etc.).
-- **Deploy Vercel:** checklist manual en Ops; ver `README.md` (solo `ACCOUNT_ID` + `API_URL`).
+- **Deploy Vercel:** checklist manual en Ops; ver `README.md` (solo `ACCOUNT_ID` + `API_URL`). No copiar arquitectura al README — vive en este archivo.
