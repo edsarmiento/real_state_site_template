@@ -59,7 +59,7 @@ El header público muestra «Acceder» o «Administrar» según la sesión. No h
 
 - Arquitectura (fuente de verdad): [`AGENTS.md`](./AGENTS.md)
 - Reglas de anuncios / SiteConfig: [`../real_state_api/BUSINESS_RULES.md`](../real_state_api/BUSINESS_RULES.md) §6b y §SiteConfig
-- Revisión automática de PRs: [`.github/workflows/copilot-review.yml`](./.github/workflows/copilot-review.yml) (pide el review) + [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) (cómo revisar)
+- Revisión automática de PRs: [`.coderabbit.yaml`](./.coderabbit.yaml) + [`.github/coderabbit-instructions.md`](./.github/coderabbit-instructions.md) (requiere la GitHub App de CodeRabbit instalada en el repo).
 
 ## Producción
 

@@ -160,6 +160,7 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | Contrato de props por theme | `src/themes/theme-types.ts` |
 | Tema default (catálogo + ficha) | `src/themes/default/` |
 | Tema Luxury (piloto `deo`) | `src/themes/luxury/` |
+| Tema Beige | `src/themes/beige/` |
 | Contenido marketing del tema | `src/lib/public-site-content.ts` (lee `getResolvedSiteConfig` + env `SITE_*`) |
 | Páginas legales | `src/app/terminos/`, `cookies/`, `aviso-de-privacidad/` + `*-legal-page.tsx` por theme |
 | Admin anuncios | `src/app/(admin)/listings/` |
@@ -190,7 +191,7 @@ THEME_REGISTRY[name]                 ← src/themes/theme-registry.ts
 theme.Catalog / theme.ListingDetail / theme.LegalPage
 ```
 
-Las rutas `src/app/page.tsx`, `src/app/inmueble/[slug]/page.tsx` y las legales **solo** hacen fetch / metadata y **delegan** al theme. No `if (theme.name === …)` en `app/`.
+Las rutas `src/app/page.tsx`, `src/app/inmueble/[slug]/page.tsx` y las legales **solo** hacen fetch / metadata y **delegan** al theme. No `if (theme.name === …)` en `app/`. Opciones de catálogo (`pageSize`, `heroGallery`) y errores de ficha viven en `THEME_REGISTRY` / `theme.ListingLoadError`.
 
 **Themes = skins, no dominio.** Cada theme recibe valores ya resueltos (listings, `SiteConfig`, locale, copy) y solo pinta. Inquiry, WhatsApp, specs, href de ficha y labels salen de `src/lib/` + `src/components/`. **Prohibido** copiar `ListingInquiryForm` / `ListingWhatsAppButton` / helpers de specs en `src/themes/<nombre>/`. El look se configura con `classNames`, tokens CSS o markup propio alrededor de esos widgets.
 
@@ -202,8 +203,9 @@ Fuente de verdad: `THEME_DEFINITIONS` en `src/themes/theme-definitions.ts` (keys
 |------------------------|-----------------|-------------|
 | `default` | `default` | Catalog, ListingDetail, LegalPage |
 | `deo` / `luxury` | `luxury` | Catalog, ListingDetail, LegalPage |
+| `beige` | `beige` | Catalog, ListingDetail, LegalPage |
 
-Unknown `layout_key` → `default`.
+Unknown `layout_key` → `default` (nunca beige).
 
 **Legacy:** `deo-catalog-hero.tsx` es de la Fase 3; con `layout_key: deo` **no** se usa (Luxury reemplaza el catálogo). No crear plantillas nuevas solo como hero.
 
@@ -234,7 +236,7 @@ Reglas en template:
 
 - `resolveRequestLocale(?lang, config.locale)` elige idioma activo; fallback inválido → `default_locale`.
 - El selector solo se renderiza si `show_locale_switcher === true` **y** hay ≥2 idiomas en `supported_locales` (`locale-switcher-base.tsx`).
-- Diccionarios: `getDictionary(locale)` en `site-i18n.ts`. Server: `getSiteUi(lang)` o `getLuxuryUi(lang)`.
+- Diccionarios: `getDictionary(locale)` en `site-i18n.ts`. Server: `getSiteUi(lang)`, `getLuxuryUi(lang)` o `getBeigeUi(lang)`.
 - `?lang=en` / `?lang=es` en URLs cuando el idioma está en `supported_locales` (con o sin selector visible).
 
 ### Tema `default` (estructura)
@@ -251,6 +253,17 @@ Reglas en template:
 - CSS: `[data-site-theme="luxury"]`, variables `--luxury-*` (`luxuryThemeCssVars()` en `globals.css`).
 - Legales: `theme.LegalPage` (registrado como `LuxuryLegalPage`).
 - Gaps API: [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md).
+
+### Tema `beige`
+
+- `src/themes/beige/` — catálogo (hero collage, buscador, residencial, ubicaciones, comercial, FAQ) y ficha con galería, inquiry y WhatsApp.
+- i18n: mismo `site-i18n.ts`; `getBeigeUi(lang)`.
+- CSS encapsulado en `[data-site-theme="beige"]` (`globals.css`): marfil/beige/oliva; Playfair Display + Plus Jakarta Sans vía `next/font`.
+- Catálogo: `theme.catalog.pageSize` / `heroGallery` (sin `if (theme.name)` en `app/`).
+- Legales: `theme.LegalPage` (registrado como `BeigeLegalPage`).
+- Widgets compartidos: `ListingInquiryForm`, `ListingWhatsAppButton`, `ListingShareButton`, `ListingPhotoGallery`, `publicListingCardModel`.
+- Admin/login: `isStyledSiteLayout` es true (cualquier `layout_key` distinto de `default`).
+- Para que Ops pueda elegir `beige`, el API debe aceptar `SiteConfig::LAYOUT_KEYS` con esa clave (cambio coordinado fuera de este repo).
 
 ### Admin / login vs theme público
 
@@ -277,7 +290,7 @@ Helpers: `isStyledSiteLayout(layoutKey)`, `SiteLayoutVariantProvider`, `useSiteL
 | `getResolvedSiteConfig()` | Server Components |
 | `resolveSiteThemeFromConfig()` | Elegir theme (legales, etc.) |
 | `getPublicSiteContent()` | Copy/marketing del theme (server) |
-| `getSiteUi(lang)` / `getLuxuryUi(lang)` | Locale + diccionario en Server Components |
+| `getSiteUi(lang)` / `getLuxuryUi(lang)` / `getBeigeUi(lang)` | Locale + diccionario en Server Components |
 | `pickSiteBranding(config)` | Marca en `"use client"` |
 | `site-config-env.ts` | `ACCOUNT_ID`, `listingPublicUrl` — solo servidor |
 
@@ -380,8 +393,8 @@ Clonar **default**, no Luxury, como scaffold de un theme fino.
 |-----|-----|
 | Este `AGENTS.md` | **Única fuente de verdad** de arquitectura, capas, themes y playbook |
 | [`README.md`](README.md) | Deploy / quickstart — no duplicar arquitectura aquí |
-| [`.github/workflows/copilot-review.yml`](.github/workflows/copilot-review.yml) | Pide a Copilot revisar al abrir un PR y en cada commit |
-| [`.github/copilot-instructions.md`](.github/copilot-instructions.md) | Cómo Copilot revisa (lee este `AGENTS.md`) |
+| [`.github/coderabbit-instructions.md`](.github/coderabbit-instructions.md) | Cómo CodeRabbit revisa (lee este `AGENTS.md`) |
+| [`.coderabbit.yaml`](.coderabbit.yaml) | Auto-review CodeRabbit (`commit_status`, idioma, path instructions); requiere la GitHub App instalada |
 | [`docs/new-theme-agent-prompt.template.txt`](docs/new-theme-agent-prompt.template.txt) | Plantilla de brief por theme; copiar y rellenar `<slug>` / `<ThemeName>` |
 | [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md) | Gaps API, env `SITE_*` |
 | [`docs/architecture/luxury-layout-implementation.md`](docs/architecture/luxury-layout-implementation.md) | Contexto histórico — no fuente del registry actual |

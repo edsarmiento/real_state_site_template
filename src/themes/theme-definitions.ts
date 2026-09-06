@@ -8,6 +8,7 @@
 export const THEME_DEFINITIONS = [
   { name: "default", layoutKeys: ["default"] },
   { name: "luxury", layoutKeys: ["deo", "luxury"] },
+  { name: "beige", layoutKeys: ["beige"] },
 ] as const;
 
 export type SiteThemeName = (typeof THEME_DEFINITIONS)[number]["name"];

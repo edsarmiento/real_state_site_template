@@ -4,21 +4,15 @@ import { publicApiFetch } from "@/lib/public-api-fetch";
 import {
   formatRentCents,
   listingPriceSuffix,
-  OFFER_TYPE_LABEL,
   parseOfferType,
   type PublicListingDetail,
 } from "@/lib/listing-types";
-import { getPublicSiteContent } from "@/lib/public-site-content";
 import { getSessionContext } from "@/lib/session-context";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
-import { fillTemplate, getDictionary, resolveRequestLocale } from "@/lib/site-i18n";
+import { getDictionary, resolveRequestLocale } from "@/lib/site-i18n";
 import { firstSearchParam } from "@/lib/search-params";
-import { LuxuryShell } from "@/themes/luxury/luxury-shell";
-import {
-  resolveSiteThemeFromConfig,
-  themeNameFromLayoutKey,
-} from "@/themes/resolve-site-theme";
+import { resolveSiteThemeFromConfig } from "@/themes/resolve-site-theme";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -36,17 +30,26 @@ function listingShareImage(
   return new URL(raw.startsWith("/") ? raw : `/${raw}`, siteOrigin).href;
 }
 
-function listingShareDescription(listing: PublicListingDetail): string {
+function listingShareDescription(
+  listing: PublicListingDetail,
+  locale: "es" | "en",
+): string {
+  const dict = getDictionary(locale);
   const offerType = parseOfferType(listing.offer_type);
   const price = formatRentCents(listing.rent_cents, listing.currency);
-  const suffix = listingPriceSuffix(offerType);
+  const suffix =
+    offerType === "rent" ? dict.listing.perMonth : listingPriceSuffix(offerType);
   const priceLabel = suffix ? `${price}${suffix}` : price;
-  const parts = [
-    `${OFFER_TYPE_LABEL[offerType]} · ${priceLabel}`,
+  const offerLabel =
+    offerType === "sale" ? dict.listing.sale : dict.listing.rent;
+  return [
+    `${offerLabel} · ${priceLabel}`,
     listing.location_label || null,
     listing.description?.trim() || null,
-  ].filter(Boolean);
-  return parts.join(" · ").slice(0, 200);
+  ]
+    .filter(Boolean)
+    .join(" · ")
+    .slice(0, 200);
 }
 
 export async function generateMetadata({
@@ -56,47 +59,22 @@ export async function generateMetadata({
   const { slug } = await params;
   const lang = firstSearchParam((await searchParams).lang);
   const config = await getResolvedSiteConfig();
-  const themeName = themeNameFromLayoutKey(config.layoutKey);
+  const locale = resolveRequestLocale(lang, config.locale);
+  const dict = getDictionary(locale);
   const path = `/inmueble/${encodeURIComponent(slug)}`;
   const result = await publicApiFetch<PublicListingDetail>(
     `/api/public/listings/${encodeURIComponent(slug)}`,
   );
 
   if (!result.ok) {
-    if (themeName === "luxury") {
-      const content = await getPublicSiteContent();
-      const locale = resolveRequestLocale(lang, content.locale);
-      return { title: getDictionary(locale).listing.metaFallback };
-    }
-    return { title: "Inmueble" };
+    return { title: dict.listing.metaFallback };
   }
 
   const listing = result.data;
   const title = listing.title;
   const image = listingShareImage(listing, config.siteOrigin);
-  let description = listingShareDescription(listing);
-  let ogLocale = "es_MX";
-
-  if (themeName === "luxury") {
-    const content = await getPublicSiteContent();
-    const locale = resolveRequestLocale(lang, content.locale);
-    const dict = getDictionary(locale);
-    ogLocale = locale === "en" ? "en_US" : "es_MX";
-    const offerType = parseOfferType(listing.offer_type);
-    const price = formatRentCents(listing.rent_cents, listing.currency);
-    const suffix = offerType === "rent" ? dict.listing.perMonth : "";
-    const priceLabel = suffix ? `${price}${suffix}` : price;
-    const offerLabel =
-      offerType === "sale" ? dict.listing.sale : dict.listing.rent;
-    description = [
-      `${offerLabel} · ${priceLabel}`,
-      listing.location_label || null,
-      listing.description?.trim() || null,
-    ]
-      .filter(Boolean)
-      .join(" · ")
-      .slice(0, 200);
-  }
+  const description = listingShareDescription(listing, locale);
+  const ogLocale = locale === "en" ? "en_US" : "es_MX";
 
   return {
     title,
@@ -133,17 +111,9 @@ export default async function ListingDetailPage({
 
   if (result.status === 404) notFound();
   if (!result.ok) {
-    if (theme.name === "luxury") {
-      const content = await getPublicSiteContent();
-      const locale = resolveRequestLocale(lang, content.locale);
-      const dict = getDictionary(locale);
-      return (
-        <LuxuryShell lang={lang}>
-          <p className="luxury-state luxury-state--error">
-            {fillTemplate(dict.results.listingError, { status: result.status })}
-          </p>
-        </LuxuryShell>
-      );
+    if (theme.ListingLoadError) {
+      const ListingLoadError = theme.ListingLoadError;
+      return <ListingLoadError status={result.status} lang={lang} />;
     }
     return (
       <div className="min-h-screen bg-zinc-50 px-4 py-16 text-sm text-zinc-600">
