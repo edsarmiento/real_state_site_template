@@ -1,0 +1,50 @@
+# Requests CodeRabbit review on every new PR and on each new commit.
+# Requires the CodeRabbit GitHub App installed on this repo.
+# Review guidance: AGENTS.md + .github/coderabbit-instructions.md + .coderabbit.yaml
+# CodeRabbit posts a commit check (pending → success) when reviews.commit_status is true.
+name: CodeRabbit review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: coderabbit-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  request-review:
+    name: Request CodeRabbit review
+    runs-on: ubuntu-latest
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      github.actor != 'coderabbitai[bot]' &&
+      github.event.pull_request.draft == false
+    steps:
+      - name: Request CodeRabbit via PR comment
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.payload.pull_request.number;
+            const action = context.payload.action;
+
+            // Full pass on open/reopen/undraft; incremental on new commits.
+            const body =
+              action === "synchronize"
+                ? "@coderabbitai review"
+                : "@coderabbitai full review";
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body,
+            });

@@ -1,0 +1,25 @@
+# https://docs.coderabbit.ai/guides/configure-coderabbit
+language: es-ES
+reviews:
+  profile: assertive
+  high_level_summary: true
+  poem: false
+  review_status: true
+  # Pending check while reviewing → green when finished (CodeRabbit-native gate).
+  commit_status: true
+  request_changes_workflow: false
+  # Triggered by .github/workflows/coderabbit-review.yml (@coderabbitai …).
+  auto_review:
+    enabled: false
+    drafts: false
+  path_instructions:
+    - path: "**"
+      instructions: |
+        Antes de comentar, lee AGENTS.md en la raíz del repo (única fuente de
+        arquitectura) y .github/coderabbit-instructions.md.
+        Deja comentarios de review en español.
+        No inventes un modelo distinto al de AGENTS.md / THEME_REGISTRY.
+chat:
+  auto_reply: true
+knowledge_base:
+  opt_out: false

@@ -393,8 +393,9 @@ Clonar **default**, no Luxury, como scaffold de un theme fino.
 |-----|-----|
 | Este `AGENTS.md` | **Única fuente de verdad** de arquitectura, capas, themes y playbook |
 | [`README.md`](README.md) | Deploy / quickstart — no duplicar arquitectura aquí |
-| [`.github/workflows/copilot-review.yml`](.github/workflows/copilot-review.yml) | Pide a Copilot revisar al abrir un PR y en cada commit |
-| [`.github/copilot-instructions.md`](.github/copilot-instructions.md) | Cómo Copilot revisa (lee este `AGENTS.md`) |
+| [`.github/workflows/coderabbit-review.yml`](.github/workflows/coderabbit-review.yml) | Pide a CodeRabbit revisar al abrir un PR y en cada commit |
+| [`.github/coderabbit-instructions.md`](.github/coderabbit-instructions.md) | Cómo CodeRabbit revisa (lee este `AGENTS.md`) |
+| [`.coderabbit.yaml`](.coderabbit.yaml) | Config CodeRabbit (`commit_status`, idioma, path instructions) |
 | [`docs/new-theme-agent-prompt.template.txt`](docs/new-theme-agent-prompt.template.txt) | Plantilla de brief por theme; copiar y rellenar `<slug>` / `<ThemeName>` |
 | [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md) | Gaps API, env `SITE_*` |
 | [`docs/architecture/luxury-layout-implementation.md`](docs/architecture/luxury-layout-implementation.md) | Contexto histórico — no fuente del registry actual |
