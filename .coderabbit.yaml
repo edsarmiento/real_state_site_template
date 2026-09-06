@@ -21,7 +21,7 @@ reviews:
         Antes de comentar, lee AGENTS.md en la raíz del repo (única fuente de
         arquitectura) y .github/coderabbit-instructions.md.
         Deja comentarios de review en español.
-        No inventes un modelo distinto al de AGENTS.md / THEME_REGISTRY.
+        No inventes un modelo distinto al de AGENTS.md / THEME_REGISTRY
 chat:
   auto_reply: true
 knowledge_base:
