@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { NotificationRoot } from "@/components/notification-root";
-import { SiteBrandingStyles } from "@/components/site-branding-styles";
 import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import "./globals.css";
 
@@ -48,9 +47,6 @@ export default async function RootLayout({
       className={`${geistSans.variable} h-full antialiased`}
       data-site-layout={config.layoutKey}
     >
-      <head>
-        <SiteBrandingStyles />
-      </head>
       <body className="min-h-full">
         <NotificationRoot>{children}</NotificationRoot>
       </body>

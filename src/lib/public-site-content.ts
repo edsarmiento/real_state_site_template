@@ -25,7 +25,6 @@ export type BrandContent = {
   name: string;
   tagline: string;
   logoUrl: string | null;
-  primaryColor: string | null;
   secondaryColor: string | null;
   accentColor: string | null;
   surfaceColor: string | null;
@@ -741,7 +740,6 @@ function buildPublicSiteContent(config: ResolvedSiteConfig): PublicSiteContent {
       name,
       tagline,
       logoUrl: config.siteLogoUrl,
-      primaryColor: config.primaryColor,
       secondaryColor: parseCssHexColor(process.env.SITE_SECONDARY_COLOR),
       accentColor: parseCssHexColor(process.env.SITE_ACCENT_COLOR),
       surfaceColor: parseCssHexColor(process.env.SITE_SURFACE_COLOR),
@@ -911,9 +909,7 @@ export type LuxuryThemeCssVars = {
 export function luxuryThemeCssVars(
   content: PublicSiteContent,
 ): LuxuryThemeCssVars {
-  const palette = resolveLuxuryAccentTokens(
-    content.brand.accentColor ?? content.brand.primaryColor,
-  );
+  const palette = resolveLuxuryAccentTokens(content.brand.accentColor);
   const surface = contrastSafeSurface(content.brand.surfaceColor);
   const surfaceAlt = contrastSafeSurface(content.brand.secondaryColor);
 

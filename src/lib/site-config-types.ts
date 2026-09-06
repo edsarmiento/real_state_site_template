@@ -7,7 +7,6 @@ export type SiteConfigBranding = {
   site_name: string;
   tagline: string;
   logo_url: string | null;
-  primary_color: string | null;
   show_powered_by: boolean;
   show_share_button?: boolean;
   default_locale?: string;
@@ -36,7 +35,6 @@ export type ResolvedSiteConfig = {
   siteName: string;
   siteTagline: string;
   siteLogoUrl: string | null;
-  primaryColor: string | null;
   showPoweredBy: boolean;
   showShareButton: boolean;
   siteOrigin: string;
@@ -47,5 +45,5 @@ export type ResolvedSiteConfig = {
 
 export type SiteBranding = Pick<
   ResolvedSiteConfig,
-  "siteName" | "siteTagline" | "siteLogoUrl" | "primaryColor" | "showPoweredBy"
+  "siteName" | "siteTagline" | "siteLogoUrl" | "showPoweredBy"
 >;

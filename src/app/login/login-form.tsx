@@ -13,7 +13,6 @@ export function LoginForm({
   siteName,
   siteTagline,
   siteLogoUrl,
-  primaryColor,
   showPoweredBy,
   styledLayout = true,
 }: SiteBranding & { styledLayout?: boolean }) {
@@ -75,7 +74,6 @@ export function LoginForm({
       siteName={siteName}
       siteTagline={siteTagline}
       siteLogoUrl={siteLogoUrl}
-      primaryColor={primaryColor}
       showPoweredBy={showPoweredBy}
       styledLayout={styledLayout}
     >

@@ -330,7 +330,6 @@ export type SiteConfigV1 = {
     name: string;
     tagline: string;
     logoUrl: string | null;
-    primaryColor?: string;
     accentColor?: string;
   };
   header: {

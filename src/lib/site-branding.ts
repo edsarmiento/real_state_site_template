@@ -5,7 +5,6 @@ export function pickSiteBranding(config: ResolvedSiteConfig): SiteBranding {
     siteName: config.siteName,
     siteTagline: config.siteTagline,
     siteLogoUrl: config.siteLogoUrl,
-    primaryColor: config.primaryColor,
     showPoweredBy: config.showPoweredBy,
   };
 }

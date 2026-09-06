@@ -47,7 +47,6 @@ function mergeApiPayload(
     siteName: branding.site_name?.trim() || env.siteName,
     siteTagline: branding.tagline?.trim() || env.siteTagline,
     siteLogoUrl: branding.logo_url?.trim() || env.siteLogoUrl,
-    primaryColor: branding.primary_color?.trim() || env.primaryColor,
     showPoweredBy: branding.show_powered_by ?? env.showPoweredBy,
     showShareButton: branding.show_share_button ?? env.showShareButton,
     siteOrigin: api.public_url?.trim() || env.siteOrigin,

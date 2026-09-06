@@ -39,9 +39,6 @@ function normalizeSiteOrigin(raw: string): string {
 
 /** Env-only config (fallback when API has no SiteConfig). */
 export function envSiteConfig(): ResolvedSiteConfig {
-  const primaryFromEnv =
-    process.env.NEXT_PUBLIC_PRIMARY_COLOR?.trim() || null;
-
   return {
     accountId: accountId(),
     layoutKey: "default",
@@ -49,7 +46,6 @@ export function envSiteConfig(): ResolvedSiteConfig {
     siteTagline:
       process.env.NEXT_PUBLIC_SITE_TAGLINE?.trim() || DEFAULT_SITE_TAGLINE,
     siteLogoUrl: process.env.NEXT_PUBLIC_SITE_LOGO_URL?.trim() || null,
-    primaryColor: primaryFromEnv,
     showPoweredBy: process.env.NEXT_PUBLIC_SHOW_POWERED_BY !== "false",
     showShareButton: process.env.NEXT_PUBLIC_SHOW_SHARE_BUTTON !== "false",
     siteOrigin: envSiteOrigin(),

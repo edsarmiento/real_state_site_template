@@ -46,7 +46,6 @@ export async function DefaultCatalog({
         siteName={ui.config.siteName}
         siteTagline={ui.config.siteTagline}
         siteLogoUrl={ui.config.siteLogoUrl}
-        primaryColor={ui.config.primaryColor}
         showPoweredBy={ui.config.showPoweredBy}
         search={
           <PublicCatalogSearch

@@ -120,12 +120,12 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | Fuente | Cuándo |
 |--------|--------|
 | **API** (`SiteConfig`) | Hay registro; prioridad sobre env |
-| **Env** (`NEXT_PUBLIC_SITE_*`, `NEXT_PUBLIC_PRIMARY_COLOR`) | Sin registro, fetch fallido, o campos vacíos en `branding` |
+| **Env** (`NEXT_PUBLIC_SITE_*`) | Sin registro, fetch fallido, o campos vacíos en `branding` |
 | **Deploy** (`ACCOUNT_ID`, `API_URL`) | Siempre por proyecto Vercel; no viene del API |
 
 **Política de deploy:** guardar `SiteConfig` en Ops antes de desplegar. En Vercel solo `ACCOUNT_ID` + `API_URL`; no duplicar marca en env.
 
-**Campos relevantes:** `layout_key`, `public_url` (origen para metadata, WhatsApp, links), `branding` (`site_name`, `tagline`, `logo_url`, `primary_color`, `show_powered_by`, `default_locale`, `supported_locales`, `show_locale_switcher`), y `locale` en la respuesta JSON (`default_locale`, `supported_locales`, `show_locale_switcher`).
+**Campos relevantes:** `layout_key`, `public_url` (origen para metadata, WhatsApp, links), `branding` (`site_name`, `tagline`, `logo_url`, `show_powered_by`, `default_locale`, `supported_locales`, `show_locale_switcher`), y `locale` en la respuesta JSON (`default_locale`, `supported_locales`, `show_locale_switcher`).
 
 **Sin redeploy** al cambiar marca/layout/dominio en Ops. **Sí redeploy** si cambia `ACCOUNT_ID` o `API_URL`.
 
@@ -139,7 +139,6 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | Resolver API + env | `src/lib/resolved-site-config.ts` |
 | Solo env / `ACCOUNT_ID` | `src/lib/site-config-env.ts` |
 | Props de marca (client) | `src/lib/site-branding.ts` → `pickSiteBranding()` |
-| CSS `--site-primary` | `src/components/site-branding-styles.tsx` (en `app/layout.tsx`) |
 | Layouts de catálogo | `src/components/layouts/` |
 | Variante layout (styled vs estructura) | `src/lib/site-layout-variant.ts`, `src/components/site-layout-variant-provider.tsx` |
 | Header / footer público | `src/components/site-header.tsx`, `site-footer.tsx` |
@@ -243,7 +242,7 @@ Reglas en template:
 - Catálogo: `DefaultCatalog` → `CatalogHero` (solo `layout_key: default` en producción hoy).
 - Ficha: `DefaultListingDetail` — galería, `listingPublicSpecsLocalized`, `ListingInquiryForm`, `ListingWhatsAppButton`, `listingPublicUrl` desde `config.siteOrigin`.
 - i18n vía `getSiteUi` + `site-i18n.ts` (mismo contrato que Luxury para locale).
-- **`layout_key: default`:** sin `--site-primary`; paleta zinc/blanco.
+- **`layout_key: default`:** paleta zinc/blanco.
 
 ### Tema `luxury` (plantilla premium, piloto `deo`)
 
@@ -259,7 +258,6 @@ El theme público **no** redefine el admin. Acentos en login y `/listings`:
 
 | | `layout_key: default` | `layout_key: deo` (styled) |
 |---|----------------------|----------------------------|
-| **`--site-primary`** | No inyectado | Sí, desde `branding.primary_color` |
 | **Login** | Tarjeta neutra | Banda con gradiente en `AuthPageShell` |
 | **Admin nav** | Borde zinc | Pill `bg-zinc-900` |
 | **Client** | `useSiteLayoutStyled()` → `false` | `true` |
@@ -269,8 +267,8 @@ Helpers: `isStyledSiteLayout(layoutKey)`, `SiteLayoutVariantProvider`, `useSiteL
 ### Marca y color (todos los themes)
 
 - Logo y nombre: `getResolvedSiteConfig()` o `pickSiteBranding()` en client.
-- Acentos: `var(--site-primary, #fallback)` en styled; Luxury también `--luxury-*`.
-- Tailwind para estructura; color de marca por variables cuando Ops lo controla.
+- Luxury: acentos `--luxury-*` (defaults / `SITE_ACCENT_COLOR` en deploy).
+- Tailwind para estructura.
 
 ### Server vs client
 
@@ -300,7 +298,7 @@ Usa este flujo cuando pidan **una plantilla nueva** (visual distinta de default/
 - Idiomas: `supported_locales`, `default_locale` y si el visitante ve selector (`show_locale_switcher`) — todo desde Ops, no inferir en código.
 
 **Marca (prioridad Ops)**
-- Color primario, acento, superficie; logo; tipografías; `show_powered_by`.
+- Logo; tipografías; `show_powered_by`. Acentos luxury vía CSS/`SITE_ACCENT_COLOR` en deploy (no Ops).
 
 **Catálogo `/`**
 - Hero (imagen, título, subtítulo, CTAs); secciones extra; estilo de cards; barra admin.
@@ -422,7 +420,7 @@ Clonar **default**, no Luxury, como scaffold de un theme fino.
 ### Estilos y UI
 
 - **Tailwind CSS v4** (`globals.css` + clases en JSX). Sin CSS modules salvo necesidad excepcional.
-- Paleta base en `:root` (`globals.css`); marca dinámica con `--site-primary` (ver sección Layouts).
+- Paleta base en `:root` (`globals.css`). Luxury usa `--luxury-*`.
 - Reutilizar `components/ui/*` (Button, TextField, Card, ErrorBanner) antes de inventar estilos nuevos.
 - Diseño responsive: mobile-first (`sm:`, `md:`). Mantener contraste legible en heroes oscuros.
 - **Accesibilidad básica:** `alt` en imágenes de contenido, `aria-hidden` en decorativos, labels en campos de formulario.

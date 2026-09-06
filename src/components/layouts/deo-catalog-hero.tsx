@@ -12,7 +12,7 @@ export function DeoCatalogHero({ siteName, siteTagline, search }: Props) {
         className="pointer-events-none absolute inset-0 opacity-30"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% -10%, var(--site-primary, #b45309), transparent)",
+            "radial-gradient(ellipse 80% 60% at 50% -10%, #b45309, transparent)",
         }}
         aria-hidden
       />
