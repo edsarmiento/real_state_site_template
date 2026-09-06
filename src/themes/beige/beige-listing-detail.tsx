@@ -1,8 +1,7 @@
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ListingInquiryForm } from "@/components/listing-inquiry-form";
-import { ListingShareButton } from "@/components/listing-share-button";
 import { ListingWhatsAppButton } from "@/components/listing-whatsapp-button";
-import { parseListingDescriptionForDisplay } from "@/lib/listing-description";
 import {
   listingPublicSpecsLocalized,
   parseOfferType,
@@ -16,6 +15,8 @@ import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeGallery } from "@/themes/beige/beige-gallery";
 import { BeigeHeader } from "@/themes/beige/beige-header";
+import { BeigeReveal } from "@/themes/beige/beige-reveal";
+import { BeigeShareButton } from "@/themes/beige/beige-share-button";
 import {
   BeigeIconArrowLeft,
   BeigeIconBath,
@@ -28,6 +29,8 @@ import {
 } from "@/themes/beige/beige-icons";
 import { BeigeShell } from "@/themes/beige/beige-shell";
 import { formatBeigePriceParts, getBeigeUi } from "@/themes/beige/beige-ui";
+
+const SPEC_STAGGER_MS = [0, 80, 160, 240] as const;
 
 export async function BeigeListingDetail({
   listing,
@@ -42,6 +45,7 @@ export async function BeigeListingDetail({
   const isSale = offerType === "sale";
   const agency = listing.agency_name || content.brand.name;
   const hasMap = listing.latitude != null && listing.longitude != null;
+  const hasPlace = Boolean(listing.address_label) || hasMap;
   const backHref = localizedHref("/#catalogo", locale, null, defaultLocale);
   const listingUrl = listingPublicUrl(
     listing.slug,
@@ -58,9 +62,7 @@ export async function BeigeListingDetail({
     listing.currency,
     locale,
   );
-  const descriptionBlocks = parseListingDescriptionForDisplay(
-    listing.description ?? "",
-  );
+  const description = listing.description?.trim() ?? "";
 
   return (
     <BeigeShell floatRaised lang={lang}>
@@ -68,13 +70,19 @@ export async function BeigeListingDetail({
 
       <main className="beige-detail">
         <div className="beige-shell beige-detail__wrap">
-          <Link href={backHref} className="beige-detail__back">
-            <BeigeIconArrowLeft className="h-4 w-4" />
-            {dict.listing.back}
-          </Link>
+          <BeigeReveal variant="up" durationMs={700}>
+            <Link href={backHref} className="beige-detail__back">
+              <BeigeIconArrowLeft className="h-4 w-4" />
+              {dict.listing.back}
+            </Link>
+          </BeigeReveal>
 
-          <div className="beige-detail__grid">
-            <div className="beige-detail__main">
+          <section className="beige-detail__showcase">
+            <BeigeReveal
+              variant="left-zoom"
+              durationMs={950}
+              className="beige-detail__gallery"
+            >
               <BeigeGallery
                 title={listing.title}
                 photos={photos}
@@ -82,145 +90,14 @@ export async function BeigeListingDetail({
                 offerLabel={isSale ? dict.listing.sale : dict.listing.rent}
                 dict={dict}
               />
+            </BeigeReveal>
 
-              <div className="beige-detail__panel">
-                <div>
-                  <p className="beige-eyebrow">
-                    {listing.location_label || typeLabel}
-                  </p>
-                  <h1 className="beige-detail__title">
-                    {displayListingTitle(listing.title) || listing.title}
-                  </h1>
-                  {showShareButton ? (
-                    <div className="beige-detail__share">
-                      <ListingShareButton
-                        url={listingUrl}
-                        title={listing.title}
-                        label={dict.listing.share}
-                        copyLabel={dict.listing.shareCopy}
-                        copiedLabel={dict.listing.shareCopied}
-                        failedLabel={dict.listing.shareFailed}
-                        closeLabel={dict.listing.shareClose}
-                        className="beige-share-button"
-                      />
-                    </div>
-                  ) : null}
-                  <p className="beige-detail__price">
-                    {price.amount}{" "}
-                    <span className="beige-detail__price-unit">
-                      {price.currency}
-                      {offerType === "rent" ? ` ${dict.listing.perMonth}` : ""}
-                    </span>
-                  </p>
-                </div>
-
-                {specs.length > 0 ? (
-                  <dl className="beige-detail__specs">
-                    {specs.map((spec) => (
-                      <div key={spec.key} className="beige-detail__spec">
-                        <dt>
-                          {spec.key === "bedrooms" ? (
-                            <BeigeIconBed className="beige-detail__spec-icon" />
-                          ) : spec.key === "bathrooms" ? (
-                            <BeigeIconBath className="beige-detail__spec-icon" />
-                          ) : spec.key === "land" || spec.key === "built" ? (
-                            <BeigeIconMaximize className="beige-detail__spec-icon" />
-                          ) : (
-                            <BeigeIconHome className="beige-detail__spec-icon" />
-                          )}
-                          {dict.listing.specs[spec.key]}
-                        </dt>
-                        <dd>{spec.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                ) : null}
-
-                {descriptionBlocks.length > 0 ? (
-                  <section className="beige-detail__copy">
-                    <h2>{dict.listing.description}</h2>
-                    <div className="beige-detail__prose">
-                      {descriptionBlocks.map((block, index) => {
-                        if (block.type === "paragraph") {
-                          return <p key={`p-${index}`}>{block.text}</p>;
-                        }
-                        if (block.type === "subheading") {
-                          return (
-                            <p key={`h-${index}`} className="beige-detail__subhead">
-                              {block.text}
-                            </p>
-                          );
-                        }
-                        if (block.type === "callout") {
-                          return (
-                            <p key={`c-${index}`} className="beige-detail__callout">
-                              {block.text}
-                            </p>
-                          );
-                        }
-                        if (block.type === "list") {
-                          return (
-                            <ul key={`l-${index}`}>
-                              {block.items.map((item) => (
-                                <li key={item}>{item}</li>
-                              ))}
-                            </ul>
-                          );
-                        }
-                        return (
-                          <p key={`t-${index}`} className="beige-detail__tags">
-                            {block.tags.map((tag) => (
-                              <span key={tag}>{tag}</span>
-                            ))}
-                          </p>
-                        );
-                      })}
-                    </div>
-                  </section>
-                ) : null}
-
-                {listing.address_label || hasMap ? (
-                  <section className="beige-detail__place">
-                    <div className="beige-detail__place-head">
-                      <h2>{dict.listing.location}</h2>
-                      {listing.latitude != null && listing.longitude != null ? (
-                        <a
-                          href={googleMapsSearchUrl(
-                            listing.latitude,
-                            listing.longitude,
-                          )}
-                          className="beige-soft-btn"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <BeigeIconExternal className="h-3.5 w-3.5" />
-                          {dict.listing.viewMap}
-                        </a>
-                      ) : null}
-                    </div>
-                    <div className="beige-detail__address">
-                      <span className="beige-detail__address-icon" aria-hidden>
-                        <BeigeIconMapPin className="h-5 w-5" />
-                      </span>
-                      <div>
-                        <p className="beige-detail__agency">{agency}</p>
-                        {listing.address_label ? (
-                          <p>{listing.address_label}</p>
-                        ) : null}
-                      </div>
-                    </div>
-                  </section>
-                ) : null}
-
-                <p className="beige-detail__listed">
-                  {dict.listing.listedBy}:{" "}
-                  <strong>{agency}</strong>
-                </p>
-              </div>
-            </div>
-
-            <aside id="inquiry" className="beige-detail__aside">
-              <div className="beige-detail__inquiry">
+            <BeigeReveal
+              variant="right"
+              durationMs={900}
+              className="beige-detail__aside"
+            >
+              <aside id="inquiry" className="beige-detail__inquiry">
                 <div>
                   <h2>
                     {isSale
@@ -266,8 +143,153 @@ export async function BeigeListingDetail({
                     submit: "beige-btn beige-form-submit",
                   }}
                 />
+              </aside>
+            </BeigeReveal>
+          </section>
+
+          <section className="beige-detail__identity-row">
+            <BeigeReveal
+              variant="up"
+              durationMs={800}
+              className="beige-detail__identity"
+            >
+              <div className="beige-detail__identity-head">
+                <p className="beige-eyebrow">
+                  {listing.location_label || typeLabel}
+                </p>
+                {showShareButton ? (
+                  <BeigeShareButton
+                    title={listing.title}
+                    url={listingUrl}
+                    shareLabel={dict.listing.share}
+                    heading={dict.listing.shareTitle}
+                    copyLabel={dict.listing.shareCopy}
+                    copiedLabel={dict.listing.shareCopied}
+                    failedLabel={dict.listing.shareFailed}
+                    closeLabel={dict.listing.shareClose}
+                  />
+                ) : null}
               </div>
-            </aside>
+              <h1 className="beige-detail__title">
+                {displayListingTitle(listing.title) || listing.title}
+              </h1>
+            </BeigeReveal>
+
+            <BeigeReveal
+              variant="zoom"
+              durationMs={850}
+              className="beige-detail__price-panel"
+            >
+              <p className="beige-detail__price">
+                {price.amount}{" "}
+                <span className="beige-detail__price-unit">
+                  {price.currency}
+                  {offerType === "rent" ? ` ${dict.listing.perMonth}` : ""}
+                </span>
+              </p>
+            </BeigeReveal>
+          </section>
+
+          <div className="beige-detail__bento">
+            {specs.length > 0 ? (
+              <dl className="beige-detail__specs">
+                {specs.map((spec, index) => (
+                  <div
+                    key={spec.key}
+                    className={
+                      index === 1 || index === 2
+                        ? "beige-detail__spec beige-detail__spec--tint"
+                        : "beige-detail__spec"
+                    }
+                    data-beige-reveal="up"
+                    style={
+                      {
+                        "--beige-delay": `${SPEC_STAGGER_MS[index] ?? 0}ms`,
+                        "--beige-duration": "800ms",
+                      } as CSSProperties
+                    }
+                  >
+                    <dt>
+                      {spec.key === "bedrooms" ? (
+                        <BeigeIconBed className="beige-detail__spec-icon" />
+                      ) : spec.key === "bathrooms" ? (
+                        <BeigeIconBath className="beige-detail__spec-icon" />
+                      ) : spec.key === "land" || spec.key === "built" ? (
+                        <BeigeIconMaximize className="beige-detail__spec-icon" />
+                      ) : (
+                        <BeigeIconHome className="beige-detail__spec-icon" />
+                      )}
+                      {dict.listing.specs[spec.key]}
+                    </dt>
+                    <dd>{spec.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+
+            {description ? (
+              <BeigeReveal
+                variant="up"
+                durationMs={800}
+                className="beige-detail__copy"
+              >
+                <section>
+                  <h2>{dict.listing.description}</h2>
+                  <div
+                    className="beige-detail__prose"
+                    data-beige-listing-description
+                  >
+                    {description}
+                  </div>
+                </section>
+              </BeigeReveal>
+            ) : null}
+
+            <BeigeReveal
+              variant="right"
+              durationMs={850}
+              className={
+                description
+                  ? "beige-detail__place"
+                  : "beige-detail__place beige-detail__place--wide"
+              }
+            >
+              {hasPlace ? (
+                <section>
+                  <div className="beige-detail__place-head">
+                    <h2>{dict.listing.location}</h2>
+                    {listing.latitude != null && listing.longitude != null ? (
+                      <a
+                        href={googleMapsSearchUrl(
+                          listing.latitude,
+                          listing.longitude,
+                        )}
+                        className="beige-soft-btn"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <BeigeIconExternal className="h-3.5 w-3.5" />
+                        {dict.listing.viewMap}
+                      </a>
+                    ) : null}
+                  </div>
+                  <div className="beige-detail__address">
+                    <span className="beige-detail__address-icon" aria-hidden>
+                      <BeigeIconMapPin className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <p className="beige-detail__agency">{agency}</p>
+                      {listing.address_label ? (
+                        <p>{listing.address_label}</p>
+                      ) : null}
+                    </div>
+                  </div>
+                </section>
+              ) : null}
+              <p className="beige-detail__listed">
+                {dict.listing.listedBy}: <strong>{agency}</strong>
+              </p>
+            </BeigeReveal>
           </div>
         </div>
       </main>

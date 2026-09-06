@@ -95,7 +95,7 @@ export function BeigeGallery({
           placeholder={dict.listing.noPhoto}
         />
         {offerLabel ? (
-          <span className="beige-card__badge">{offerLabel}</span>
+          <span className="beige-gallery__badge">{offerLabel}</span>
         ) : null}
         {urls.length > 1 ? (
           <>
