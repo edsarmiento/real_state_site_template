@@ -86,3 +86,21 @@ export function catalogPageItems(
   }
   return items;
 }
+
+/** Shared public catalog query params (`?oferta=&city=&page=`). */
+export function catalogSearchParams(input: {
+  oferta: "all" | "sale" | "rent";
+  city: string;
+  propertyType: string;
+  bedrooms: string;
+  page?: number;
+}): Record<string, string> {
+  const params: Record<string, string> = {};
+  if (input.oferta === "sale") params.oferta = "venta";
+  if (input.oferta === "rent") params.oferta = "renta";
+  if (input.city.trim()) params.city = input.city.trim();
+  if (input.propertyType) params.tipo = input.propertyType;
+  if (input.bedrooms) params.recamaras = input.bedrooms;
+  if (input.page && input.page > 1) params.page = String(input.page);
+  return params;
+}

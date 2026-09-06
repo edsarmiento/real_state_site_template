@@ -39,7 +39,7 @@ export async function LuxuryFooter({ lang }: Props) {
             <p className="luxury-footer__brand">{brand.name}</p>
           )}
           <p className="luxury-footer__copy">
-            {process.env.SITE_FOOTER_DESCRIPTION?.trim() || dict.footer.description}
+            {footer.description || dict.footer.description}
           </p>
           {contact.location ? (
             <p className="luxury-footer__meta">{contact.location}</p>

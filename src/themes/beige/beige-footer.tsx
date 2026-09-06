@@ -38,8 +38,7 @@ export async function BeigeFooter({ lang }: Props) {
               <p className="beige-footer__brand">{brand.name}</p>
             )}
             <p className="beige-footer__description">
-              {process.env.SITE_FOOTER_DESCRIPTION?.trim() ||
-                dict.footer.description}
+              {footer.description || dict.footer.description}
             </p>
             {contact.location ? (
               <p className="beige-footer__location">{contact.location}</p>

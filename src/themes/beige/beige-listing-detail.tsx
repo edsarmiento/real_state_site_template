@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ListingInquiryForm } from "@/components/listing-inquiry-form";
+import { ListingPhotoGallery } from "@/components/listing-photo-gallery";
+import { ListingShareButton } from "@/components/listing-share-button";
 import { ListingWhatsAppButton } from "@/components/listing-whatsapp-button";
 import {
   listingPublicSpecsLocalized,
@@ -13,10 +15,8 @@ import { localizedHref } from "@/lib/site-i18n";
 import type { ListingDetailThemeProps } from "@/themes/theme-types";
 import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
-import { BeigeGallery } from "@/themes/beige/beige-gallery";
 import { BeigeHeader } from "@/themes/beige/beige-header";
 import { BeigeReveal } from "@/themes/beige/beige-reveal";
-import { BeigeShareButton } from "@/themes/beige/beige-share-button";
 import {
   BeigeIconArrowLeft,
   BeigeIconBath,
@@ -63,6 +63,7 @@ export async function BeigeListingDetail({
     locale,
   );
   const description = listing.description?.trim() ?? "";
+  const offerLabel = isSale ? dict.listing.sale : dict.listing.rent;
 
   return (
     <BeigeShell floatRaised lang={lang}>
@@ -83,13 +84,17 @@ export async function BeigeListingDetail({
               durationMs={950}
               className="beige-detail__gallery"
             >
-              <BeigeGallery
-                title={listing.title}
-                photos={photos}
-                fallbackUrl={listing.photo_url}
-                offerLabel={isSale ? dict.listing.sale : dict.listing.rent}
-                dict={dict}
-              />
+              <div className="beige-gallery-wrap">
+                <ListingPhotoGallery
+                  title={listing.title}
+                  photos={photos}
+                  fallbackUrl={listing.photo_url}
+                  className="beige-gallery"
+                  styledLayout={false}
+                  labels={dict.listing.gallery}
+                />
+                <span className="beige-gallery__badge">{offerLabel}</span>
+              </div>
             </BeigeReveal>
 
             <BeigeReveal
@@ -158,15 +163,15 @@ export async function BeigeListingDetail({
                   {listing.location_label || typeLabel}
                 </p>
                 {showShareButton ? (
-                  <BeigeShareButton
-                    title={listing.title}
+                  <ListingShareButton
                     url={listingUrl}
-                    shareLabel={dict.listing.share}
-                    heading={dict.listing.shareTitle}
+                    title={listing.title}
+                    label={dict.listing.share}
                     copyLabel={dict.listing.shareCopy}
                     copiedLabel={dict.listing.shareCopied}
                     failedLabel={dict.listing.shareFailed}
                     closeLabel={dict.listing.shareClose}
+                    className="beige-share-button"
                   />
                 ) : null}
               </div>

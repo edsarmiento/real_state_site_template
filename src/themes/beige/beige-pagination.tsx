@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { catalogPageItems } from "@/lib/catalog-pagination";
+import {
+  catalogPageItems,
+  catalogSearchParams,
+} from "@/lib/catalog-pagination";
 import { fillTemplate, localizedHref } from "@/lib/site-i18n";
 import type { CatalogOfferFilter } from "@/lib/listing-types";
 import type { SiteLocale } from "@/lib/site-i18n";
@@ -19,23 +22,6 @@ type Props = {
   defaultLocale: SiteLocale;
 };
 
-export function beigeCatalogSearchParams(input: {
-  oferta: CatalogOfferFilter;
-  city: string;
-  propertyType: string;
-  bedrooms: string;
-  page?: number;
-}): Record<string, string> {
-  const params: Record<string, string> = {};
-  if (input.oferta === "sale") params.oferta = "venta";
-  if (input.oferta === "rent") params.oferta = "renta";
-  if (input.city.trim()) params.city = input.city.trim();
-  if (input.propertyType) params.tipo = input.propertyType;
-  if (input.bedrooms) params.recamaras = input.bedrooms;
-  if (input.page && input.page > 1) params.page = String(input.page);
-  return params;
-}
-
 export function BeigePagination({
   page,
   totalPages,
@@ -54,7 +40,7 @@ export function BeigePagination({
     localizedHref(
       "/",
       locale,
-      beigeCatalogSearchParams({
+      catalogSearchParams({
         oferta,
         city,
         propertyType,

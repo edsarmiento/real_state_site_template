@@ -191,7 +191,7 @@ THEME_REGISTRY[name]                 ← src/themes/theme-registry.ts
 theme.Catalog / theme.ListingDetail / theme.LegalPage
 ```
 
-Las rutas `src/app/page.tsx`, `src/app/inmueble/[slug]/page.tsx` y las legales **solo** hacen fetch / metadata y **delegan** al theme. No `if (theme.name === …)` en `app/`.
+Las rutas `src/app/page.tsx`, `src/app/inmueble/[slug]/page.tsx` y las legales **solo** hacen fetch / metadata y **delegan** al theme. No `if (theme.name === …)` en `app/`. Opciones de catálogo (`pageSize`, `heroGallery`) y errores de ficha viven en `THEME_REGISTRY` / `theme.ListingLoadError`.
 
 **Themes = skins, no dominio.** Cada theme recibe valores ya resueltos (listings, `SiteConfig`, locale, copy) y solo pinta. Inquiry, WhatsApp, specs, href de ficha y labels salen de `src/lib/` + `src/components/`. **Prohibido** copiar `ListingInquiryForm` / `ListingWhatsAppButton` / helpers de specs en `src/themes/<nombre>/`. El look se configura con `classNames`, tokens CSS o markup propio alrededor de esos widgets.
 
@@ -259,7 +259,9 @@ Reglas en template:
 - `src/themes/beige/` — catálogo (hero collage, buscador, residencial, ubicaciones, comercial, FAQ) y ficha con galería, inquiry y WhatsApp.
 - i18n: mismo `site-i18n.ts`; `getBeigeUi(lang)`.
 - CSS encapsulado en `[data-site-theme="beige"]` (`globals.css`): marfil/beige/oliva; Playfair Display + Plus Jakarta Sans vía `next/font`.
+- Catálogo: `theme.catalog.pageSize` / `heroGallery` (sin `if (theme.name)` en `app/`).
 - Legales: `theme.LegalPage` (registrado como `BeigeLegalPage`).
+- Widgets compartidos: `ListingInquiryForm`, `ListingWhatsAppButton`, `ListingShareButton`, `ListingPhotoGallery`, `publicListingCardModel`.
 - Admin/login: `isStyledSiteLayout` es true (cualquier `layout_key` distinto de `default`).
 - Para que Ops pueda elegir `beige`, el API debe aceptar `SiteConfig::LAYOUT_KEYS` con esa clave (cambio coordinado fuera de este repo).
 

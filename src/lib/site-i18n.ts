@@ -107,7 +107,6 @@ export type SiteDictionary = {
     viewMap: string;
     listedBy: string;
     share: string;
-    shareTitle: string;
     shareCopy: string;
     shareCopied: string;
     shareFailed: string;
@@ -540,7 +539,6 @@ const dictionaries = {
       viewMap: "Ver en el mapa",
       listedBy: "Anunciado por",
       share: "Compartir",
-      shareTitle: "Compartir propiedad",
       shareCopy: "Copiar enlace",
       shareCopied: "Enlace copiado",
       shareFailed: "No se pudo compartir. Copia el enlace manualmente.",
@@ -841,7 +839,6 @@ const dictionaries = {
       viewMap: "Open in maps",
       listedBy: "Listed by",
       share: "Share",
-      shareTitle: "Share property",
       shareCopy: "Copy link",
       shareCopied: "Link copied",
       shareFailed: "Couldn’t share. Copy the link manually.",
