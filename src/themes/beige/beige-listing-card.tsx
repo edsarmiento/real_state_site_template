@@ -1,11 +1,9 @@
 import Link from "next/link";
-import { parseOfferType, type PublicListingCard } from "@/lib/listing-types";
 import {
-  fillTemplate,
-  localizedHref,
-  type SiteDictionary,
-  type SiteLocale,
-} from "@/lib/site-i18n";
+  publicListingCardModel,
+  type PublicListingCard,
+} from "@/lib/listing-types";
+import { fillTemplate, type SiteDictionary, type SiteLocale } from "@/lib/site-i18n";
 import { BeigeCoverImage } from "@/themes/beige/beige-cover-image";
 import { displayListingTitle } from "@/themes/beige/beige-display";
 import {
@@ -14,7 +12,6 @@ import {
 } from "@/themes/beige/beige-icons";
 import { BeigeReveal } from "@/themes/beige/beige-reveal";
 import { formatBeigePriceParts } from "@/themes/beige/beige-ui";
-import { luxuryCardSpecLine } from "@/themes/luxury/luxury-specs";
 
 type Props = {
   listing: PublicListingCard;
@@ -31,27 +28,14 @@ export function BeigeListingCard({
   dict,
   index = 0,
 }: Props) {
-  const offerType = parseOfferType(listing.offer_type);
-  const suffix = offerType === "rent" ? dict.listing.perMonth : null;
-  const offerLabel =
-    offerType === "sale" ? dict.listing.sale : dict.listing.rent;
-  const href = localizedHref(
-    `/inmueble/${listing.slug}`,
-    locale,
-    null,
-    defaultLocale,
-  );
+  const { href, suffix, typeLabel, specLine, offerLabel } =
+    publicListingCardModel(listing, { dict, locale, defaultLocale });
   const price = formatBeigePriceParts(
     listing.rent_cents,
     listing.currency,
     locale,
   );
-  const specLine = luxuryCardSpecLine(listing, dict.listing);
   const title = displayListingTitle(listing.title) || listing.title;
-  const typeLabel =
-    dict.propertyTypes[
-      listing.property_type as keyof typeof dict.propertyTypes
-    ] ?? listing.property_type;
 
   return (
     <BeigeReveal variant="up" delayMs={(index % 3) * 100}>

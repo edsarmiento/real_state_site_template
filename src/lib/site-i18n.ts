@@ -100,8 +100,6 @@ export type SiteDictionary = {
     viewProperty: string;
     viewPropertyAria: string;
     viewDetail: string;
-    share: string;
-    shareCopied: string;
     consultWhatsApp: string;
     back: string;
     description: string;
@@ -534,8 +532,6 @@ const dictionaries = {
       viewProperty: "Ver propiedad",
       viewPropertyAria: "Ver propiedad: {title}",
       viewDetail: "Ver detalle",
-      share: "Compartir",
-      shareCopied: "Enlace copiado",
       consultWhatsApp: "Consultar por WhatsApp",
       back: "Volver a propiedades",
       description: "Descripción",
@@ -836,8 +832,6 @@ const dictionaries = {
       viewProperty: "View property",
       viewPropertyAria: "View property: {title}",
       viewDetail: "View details",
-      share: "Share",
-      shareCopied: "Link copied",
       consultWhatsApp: "Ask on WhatsApp",
       back: "Back to properties",
       description: "Description",

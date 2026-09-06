@@ -1,9 +1,18 @@
 import Link from "next/link";
+import { ListingInquiryForm } from "@/components/listing-inquiry-form";
+import { ListingShareButton } from "@/components/listing-share-button";
+import { ListingWhatsAppButton } from "@/components/listing-whatsapp-button";
 import { parseListingDescriptionForDisplay } from "@/lib/listing-description";
-import { parseOfferType } from "@/lib/listing-types";
+import {
+  listingPublicSpecsLocalized,
+  parseOfferType,
+} from "@/lib/listing-types";
 import { googleMapsSearchUrl } from "@/lib/maps-links";
+import { localizedPropertyTypeLabel } from "@/lib/property-labels";
+import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref } from "@/lib/site-i18n";
 import type { ListingDetailThemeProps } from "@/themes/theme-types";
+import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeGallery } from "@/themes/beige/beige-gallery";
 import { BeigeHeader } from "@/themes/beige/beige-header";
@@ -15,30 +24,35 @@ import {
   BeigeIconHome,
   BeigeIconMapPin,
   BeigeIconMaximize,
+  BeigeIconWhatsApp,
 } from "@/themes/beige/beige-icons";
-import { BeigeInquiryForm } from "@/themes/beige/beige-inquiry-form";
-import { BeigeListingWhatsAppButton } from "@/themes/beige/beige-listing-whatsapp";
 import { BeigeShell } from "@/themes/beige/beige-shell";
-import { displayListingTitle } from "@/themes/beige/beige-display";
 import { formatBeigePriceParts, getBeigeUi } from "@/themes/beige/beige-ui";
-import { luxuryVisibleSpecs } from "@/themes/luxury/luxury-specs";
 
 export async function BeigeListingDetail({
   listing,
   lang,
 }: ListingDetailThemeProps) {
-  const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
+  const { content, dict, locale, defaultLocale, showShareButton, siteOrigin } =
+    await getBeigeUi(lang);
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
-  const specs = luxuryVisibleSpecs(listing);
-  const typeLabel =
-    dict.propertyTypes[
-      listing.property_type as keyof typeof dict.propertyTypes
-    ] ?? listing.property_type;
+  const specs = listingPublicSpecsLocalized(listing, dict);
+  const typeLabel = localizedPropertyTypeLabel(dict, listing.property_type);
   const isSale = offerType === "sale";
   const agency = listing.agency_name || content.brand.name;
   const hasMap = listing.latitude != null && listing.longitude != null;
   const backHref = localizedHref("/#catalogo", locale, null, defaultLocale);
+  const listingUrl = listingPublicUrl(
+    listing.slug,
+    siteOrigin,
+    localizedHref(
+      `/inmueble/${encodeURIComponent(listing.slug)}`,
+      locale,
+      null,
+      defaultLocale,
+    ),
+  );
   const price = formatBeigePriceParts(
     listing.rent_cents,
     listing.currency,
@@ -77,6 +91,20 @@ export async function BeigeListingDetail({
                   <h1 className="beige-detail__title">
                     {displayListingTitle(listing.title) || listing.title}
                   </h1>
+                  {showShareButton ? (
+                    <div className="beige-detail__share">
+                      <ListingShareButton
+                        url={listingUrl}
+                        title={listing.title}
+                        label={dict.listing.share}
+                        copyLabel={dict.listing.shareCopy}
+                        copiedLabel={dict.listing.shareCopied}
+                        failedLabel={dict.listing.shareFailed}
+                        closeLabel={dict.listing.shareClose}
+                        className="beige-share-button"
+                      />
+                    </div>
+                  ) : null}
                   <p className="beige-detail__price">
                     {price.amount}{" "}
                     <span className="beige-detail__price-unit">
@@ -206,25 +234,37 @@ export async function BeigeListingDetail({
                   </p>
                 </div>
                 {listing.contact_phone ? (
-                  <BeigeListingWhatsAppButton
+                  <ListingWhatsAppButton
                     phone={listing.contact_phone}
                     title={listing.title}
-                    slug={listing.slug}
+                    listingUrl={listingUrl}
                     offerType={offerType}
-                    dict={dict}
+                    saleLabel={dict.inquiry.whatsappSale}
+                    rentLabel={dict.inquiry.whatsappRent}
+                    messageTemplate={dict.inquiry.whatsappMessage}
+                    unstyled
                     className="beige-btn beige-detail__whatsapp"
+                    ariaLabel={`${isSale ? dict.inquiry.whatsappSale : dict.inquiry.whatsappRent}. ${dict.a11y.opensInNewTab}`}
+                    icon={<BeigeIconWhatsApp className="h-5 w-5" />}
                   />
                 ) : null}
                 {listing.contact_phone ? (
                   <p className="beige-detail__or">{dict.listing.orLeaveDetails}</p>
                 ) : null}
-                <BeigeInquiryForm
+                <ListingInquiryForm
                   slug={listing.slug}
                   offerType={offerType}
-                  dict={dict}
-                  locale={locale}
-                  defaultLocale={defaultLocale}
-                  privacyHref={content.legal.privacyNoticeUrl}
+                  copy={dict.inquiry}
+                  inputIdPrefix="beige-inquiry"
+                  classNames={{
+                    form: "beige-inquiry",
+                    label: "beige-search__label",
+                    control: "beige-field",
+                    textarea: "beige-field",
+                    error: "beige-inquiry__error",
+                    success: "beige-form-hint",
+                    submit: "beige-btn beige-form-submit",
+                  }}
                 />
               </div>
             </aside>
