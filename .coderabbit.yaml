@@ -1,4 +1,4 @@
-# https://docs.coderabbit.ai/guides/configure-coderabbit
+# https://docs.coderabbit.ai/configuration/auto-review
 language: es-ES
 reviews:
   profile: assertive
@@ -8,10 +8,13 @@ reviews:
   # Pending check while reviewing → green when finished (CodeRabbit-native gate).
   commit_status: true
   request_changes_workflow: false
-  # Triggered by .github/workflows/coderabbit-review.yml (@coderabbitai …).
   auto_review:
-    enabled: false
+    enabled: true
+    auto_incremental_review: true
     drafts: false
+    # Review PRs targeting any base (not only the detected default).
+    base_branches:
+      - ".*"
   path_instructions:
     - path: "**"
       instructions: |

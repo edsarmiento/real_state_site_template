@@ -36,7 +36,7 @@ jobs:
             const issue_number = context.payload.pull_request.number;
             const action = context.payload.action;
 
-            // Full pass on open/reopen/undraft; incremental on new commits.
+            // Incremental on new commits; full pass on open / reopen / undraft.
             const body =
               action === "synchronize"
                 ? "@coderabbitai review"
