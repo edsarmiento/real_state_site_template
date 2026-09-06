@@ -14,8 +14,8 @@ import {
   OrangeIconMaximize,
 } from "@/themes/orange/orange-icons";
 import { OrangeShareButton } from "@/themes/orange/orange-share-button";
-import { formatOrangePriceParts } from "@/themes/orange/orange-ui";
 import { orangeVisibleSpecs } from "@/themes/orange/orange-listing-specs";
+import { formatOrangePriceParts } from "@/themes/orange/orange-ui";
 
 type Props = {
   listing: PublicListingCard;
