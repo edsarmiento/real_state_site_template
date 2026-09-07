@@ -18,6 +18,7 @@ import { UltraHero } from "@/themes/ultra/ultra-hero";
 import { UltraLocations } from "@/themes/ultra/ultra-locations";
 import { UltraPagination } from "@/themes/ultra/ultra-pagination";
 import { UltraProcess } from "@/themes/ultra/ultra-process";
+import { UltraReveal } from "@/themes/ultra/ultra-reveal";
 import { UltraShell } from "@/themes/ultra/ultra-shell";
 import { getUltraUi } from "@/themes/ultra/ultra-ui";
 
@@ -91,17 +92,23 @@ export async function UltraCatalog({
 
       <div className="ultra-search-shell">
         <div className="ultra-shell">
-          <PublicCatalogSearch
-            oferta={oferta}
-            city={city}
-            propertyType={propertyType}
-            bedrooms={bedrooms}
-            styledLayout
-            dict={dict}
-            locale={locale}
-            defaultLocale={defaultLocale}
-            className="ultra-search"
-          />
+          <UltraReveal variant="up">
+            <PublicCatalogSearch
+              oferta={oferta}
+              city={city}
+              propertyType={propertyType}
+              bedrooms={bedrooms}
+              styledLayout
+              dict={dict}
+              locale={locale}
+              defaultLocale={defaultLocale}
+              className="ultra-search"
+              offerControl="radios"
+              submitOnOperationChange={false}
+              operationClassName="ultra-search-operation"
+              formAction={localizedHref("/#catalogo", locale, null, defaultLocale)}
+            />
+          </UltraReveal>
         </div>
       </div>
 
@@ -132,6 +139,7 @@ export async function UltraCatalog({
             </div>
           ) : (
             <section>
+              <UltraReveal variant="up">
               <div className="ultra-catalog__head">
                 <div>
                   <p className="ultra-eyebrow">
@@ -146,17 +154,21 @@ export async function UltraCatalog({
                   </Link>
                 ) : null}
               </div>
+              </UltraReveal>
               <ul className="ultra-grid">
-                {listings.map((listing) => (
+                {listings.map((listing, index) => (
                   <li key={listing.slug} className="min-w-0">
-                    <PublicListingCard
-                      listing={listing}
-                      styledLayout
-                      dict={dict}
-                      locale={locale}
-                      defaultLocale={defaultLocale}
-                      className="ultra-card"
-                    />
+                    <UltraReveal variant="up" delayMs={Math.min(index, 5) * 70}>
+                      <PublicListingCard
+                        listing={listing}
+                        styledLayout
+                        dict={dict}
+                        locale={locale}
+                        defaultLocale={defaultLocale}
+                        className="ultra-card"
+                        ctaLabel={dict.listing.viewDetail}
+                      />
+                    </UltraReveal>
                   </li>
                 ))}
               </ul>
@@ -188,6 +200,7 @@ export async function UltraCatalog({
         dict={dict}
         locale={locale}
         defaultLocale={defaultLocale}
+        coverUrl={listings.find((item) => item.photo_url)?.photo_url}
       />
       <UltraProcess dict={dict} />
       <UltraContact

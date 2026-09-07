@@ -6,6 +6,7 @@ export type UltraCopy = {
   paginationPageOf: string;
   paginationAria: string;
   goToPage: string;
+  poweredBy: string;
 };
 
 const ES: UltraCopy = {
@@ -14,6 +15,7 @@ const ES: UltraCopy = {
   paginationPageOf: "Página {current} de {total}",
   paginationAria: "Paginación de propiedades",
   goToPage: "Ir a la página {page}",
+  poweredBy: "Tecnología para inmobiliarias",
 };
 
 const EN: UltraCopy = {
@@ -22,6 +24,7 @@ const EN: UltraCopy = {
   paginationPageOf: "Page {current} of {total}",
   paginationAria: "Property pagination",
   goToPage: "Go to page {page}",
+  poweredBy: "Real estate technology",
 };
 
 export function getUltraCopy(locale: SiteLocale): UltraCopy {

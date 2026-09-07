@@ -2,6 +2,7 @@ import Link from "next/link";
 import { fillTemplate, localizeSiteHref } from "@/lib/site-i18n";
 import { ultraContactChannels } from "@/themes/ultra/ultra-contact-channels";
 import { UltraSocialLinks } from "@/themes/ultra/ultra-social-links";
+import { getUltraCopy } from "@/themes/ultra/ultra-copy";
 import { getUltraUi, ultraNavLinks } from "@/themes/ultra/ultra-ui";
 
 type Props = {
@@ -20,6 +21,7 @@ export async function UltraFooter({ lang }: Props) {
     whatsappHref || contact.phoneHref || contact.emailHref,
   );
   const year = new Date().getFullYear();
+  const copy = getUltraCopy(locale);
 
   return (
     <footer className="ultra-footer">
@@ -150,7 +152,7 @@ export async function UltraFooter({ lang }: Props) {
           })}
         </p>
         {footer.showPoweredBy ? (
-          <p className="mt-2">{dict.footer.poweredBy}</p>
+          <p className="ultra-footer__powered">{copy.poweredBy}</p>
         ) : null}
       </div>
     </footer>

@@ -12,6 +12,7 @@ import {
   UltraIconPhone,
   UltraIconWhatsApp,
 } from "@/themes/ultra/ultra-icons";
+import { UltraReveal } from "@/themes/ultra/ultra-reveal";
 import { UltraSocialLinks } from "@/themes/ultra/ultra-social-links";
 
 type Channel = {
@@ -109,7 +110,7 @@ export function UltraContact({ content, dict, locale, defaultLocale }: Props) {
   return (
     <section id="contact" className="ultra-contact">
       <div className="ultra-shell ultra-contact__grid">
-        <div className="ultra-contact__copy">
+        <UltraReveal variant="left" className="ultra-contact__copy">
           <p className="ultra-eyebrow">{dict.contact.kicker}</p>
           <h2 className="ultra-section-title">{dict.contact.heading}</h2>
           <p className="ultra-lead">{dict.contact.description}</p>
@@ -170,8 +171,9 @@ export function UltraContact({ content, dict, locale, defaultLocale }: Props) {
             whatsappHref={whatsappHref}
             className="ultra-contact__social"
           />
-        </div>
+        </UltraReveal>
 
+        <UltraReveal variant="right" delayMs={80}>
         <aside className="ultra-form-panel" aria-label={dict.contact.kicker}>
           <p className="ultra-form-panel__eyebrow">{dict.contact.formEyebrow}</p>
           <h3 className="ultra-form-panel__title">{dict.contact.formTitle}</h3>
@@ -219,6 +221,7 @@ export function UltraContact({ content, dict, locale, defaultLocale }: Props) {
             <p className="ultra-lead">{dict.contact.formUnavailable}</p>
           )}
         </aside>
+        </UltraReveal>
       </div>
     </section>
   );

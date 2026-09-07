@@ -36,6 +36,7 @@ type Props = {
   className?: string;
   labels?: ListingGalleryLabels;
   styledLayout?: boolean;
+  transition?: "slide" | "crossfade";
 };
 
 function ChevronLeft({ className }: { className?: string }) {
@@ -79,6 +80,7 @@ export function ListingPhotoGallery({
   className,
   labels = DEFAULT_GALLERY_LABELS,
   styledLayout = true,
+  transition = "slide",
 }: Props) {
   const urls = photos
     .map((p) => p.url)
@@ -162,33 +164,66 @@ export function ListingPhotoGallery({
         }}
       >
         <div className="relative aspect-[4/3] w-full sm:aspect-[16/9]">
-          <div
-            className="flex h-full w-full transition-transform duration-300 ease-out"
-            style={{ transform: `translateX(-${activeIndex * 100}%)` }}
-          >
-            {urls.map((url, index) => (
-              <div
-                key={`${url}-${index}`}
-                className="h-full min-w-full w-full shrink-0 basis-full"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={url}
-                  alt={fillTemplate(labels.photoAlt, {
-                    title,
-                    index: index + 1,
-                    count,
-                  })}
-                  className="h-full w-full object-cover"
-                  draggable={false}
-                  onError={(event) => {
-                    event.currentTarget.style.visibility = "hidden";
-                    event.currentTarget.removeAttribute("src");
-                  }}
-                />
-              </div>
-            ))}
-          </div>
+          {transition === "crossfade" ? (
+            <div className="listing-gallery__fade relative h-full w-full">
+              {urls.map((url, index) => (
+                <div
+                  key={`${url}-${index}`}
+                  className={[
+                    "absolute inset-0 bg-zinc-900 transition-opacity duration-300 ease-out",
+                    index === activeIndex
+                      ? "opacity-100"
+                      : "pointer-events-none opacity-0",
+                  ].join(" ")}
+                  aria-hidden={index !== activeIndex}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt={fillTemplate(labels.photoAlt, {
+                      title,
+                      index: index + 1,
+                      count,
+                    })}
+                    className="h-full w-full object-cover"
+                    draggable={false}
+                    onError={(event) => {
+                      event.currentTarget.style.visibility = "hidden";
+                      event.currentTarget.removeAttribute("src");
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div
+              className="flex h-full w-full transition-transform duration-300 ease-out"
+              style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+            >
+              {urls.map((url, index) => (
+                <div
+                  key={`${url}-${index}`}
+                  className="h-full min-w-full w-full shrink-0 basis-full"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt={fillTemplate(labels.photoAlt, {
+                      title,
+                      index: index + 1,
+                      count,
+                    })}
+                    className="h-full w-full object-cover"
+                    draggable={false}
+                    onError={(event) => {
+                      event.currentTarget.style.visibility = "hidden";
+                      event.currentTarget.removeAttribute("src");
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           {count > 1 ? (
             <>

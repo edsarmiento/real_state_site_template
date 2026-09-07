@@ -73,6 +73,11 @@ export function PublicListingCard({
           saleLabel={dict?.listing.sale}
           rentLabel={dict?.listing.rent}
         />
+        {ctaLabel ? (
+          <span className="public-listing-card__cta hidden" aria-hidden>
+            {ctaLabel}
+          </span>
+        ) : null}
       </div>
 
       <div className="public-listing-card__body flex flex-1 flex-col gap-2 p-4">

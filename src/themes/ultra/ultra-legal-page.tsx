@@ -14,7 +14,7 @@ export async function UltraLegalPage({ kind, lang }: LegalPageThemeProps) {
         : dict.legal.cookiesTitle;
 
   return (
-    <UltraShell lang={lang}>
+    <UltraShell lang={lang} particles="detail">
       <UltraHeader lang={lang} />
       <main className="ultra-legal">
         <div className="ultra-shell ultra-legal__inner">

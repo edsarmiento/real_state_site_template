@@ -82,12 +82,17 @@ export function UltraMobileNav({
         )}
       </button>
 
-      {open ? (
-        <nav
+      <nav
           ref={panelRef}
           id={panelId}
-          className="ultra-mobile-nav__panel"
+          className={
+            open
+              ? "ultra-mobile-nav__panel is-open"
+              : "ultra-mobile-nav__panel"
+          }
           aria-label={menuLabel}
+          aria-hidden={!open}
+          inert={!open}
         >
           <button
             type="button"
@@ -127,7 +132,6 @@ export function UltraMobileNav({
             </a>
           ) : null}
         </nav>
-      ) : null}
     </div>
   );
 }

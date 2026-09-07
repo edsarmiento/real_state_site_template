@@ -21,6 +21,10 @@ type Props = {
   locale?: SiteLocale;
   defaultLocale?: SiteLocale;
   className?: string;
+  offerControl?: "links" | "radios";
+  formAction?: string;
+  submitOnOperationChange?: boolean;
+  operationClassName?: string;
 };
 
 function catalogHref(
@@ -53,6 +57,10 @@ export function PublicCatalogSearch({
   locale,
   defaultLocale,
   className,
+  offerControl = "links",
+  formAction,
+  submitOnOperationChange = true,
+  operationClassName = "public-catalog-search__offers",
 }: Props) {
   const offerTabs: { id: CatalogOfferFilter; label: string }[] = dict
     ? [
@@ -88,14 +96,116 @@ export function PublicCatalogSearch({
       ? "focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
       : "focus:border-zinc-400 focus:ring-2 focus:ring-zinc-200");
 
+  const cardClassName = `overflow-hidden rounded-2xl bg-white ${
+    styledLayout
+      ? "shadow-[0_24px_48px_-24px_rgba(15,23,42,0.35)] ring-1 ring-blue-950/10"
+      : "border border-zinc-200 shadow-sm"
+  }${className ? ` ${className}` : ""}`;
+
+  const fields = (
+    <>
+      {locale && locale !== defaultLocale ? (
+        <input type="hidden" name="lang" value={locale} />
+      ) : null}
+
+      <label className="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-1">
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+          {dict?.search.location ?? "Ubicación"}
+        </span>
+        <input
+          id="city"
+          name="city"
+          defaultValue={city}
+          placeholder={dict?.search.locationPlaceholder ?? "Ciudad o colonia"}
+          className={focusField}
+        />
+      </label>
+
+      <label className="flex flex-col gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+          {dict?.search.propertyType ?? "Tipo de inmueble"}
+        </span>
+        <select
+          name="tipo"
+          defaultValue={propertyType}
+          className={focusField}
+        >
+          <option value="">{dict?.search.allTypes ?? "Todos"}</option>
+          {PROPERTY_TYPES.map((type) => (
+            <option key={type} value={type}>
+              {localizedPropertyTypeLabel(dict, type)}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="flex flex-col gap-1.5">
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+          {dict?.search.bedrooms ?? "Recámaras"}
+        </span>
+        <select
+          name="recamaras"
+          defaultValue={bedrooms}
+          className={focusField}
+        >
+          {bedroomOptions.map((opt) => (
+            <option key={opt.value || "any"} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <div className="flex items-end sm:col-span-2 lg:col-span-1">
+        <button
+          type="submit"
+          className={`w-full rounded-xl px-6 py-3.5 text-sm font-semibold text-white ${
+            styledLayout
+              ? "bg-blue-600 hover:bg-blue-500"
+              : "bg-zinc-900 hover:bg-zinc-800"
+          }`}
+        >
+          {dict?.search.submitShort ?? "Buscar"}
+        </button>
+      </div>
+    </>
+  );
+
+  const useLocalRadios =
+    offerControl === "radios" || submitOnOperationChange === false;
+
+  if (useLocalRadios) {
+    return (
+      <form
+        className={cardClassName}
+        method="get"
+        action={formAction}
+      >
+        <fieldset className={operationClassName}>
+          <legend className="sr-only">
+            {dict?.search.intentLegend ?? "Tipo de operación"}
+          </legend>
+          {offerTabs.map((tab) => (
+            <label key={tab.id}>
+              <input
+                type="radio"
+                name="oferta"
+                value={catalogOfferQueryValue(tab.id)}
+                defaultChecked={oferta === tab.id}
+              />
+              <span>{tab.label}</span>
+            </label>
+          ))}
+        </fieldset>
+        <div className="public-catalog-search__fields grid gap-3 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.75fr)_auto]">
+          {fields}
+        </div>
+      </form>
+    );
+  }
+
   return (
-    <div
-      className={`overflow-hidden rounded-2xl bg-white ${
-        styledLayout
-          ? "shadow-[0_24px_48px_-24px_rgba(15,23,42,0.35)] ring-1 ring-blue-950/10"
-          : "border border-zinc-200 shadow-sm"
-      }${className ? ` ${className}` : ""}`}
-    >
+    <div className={cardClassName}>
       <nav
         className="flex border-b border-zinc-100"
         aria-label={dict?.search.intentLegend ?? "Tipo de oferta"}
@@ -132,6 +242,7 @@ export function PublicCatalogSearch({
       <form
         className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.75fr)_auto]"
         method="get"
+        action={formAction}
       >
         {oferta !== "all" ? (
           <input
@@ -140,70 +251,7 @@ export function PublicCatalogSearch({
             value={catalogOfferQueryValue(oferta)}
           />
         ) : null}
-        {locale && locale !== defaultLocale ? (
-          <input type="hidden" name="lang" value={locale} />
-        ) : null}
-
-        <label className="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-1">
-          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-            {dict?.search.location ?? "Ubicación"}
-          </span>
-          <input
-            id="city"
-            name="city"
-            defaultValue={city}
-            placeholder={dict?.search.locationPlaceholder ?? "Ciudad o colonia"}
-            className={focusField}
-          />
-        </label>
-
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-            {dict?.search.propertyType ?? "Tipo de inmueble"}
-          </span>
-          <select
-            name="tipo"
-            defaultValue={propertyType}
-            className={focusField}
-          >
-            <option value="">{dict?.search.allTypes ?? "Todos"}</option>
-            {PROPERTY_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {localizedPropertyTypeLabel(dict, type)}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-            {dict?.search.bedrooms ?? "Recámaras"}
-          </span>
-          <select
-            name="recamaras"
-            defaultValue={bedrooms}
-            className={focusField}
-          >
-            {bedroomOptions.map((opt) => (
-              <option key={opt.value || "any"} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div className="flex items-end sm:col-span-2 lg:col-span-1">
-          <button
-            type="submit"
-            className={`w-full rounded-xl px-6 py-3.5 text-sm font-semibold text-white ${
-              styledLayout
-                ? "bg-blue-600 hover:bg-blue-500"
-                : "bg-zinc-900 hover:bg-zinc-800"
-            }`}
-          >
-            {dict?.search.submitShort ?? "Buscar"}
-          </button>
-        </div>
+        {fields}
       </form>
     </div>
   );

@@ -1,6 +1,7 @@
 import type { PublicSiteContent } from "@/lib/public-site-content";
 import type { SiteDictionary } from "@/lib/site-i18n";
 import { ultraContactChannels } from "@/themes/ultra/ultra-contact-channels";
+import { UltraReveal } from "@/themes/ultra/ultra-reveal";
 
 type Props = {
   content: PublicSiteContent;
@@ -15,6 +16,7 @@ export function UltraFinalCta({ content, dict }: Props) {
   return (
     <section className="ultra-final-cta" aria-label={dict.contact.finalCtaAria}>
       <div className="ultra-shell">
+        <UltraReveal variant="up">
         <div className="ultra-final-cta__panel">
           <h2 className="ultra-section-title">{title}</h2>
           <p className="ultra-lead">{description}</p>
@@ -30,6 +32,7 @@ export function UltraFinalCta({ content, dict }: Props) {
             </a>
           ) : null}
         </div>
+        </UltraReveal>
       </div>
     </section>
   );

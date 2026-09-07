@@ -4,6 +4,7 @@ import { localizedHref } from "@/lib/site-i18n";
 import { getSessionContext } from "@/lib/session-context";
 import { ultraContactChannels } from "@/themes/ultra/ultra-contact-channels";
 import { UltraIconWhatsApp } from "@/themes/ultra/ultra-icons";
+import { UltraHeaderChrome } from "@/themes/ultra/ultra-header-chrome";
 import { UltraLocaleSwitcher } from "@/themes/ultra/ultra-locale-switcher";
 import { UltraMobileNav } from "@/themes/ultra/ultra-mobile-nav";
 import { getUltraUi, ultraNavLinks } from "@/themes/ultra/ultra-ui";
@@ -44,7 +45,7 @@ export async function UltraHeader({ lang }: Props) {
   const initial = brand.name.trim().charAt(0).toUpperCase() || "·";
 
   return (
-    <header className="ultra-header">
+    <UltraHeaderChrome>
       <div className="ultra-header__bar">
         <Link href={homeHref} className="ultra-logo-link">
           {brand.logoUrl ? (
@@ -108,6 +109,6 @@ export async function UltraHeader({ lang }: Props) {
           />
         </div>
       </div>
-    </header>
+    </UltraHeaderChrome>
   );
 }
