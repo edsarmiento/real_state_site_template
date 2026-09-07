@@ -1,0 +1,47 @@
+Pendientes Ultra — continuar mañana
+===================================
+
+Branch: feat/ultra-theme
+Estado: theme implementado en el template; commit local. No está activado desde Ops.
+
+API / Ops (fuera de este repo)
+------------------------------
+- real_state_api: añadir "ultra" a SiteConfig::LAYOUT_KEYS
+  (app/models/site_config.rb). El repo API no estaba en el workspace.
+- Specs + BUSINESS_RULES.md §SiteConfig.
+- real_state_frontend: opción Ultra en el selector de Ops
+  (LAYOUT_OPTIONS / layout_options).
+Hasta que Ops pueda guardar layout_key: "ultra", el deploy local seguirá
+el layout que ya envía el API (hoy beige). No simular que el flujo
+Ops → sitio ya funciona.
+
+QA visual (no hubo navegador en la sesión)
+------------------------------------------
+- Abrir / con layout_key ultra: hero (caption encima de miniaturas),
+  buscador, cards, ubicaciones con overlay vino, about, proceso,
+  contacto, CTA, footer.
+- Escritorio y móvil: sin desbordes; títulos/precios/descripciones
+  sin recortes.
+- Ficha: título a todo el ancho; galería + descripción a la izquierda;
+  precio, specs, inquiry/WhatsApp y ubicación a la derecha.
+- Vacío, error de catálogo, ficha con 0/1/N fotos y campos opcionales.
+- Inquiry: validación y éxito/error del widget compartido (sin enviar
+  consultas reales si no hace falta).
+- Selector ES|EN on/off según Ops; legales y login sin regresiones
+  en default/luxury/beige.
+
+Diferencias visuales conocidas (no son bugs de dominio)
+-------------------------------------------------------
+- Buscador con pestañas (PublicCatalogSearch), no selects del HTML.
+- Cards compartidas, no glass cards pixel-perfect del mockup.
+- Miniaturas del hero debajo del caption a propósito.
+- About sin imagen si no hay about.imageUrl (no Unsplash).
+- Formulario general de contacto: hidden/preview; inquiry real solo
+  en la ficha.
+- Footer poweredBy sin enlace a un dominio de producto.
+
+No hacer
+--------
+- No merge, no push, no deploy salvo pedido.
+- No mezclar trabajo de feat/orange-theme.
+- No añadir SITE_THEME_PREVIEW permanente.

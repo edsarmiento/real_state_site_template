@@ -1,0 +1,124 @@
+Handoff: implementar theme Ultra — editorial vino en real_state_site_template
+=============================================================================
+
+Reglas permanentes del repo: real_state_site_template/AGENTS.md (playbook "Nueva plantilla").
+Este archivo es el brief concreto de la plantilla Ultra.
+
+
+Variables
+---------
+
+  slug              ultra
+  THEME_NAME        ultra
+  ThemeName         Ultra
+  THEME_LABEL       Ultra — editorial vino
+  REFERENCE_THEME   default (secciones de marketing al estilo beige: hero, ubicaciones, about, proceso, contacto, CTA)
+  STYLED_LAYOUT     true
+
+  Paleta:
+    Crema #F7F4EF, vino #4A1521, vino oscuro #2D0B12, dorado #C5A880,
+    carbón #1A1818, secundario #6B6563.
+    Playfair Display (títulos) + Plus Jakarta Sans (texto).
+    CSS encapsulado en [data-site-theme="ultra"] con variables --ultra-*.
+    Overlay de ubicaciones / caption del hero:
+      linear-gradient(to top, rgba(45,11,18,.82), rgba(74,21,33,.28) 55%, transparent)
+
+
+Pre-requisitos API + Ops (estado al implementar)
+------------------------------------------------
+
+  [ ] real_state_api: SiteConfig::LAYOUT_KEYS incluye "ultra"
+      Ubicación esperada: real_state_api/app/models/site_config.rb
+      Estado: el repositorio API no está disponible junto a este template
+      (`../real_state_api` no existe en el workspace). BUSINESS_RULES.md §6b
+      y §SiteConfig no pudieron verificarse aquí.
+
+  [ ] real_state_api: specs + BUSINESS_RULES.md §SiteConfig
+      Ubicación esperada: real_state_api/spec (SiteConfig layout keys) y
+      real_state_api/BUSINESS_RULES.md §SiteConfig.
+
+  [ ] real_state_frontend: Ops permite seleccionar Ultra
+      Ubicación esperada: selector de layout de Ops
+      (`OpsSiteConfigLayout` / `LAYOUT_OPTIONS`, o `layout_options` desde el API).
+      Estado: `../real_state_frontend` no está disponible en el workspace.
+
+Sin esos cambios, Ops no puede guardar `layout_key: "ultra"`. El template
+resuelve `ultra` cuando el API ya envía esa clave; claves desconocidas
+siguen cayendo a `default`. No simular que el flujo Ops→sitio ya funciona.
+
+
+Contexto
+--------
+
+Monorepo Real State. Trabaja SOLO en:
+
+  real_state_site_template/  (Next.js App Router, puerto dev 3002)
+
+1 deploy = 1 inmobiliaria (ACCOUNT_ID + API_URL). Marca, layout, idiomas y dominio
+vienen de SiteConfig via GET /api/public/site_config?account_id=.
+
+Objetivo: cuando Ops guarde layout_key: "ultra", el template renderiza el theme
+ultra en / y /inmueble/[slug].
+
+
+Arquitectura (no romper)
+------------------------
+
+  src/app/page.tsx -> resolveSiteThemeFromConfig() -> theme.Catalog
+  src/app/inmueble/[slug]/page.tsx -> theme.ListingDetail
+
+Contrato: src/themes/theme-types.ts (CatalogThemeProps, ListingDetailThemeProps).
+
+Reglas:
+  - Server Components; sin fetch de listings dentro del theme.
+  - i18n: getSiteUi(lang) + site-i18n.ts.
+  - Marca: getSiteUi().config (SiteConfig via getResolvedSiteConfig).
+  - Theme = skin: Inquiry, WhatsApp, specs y href salen de ListingInquiryForm,
+    ListingWhatsAppButton, publicListingCardModel, listingPublicSpecsLocalized.
+    NO copiar esos flujos en src/themes/ultra/.
+
+
+Alcance v1 — theme Ultra
+------------------------
+
+Referencia visual: HTML editorial vino (no portar su JS, datos de ejemplo,
+Unsplash, DEO/Tijuana ni inquiry simulada).
+
+Catálogo: header, hero (caption por encima de miniaturas), buscador compartido,
+resultados con contador real, ubicaciones, about, proceso, contacto, CTA final,
+footer, acceso admin.
+
+Ficha escritorio: título a todo el ancho; ubicación + compartir; columnas ~7/12
+(galería, miniaturas, descripción) y ~5/12 (precio, specs, inquiry/WhatsApp,
+ubicación). Móvil: una columna, sin recortes.
+
+styledLayout en componentes compartidos: true
+
+
+Cableado obligatorio (template)
+-------------------------------
+
+  1. theme-definitions.ts    — { name: "ultra", layoutKeys: ["ultra"] }
+  2. theme-registry.ts       — Catalog, ListingDetail, LegalPage, ListingLoadError
+
+NO modificar app/page.tsx, app/inmueble/[slug]/page.tsx ni rutas legales.
+NO usar site-config.ts legacy. NO fetch al Rails desde el browser.
+NO remapea default / luxury / deo / beige.
+
+
+i18n (desde Ops)
+----------------
+
+getSiteUi(lang); selector ES|EN si show_locale_switcher; localizedHref().
+
+
+Admin / login
+-------------
+
+isStyledSiteLayout(): layout_key !== "default" -> acentos de marca en admin/login.
+
+
+Fuera de alcance
+----------------
+
+Nuevos campos SiteConfig, cambios en API/Ops, deploy Vercel.

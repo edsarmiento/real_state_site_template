@@ -20,6 +20,7 @@ type Props = {
   dict?: SiteDictionary;
   locale?: SiteLocale;
   defaultLocale?: SiteLocale;
+  className?: string;
 };
 
 function catalogHref(
@@ -51,6 +52,7 @@ export function PublicCatalogSearch({
   dict,
   locale,
   defaultLocale,
+  className,
 }: Props) {
   const offerTabs: { id: CatalogOfferFilter; label: string }[] = dict
     ? [
@@ -92,7 +94,7 @@ export function PublicCatalogSearch({
         styledLayout
           ? "shadow-[0_24px_48px_-24px_rgba(15,23,42,0.35)] ring-1 ring-blue-950/10"
           : "border border-zinc-200 shadow-sm"
-      }`}
+      }${className ? ` ${className}` : ""}`}
     >
       <nav
         className="flex border-b border-zinc-100"

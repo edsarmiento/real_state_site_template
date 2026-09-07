@@ -11,6 +11,7 @@ export const THEME_DEFINITIONS = [
   { name: "beige", layoutKeys: ["beige"] },
   { name: "elegant", layoutKeys: ["elegant"] },
   { name: "orange", layoutKeys: ["orange"] },
+  { name: "ultra", layoutKeys: ["ultra"] },
 ] as const;
 
 export type SiteThemeName = (typeof THEME_DEFINITIONS)[number]["name"];
