@@ -1,11 +1,7 @@
 import Link from "next/link";
 import type { PublicListingCard } from "@/lib/listing-types";
 import { fillTemplate, type SiteDictionary } from "@/lib/site-i18n";
-import {
-  ultraHeroTitleParts,
-  uniquePhotoUrls,
-} from "@/themes/ultra/ultra-hero-title";
-import { UltraReveal } from "@/themes/ultra/ultra-reveal";
+import { ultraHeroTitleParts } from "@/themes/ultra/ultra-hero-title";
 
 type Props = {
   title: string;
@@ -15,10 +11,19 @@ type Props = {
   primaryLabel: string;
   secondaryHref: string | null;
   secondaryLabel: string;
-  photoUrls?: string[];
+  photoUrls: string[];
   listings: PublicListingCard[];
   dict: SiteDictionary;
+  brandName: string;
+  fallbackLabel: string;
 };
+
+function brandMonogram(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return `${words[0][0] ?? ""}${words[1][0] ?? ""}`.toUpperCase();
+}
 
 export function UltraHero({
   title,
@@ -31,63 +36,61 @@ export function UltraHero({
   photoUrls,
   listings,
   dict,
+  brandName,
+  fallbackLabel,
 }: Props) {
   const parts = ultraHeroTitleParts(title);
-  const photos = uniquePhotoUrls(photoUrls, 3);
-  const featured = listings.find((item) => item.photo_url) ?? listings[0];
+  const photos = photoUrls;
+  const mainPhoto = photos[0] ?? null;
+  const thumbs = photos.slice(1);
+  const featured = listings.find((item) => {
+    const url = item.photo_url?.trim();
+    return Boolean(url && mainPhoto && url === mainPhoto);
+  });
   const captionLocation = featured?.location_label?.trim() || "";
   const captionTitle = featured?.title?.trim() || "";
-  const mainPhoto = photos[0] ?? featured?.photo_url?.trim() ?? null;
-  const thumbs = photos.slice(1);
   const captionAlt = captionTitle
     ? fillTemplate(dict.listing.gallery.photoAlt, {
         title: captionTitle,
         index: 1,
         count: Math.max(photos.length, 1),
       })
-    : dict.listing.noPhoto;
+    : fallbackLabel;
   const showCaption = Boolean((captionLocation || captionTitle) && mainPhoto);
+  const monogram = brandMonogram(brandName);
 
   return (
     <section className="ultra-hero">
       <div className="ultra-shell ultra-hero__grid">
         <div className="ultra-hero__copy">
           {eyebrow ? (
-            <UltraReveal variant="up" durationMs={800}>
-              <p className="ultra-hero__badge">
-                <span className="ultra-hero__pulse" aria-hidden />
-                <span>{eyebrow}</span>
-              </p>
-            </UltraReveal>
+            <p className="ultra-hero__badge">
+              <span className="ultra-hero__pulse" aria-hidden />
+              <span>{eyebrow}</span>
+            </p>
           ) : null}
-          <UltraReveal variant="up" delayMs={80} durationMs={850}>
-            <h1 className="ultra-hero__title">
-              {parts.lead ? (
-                <>
-                  {parts.lead}{" "}
-                  <em className="ultra-hero__accent">{parts.accent}</em>
-                </>
-              ) : (
+          <h1 className="ultra-hero__title">
+            {parts.lead ? (
+              <>
+                {parts.lead}{" "}
                 <em className="ultra-hero__accent">{parts.accent}</em>
-              )}
-            </h1>
-          </UltraReveal>
-          <UltraReveal variant="up" delayMs={140} durationMs={850}>
-            <p className="ultra-hero__subtitle">{subtitle}</p>
-          </UltraReveal>
-          <UltraReveal variant="up" delayMs={200} durationMs={850}>
-            <div className="ultra-hero__actions">
-              <Link href={primaryHref} className="ultra-btn">
-                <span>{primaryLabel}</span>
-                <span aria-hidden>→</span>
+              </>
+            ) : (
+              <em className="ultra-hero__accent">{parts.accent}</em>
+            )}
+          </h1>
+          <p className="ultra-hero__subtitle">{subtitle}</p>
+          <div className="ultra-hero__actions">
+            <Link href={primaryHref} className="ultra-btn">
+              <span>{primaryLabel}</span>
+              <span aria-hidden>→</span>
+            </Link>
+            {secondaryHref ? (
+              <Link href={secondaryHref} className="ultra-btn ultra-btn--ghost">
+                {secondaryLabel}
               </Link>
-              {secondaryHref ? (
-                <Link href={secondaryHref} className="ultra-btn ultra-btn--ghost">
-                  {secondaryLabel}
-                </Link>
-              ) : null}
-            </div>
-          </UltraReveal>
+            ) : null}
+          </div>
         </div>
 
         <div
@@ -109,7 +112,15 @@ export function UltraHero({
                     className="ultra-hero-frame__img"
                   />
                 ) : (
-                  <div className="ultra-hero-frame__placeholder" aria-hidden />
+                  <div className="ultra-hero-fallback">
+                    <div className="ultra-hero-fallback__art" aria-hidden="true" />
+                    {monogram ? (
+                      <p className="ultra-hero-fallback__mark" aria-hidden="true">
+                        {monogram}
+                      </p>
+                    ) : null}
+                    <p className="ultra-hero-fallback__label">{fallbackLabel}</p>
+                  </div>
                 )}
               </div>
               {showCaption ? (

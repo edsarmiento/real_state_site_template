@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { PublicCatalogSearch } from "@/components/public-catalog-search";
-import { PublicListingCard } from "@/components/public-listing-card";
 import { catalogTotalPages } from "@/lib/catalog-pagination";
 import { locationsFromListings } from "@/lib/public-site-content";
 import {
@@ -10,15 +8,22 @@ import {
 } from "@/lib/site-i18n";
 import type { CatalogThemeProps } from "@/themes/theme-types";
 import { UltraAbout } from "@/themes/ultra/ultra-about";
+import { UltraCatalogGrid } from "@/themes/ultra/ultra-catalog-grid";
+import { UltraCatalogSearch } from "@/themes/ultra/ultra-catalog-search";
 import { UltraContact } from "@/themes/ultra/ultra-contact";
+import { getUltraCopy } from "@/themes/ultra/ultra-copy";
 import { UltraFinalCta } from "@/themes/ultra/ultra-final-cta";
 import { UltraFooter } from "@/themes/ultra/ultra-footer";
 import { UltraHeader } from "@/themes/ultra/ultra-header";
 import { UltraHero } from "@/themes/ultra/ultra-hero";
+import { fetchUnfilteredHeroPhotoUrls } from "@/themes/ultra/ultra-hero-catalog";
+import {
+  needsUnfilteredHeroCatalog,
+  resolveHeroPhotoUrls,
+} from "@/themes/ultra/ultra-hero-media";
 import { UltraLocations } from "@/themes/ultra/ultra-locations";
 import { UltraPagination } from "@/themes/ultra/ultra-pagination";
 import { UltraProcess } from "@/themes/ultra/ultra-process";
-import { UltraReveal } from "@/themes/ultra/ultra-reveal";
 import { UltraShell } from "@/themes/ultra/ultra-shell";
 import { getUltraUi } from "@/themes/ultra/ultra-ui";
 
@@ -39,21 +44,33 @@ export async function UltraCatalog({
   heroPhotoUrls,
 }: CatalogThemeProps) {
   const { content, dict, locale, defaultLocale } = await getUltraUi(lang);
+  const copy = getUltraCopy(locale);
   const locations =
     content.locations.length > 0
       ? content.locations
       : locationsFromListings(listings);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
-  const clearHref = localizedHref(
-    "/",
-    locale,
-    oferta === "all"
-      ? null
-      : { oferta: oferta === "sale" ? "venta" : "renta" },
-    defaultLocale,
-  );
   const totalPages = catalogTotalPages(total, pageSize);
-  const hasFilters = Boolean(propertyType || bedrooms || city);
+  const hasFieldFilters = Boolean(propertyType || bedrooms || city);
+  const hasAnyFilter = hasFieldFilters || oferta !== "all";
+  const localHeroUrls = resolveHeroPhotoUrls({
+    configuredUrl: content.hero.imageUrl,
+    galleryUrls: heroPhotoUrls,
+    listings,
+  });
+  const catalogHeroUrls = needsUnfilteredHeroCatalog({
+    hasAnyFilter,
+    catalogOk,
+    resolvedCount: localHeroUrls.length,
+  })
+    ? await fetchUnfilteredHeroPhotoUrls()
+    : [];
+  const heroUrls = resolveHeroPhotoUrls({
+    configuredUrl: content.hero.imageUrl,
+    galleryUrls: heroPhotoUrls,
+    listings,
+    catalogUrls: catalogHeroUrls,
+  });
   const emptyKind =
     oferta === "sale"
       ? dict.results.emptySale
@@ -85,30 +102,24 @@ export async function UltraCatalog({
         primaryLabel={dict.hero.primaryCta}
         secondaryHref={secondaryHref}
         secondaryLabel={dict.hero.secondaryCta}
-        photoUrls={heroPhotoUrls}
+        photoUrls={heroUrls}
         listings={listings}
         dict={dict}
+        brandName={content.brand.name}
+        fallbackLabel={copy.heroSelectedForYou}
       />
 
       <div className="ultra-search-shell">
         <div className="ultra-shell">
-          <UltraReveal variant="up">
-            <PublicCatalogSearch
-              oferta={oferta}
-              city={city}
-              propertyType={propertyType}
-              bedrooms={bedrooms}
-              styledLayout
-              dict={dict}
-              locale={locale}
-              defaultLocale={defaultLocale}
-              className="ultra-search"
-              offerControl="radios"
-              submitOnOperationChange={false}
-              operationClassName="ultra-search-operation"
-              formAction={localizedHref("/#catalogo", locale, null, defaultLocale)}
-            />
-          </UltraReveal>
+          <UltraCatalogSearch
+            oferta={oferta}
+            city={city}
+            propertyType={propertyType}
+            bedrooms={bedrooms}
+            dict={dict}
+            locale={locale}
+            defaultLocale={defaultLocale}
+          />
         </div>
       </div>
 
@@ -122,24 +133,31 @@ export async function UltraCatalog({
             </p>
           ) : listings.length === 0 ? (
             <div className="ultra-state">
-              <h2 className="ultra-section-title">{dict.results.emptyTitle}</h2>
+              <h2 className="ultra-section-title">
+                {hasAnyFilter
+                  ? copy.emptyFilterTitle
+                  : dict.results.emptyTitle}
+              </h2>
               <p className="ultra-lead">
-                {dict.results.emptyCopy}
+                {hasAnyFilter
+                  ? copy.emptyFilterCopy
+                  : dict.results.emptyCopy}
                 {emptyKind ? ` ${emptyKind}` : ""}
                 {city ? ` ${fillTemplate(dict.results.inPlace, { city })}` : ""}
                 {localizedType ? ` · ${localizedType}` : ""}
                 {bedrooms
                   ? ` · ${fillTemplate(dict.results.bedroomsFilter, { count: bedrooms })}`
                   : ""}
-                .
+                {hasAnyFilter ? "" : "."}
               </p>
-              <Link href={homeHref} className="ultra-btn">
-                {dict.results.viewAll}
-              </Link>
+              {hasAnyFilter ? (
+                <Link href={homeHref} className="ultra-btn">
+                  {dict.results.clearFilters}
+                </Link>
+              ) : null}
             </div>
           ) : (
             <section>
-              <UltraReveal variant="up">
               <div className="ultra-catalog__head">
                 <div>
                   <p className="ultra-eyebrow">
@@ -148,30 +166,18 @@ export async function UltraCatalog({
                   </p>
                   <h2 className="ultra-section-title">{heading}</h2>
                 </div>
-                {hasFilters ? (
-                  <Link href={clearHref} className="ultra-inline-link">
+                {hasAnyFilter ? (
+                  <Link href={homeHref} className="ultra-inline-link">
                     {dict.results.clearFilters}
                   </Link>
                 ) : null}
               </div>
-              </UltraReveal>
-              <ul className="ultra-grid">
-                {listings.map((listing, index) => (
-                  <li key={listing.slug} className="min-w-0">
-                    <UltraReveal variant="up" delayMs={Math.min(index, 5) * 70}>
-                      <PublicListingCard
-                        listing={listing}
-                        styledLayout
-                        dict={dict}
-                        locale={locale}
-                        defaultLocale={defaultLocale}
-                        className="ultra-card"
-                        ctaLabel={dict.listing.viewDetail}
-                      />
-                    </UltraReveal>
-                  </li>
-                ))}
-              </ul>
+              <UltraCatalogGrid
+                listings={listings}
+                dict={dict}
+                locale={locale}
+                defaultLocale={defaultLocale}
+              />
               <UltraPagination
                 page={page}
                 totalPages={totalPages}

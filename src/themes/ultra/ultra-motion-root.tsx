@@ -69,7 +69,6 @@ export function UltraMotionRoot({ preset, children }: Props) {
     return () => {
       mutations.disconnect();
       observer.disconnect();
-      root.classList.remove("ultra-motion-ready");
     };
   }, [preset]);
 

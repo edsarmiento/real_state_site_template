@@ -32,7 +32,7 @@ export function ListingOfferBadge({
   return (
     <span
       className={[
-        "listing-offer-badge inline-flex rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white",
+        "inline-flex rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white",
         tone,
         className,
       ].join(" ")}

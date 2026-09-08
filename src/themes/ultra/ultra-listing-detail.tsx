@@ -17,6 +17,7 @@ import type { ListingDetailThemeProps } from "@/themes/theme-types";
 import { UltraFooter } from "@/themes/ultra/ultra-footer";
 import { UltraHeader } from "@/themes/ultra/ultra-header";
 import { UltraIconArrowLeft, UltraIconWhatsApp } from "@/themes/ultra/ultra-icons";
+import { getUltraCopy } from "@/themes/ultra/ultra-copy";
 import { UltraReveal } from "@/themes/ultra/ultra-reveal";
 import { UltraShell } from "@/themes/ultra/ultra-shell";
 import { getUltraUi } from "@/themes/ultra/ultra-ui";
@@ -27,6 +28,7 @@ export async function UltraListingDetail({
 }: ListingDetailThemeProps) {
   const { content, dict, locale, defaultLocale, config } =
     await getUltraUi(lang);
+  const copy = getUltraCopy(locale);
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const specs = listingPublicSpecsLocalized(listing, dict);
@@ -96,7 +98,6 @@ export async function UltraListingDetail({
                   fallbackUrl={listing.photo_url}
                   className="ultra-gallery"
                   styledLayout={false}
-                  transition="crossfade"
                   labels={dict.listing.gallery}
                 />
                 <span className="ultra-gallery__badge">{offerLabel}</span>
@@ -116,6 +117,9 @@ export async function UltraListingDetail({
             <aside className="ultra-detail__sidebar">
               <UltraReveal variant="right" durationMs={850} className="ultra-detail__sidebar-motion">
               <div className="ultra-detail__price-card">
+                <p className="ultra-detail__price-kicker">
+                  {isSale ? copy.priceSale : copy.priceRent}
+                </p>
                 <p className="ultra-detail__price">
                   {formatRentCents(listing.rent_cents, listing.currency)}
                   {priceSuffix ? (

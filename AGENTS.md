@@ -212,7 +212,7 @@ Fuente de verdad: `THEME_DEFINITIONS` en `src/themes/theme-definitions.ts` (keys
 | `orange` | `orange` | Catalog, ListingDetail, LegalPage |
 | `ultra` | `ultra` | Catalog, ListingDetail, LegalPage |
 
-Unknown `layout_key` → `default` (nunca beige ni ultra).
+Unknown `layout_key` → `default` (nunca beige).
 
 **Legacy:** `deo-catalog-hero.tsx` es de la Fase 3; con `layout_key: deo` **no** se usa (Luxury reemplaza el catálogo). No crear plantillas nuevas solo como hero.
 
@@ -243,7 +243,7 @@ Reglas en template:
 
 - `resolveRequestLocale(?lang, config.locale)` elige idioma activo; fallback inválido → `default_locale`.
 - El selector solo se renderiza si `show_locale_switcher === true` **y** hay ≥2 idiomas en `supported_locales` (`locale-switcher-base.tsx`).
-- Diccionarios: `getDictionary(locale)` en `site-i18n.ts`. Server: `getSiteUi(lang)`, `getLuxuryUi(lang)`, `getBeigeUi(lang)` o `getUltraUi(lang)`.
+- Diccionarios: `getDictionary(locale)` en `site-i18n.ts`. Server: `getSiteUi(lang)`, `getLuxuryUi(lang)` o `getBeigeUi(lang)`.
 - `?lang=en` / `?lang=es` en URLs cuando el idioma está en `supported_locales` (con o sin selector visible).
 
 ### Tema `default` (estructura)
@@ -272,17 +272,6 @@ Reglas en template:
 - Admin/login: `isStyledSiteLayout` es true (cualquier `layout_key` distinto de `default`).
 - Para que Ops pueda elegir `beige`, el API debe aceptar `SiteConfig::LAYOUT_KEYS` con esa clave (cambio coordinado fuera de este repo).
 
-### Tema `ultra`
-
-- `src/themes/ultra/` — catálogo editorial vino/crema (hero, buscador compartido, cards, ubicaciones, about, proceso, contacto, CTA) y ficha en `/inmueble/[slug]`.
-- i18n: mismo `site-i18n.ts`; `getUltraUi(lang)` usa `getSiteUi(lang)` + `getPublicSiteContent()`.
-- CSS encapsulado en `[data-site-theme="ultra"]` (`globals.css`): crema/vino/dorado; Playfair Display + Plus Jakarta Sans vía `next/font`.
-- Catálogo: `theme.catalog.pageSize` 12 y `heroGallery: true` (sin `if (theme.name)` en `app/`).
-- Legales: `theme.LegalPage` (registrado como `UltraLegalPage`).
-- Widgets compartidos: `PublicCatalogSearch`, `PublicListingCard`, `ListingInquiryForm`, `ListingWhatsAppButton`, `ListingShareButton`, `ListingPhotoGallery`, `publicListingCardModel`, `listingPublicSpecsLocalized`.
-- Admin/login: `isStyledSiteLayout` es true (cualquier `layout_key` distinto de `default`).
-- API/Ops: falta aceptar `layout_key: "ultra"` en `SiteConfig::LAYOUT_KEYS` y exponerlo en el selector de Ops.
-
 ### Admin / login vs theme público
 
 El theme público **no** redefine el admin. Acentos en login y `/listings`:
@@ -308,7 +297,7 @@ Helpers: `isStyledSiteLayout(layoutKey)`, `SiteLayoutVariantProvider`, `useSiteL
 | `getResolvedSiteConfig()` | Server Components |
 | `resolveSiteThemeFromConfig()` | Elegir theme (legales, etc.) |
 | `getPublicSiteContent()` | Copy/marketing del theme (server) |
-| `getSiteUi(lang)` / `getLuxuryUi(lang)` / `getBeigeUi(lang)` / `getUltraUi(lang)` | Locale + diccionario en Server Components |
+| `getSiteUi(lang)` / `getLuxuryUi(lang)` / `getBeigeUi(lang)` | Locale + diccionario en Server Components |
 | `pickSiteBranding(config)` | Marca en `"use client"` |
 | `site-config-env.ts` | `ACCOUNT_ID`, `listingPublicUrl` — solo servidor |
 
