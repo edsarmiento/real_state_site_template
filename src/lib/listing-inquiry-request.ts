@@ -22,17 +22,21 @@ export async function submitListingInquiry(
   slug: string,
   inquiry: { name: string; phone: string; message: string },
 ): Promise<{ ok: true } | { ok: false; message: string }> {
-  const res = await fetch(
-    `/api/public/listings/${encodeURIComponent(slug)}/inquiries`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ inquiry }),
-    },
-  );
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    return { ok: false, message: parseApiFailureMessage(data) };
+  try {
+    const res = await fetch(
+      `/api/public/listings/${encodeURIComponent(slug)}/inquiries`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inquiry }),
+      },
+    );
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { ok: false, message: parseApiFailureMessage(data) };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, message: GENERIC_FAILURE };
   }
-  return { ok: true };
 }

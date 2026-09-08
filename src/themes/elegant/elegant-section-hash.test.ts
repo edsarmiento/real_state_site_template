@@ -22,4 +22,10 @@ describe("remapElegantSectionHash", () => {
     assert.equal(elegantLocationHash("#propiedades"), "#propiedades");
     assert.equal(elegantLocationHash(""), "");
   });
+
+  it("does not treat Object.prototype names as mapped section ids", () => {
+    assert.equal(remapElegantSectionHash("#constructor"), "constructor");
+    assert.equal(remapElegantSectionHash("#toString"), "toString");
+    assert.equal(elegantLocationHash("#valueOf"), "#valueOf");
+  });
 });

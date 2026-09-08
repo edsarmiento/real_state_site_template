@@ -45,9 +45,10 @@ html:has([data-site-theme="elegant"])::-webkit-scrollbar-thumb:hover {
   --elegant-header-h: 5rem;
   --elegant-shell: 80rem;
   --elegant-gutter: 1.5rem;
-  --font-elegant-heading: var(--font-elegant-serif), "Playfair Display", Georgia, serif;
-  --font-elegant-body: var(--font-elegant-sans), Inter, system-ui, sans-serif;
+  --font-elegant-heading: var(--font-elegant-serif), "Playfair Display", "Georgia", serif;
+  --font-elegant-body: var(--font-elegant-sans), "Inter", system-ui, sans-serif;
   --font-elegant-script-face: var(--font-elegant-script), "Great Vibes", cursive;
+
   background: var(--elegant-obsidian);
   color: #fff;
   font-family: var(--font-elegant-body);
@@ -93,7 +94,7 @@ html:has([data-site-theme="elegant"])::-webkit-scrollbar-thumb:hover {
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
@@ -1535,10 +1536,6 @@ html:has([data-site-theme="elegant"])::-webkit-scrollbar-thumb:hover {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  [data-site-theme="elegant"] .elegant-process__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   [data-site-theme="elegant"] .elegant-locations__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1576,6 +1573,10 @@ html:has([data-site-theme="elegant"])::-webkit-scrollbar-thumb:hover {
   }
 
   [data-site-theme="elegant"] .elegant-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  [data-site-theme="elegant"] .elegant-process__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 

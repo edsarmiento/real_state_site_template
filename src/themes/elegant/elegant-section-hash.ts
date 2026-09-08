@@ -12,7 +12,7 @@ const SECTION_IDS: Record<string, string> = {
 export function remapElegantSectionHash(hash: string): string {
   const key = hash.replace(/^#/, "").trim();
   if (!key) return "";
-  return SECTION_IDS[key] ?? key;
+  return Object.hasOwn(SECTION_IDS, key) ? SECTION_IDS[key] : key;
 }
 
 export function elegantLocationHash(hash: string): string {

@@ -219,7 +219,6 @@ export async function ElegantCatalog({
           dict={dict}
           locale={locale}
           defaultLocale={defaultLocale}
-          inquirySlug={listings[0]?.slug ?? null}
         />
         <ElegantFinalCta content={content} dict={dict} />
       </main>

@@ -28,7 +28,7 @@ export function elegantHeroTitleParts(
   const words = trimmed.split(" ").filter(Boolean);
   if (words.length < 2) return { before: trimmed, accent: "", after: "" };
 
-  const tail = words.slice(words.length >= 3 ? -2 : -1).join(" ");
+  const tail = words.slice(-2).join(" ");
   const tailAt = trimmed.lastIndexOf(tail);
   return {
     before: trimmed.slice(0, tailAt),

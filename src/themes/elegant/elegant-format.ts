@@ -10,6 +10,7 @@ export function elegantContentHref(
   if (!trimmed) return localizedHref("/", locale, null, defaultLocale);
   try {
     const parsed = new URL(trimmed, "https://elegant.local");
+    if (parsed.origin !== "https://elegant.local") return trimmed;
     const mapped = remapElegantSectionHash(parsed.hash);
     const path = parsed.pathname === "/" ? "/" : parsed.pathname;
     const withHash = mapped ? `${path}#${mapped}` : path;

@@ -22,6 +22,14 @@ describe("elegantHeroTitleParts", () => {
     });
   });
 
+  it("keeps both words in the fallback for a two-word title", () => {
+    assert.deepEqual(elegantHeroTitleParts("Propiedades exclusivas", ""), {
+      before: "",
+      accent: "Propiedades exclusivas",
+      after: "",
+    });
+  });
+
   it("collapses repeated whitespace without dropping words", () => {
     const parts = elegantHeroTitleParts(
       "  Encuentra   tu   próximo   inmueble  ",

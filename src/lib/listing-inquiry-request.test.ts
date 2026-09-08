@@ -55,4 +55,21 @@ describe("submitListingInquiry", () => {
 
     assert.deepEqual(result, { ok: false, message: "Teléfono inválido" });
   });
+
+  it("returns a generic failure when fetch rejects", async () => {
+    globalThis.fetch = (async () => {
+      throw new TypeError("Failed to fetch");
+    }) as typeof fetch;
+
+    const result = await submitListingInquiry("casa-burdeos", {
+      name: "Ana",
+      phone: "6641234567",
+      message: "Quiero una visita",
+    });
+
+    assert.deepEqual(result, {
+      ok: false,
+      message: "No se pudo completar la solicitud.",
+    });
+  });
 });
