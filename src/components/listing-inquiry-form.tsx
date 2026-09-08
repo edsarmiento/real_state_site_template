@@ -17,6 +17,14 @@ export type ListingInquiryFormClassNames = {
   submit?: string;
   submitPending?: string;
   submitLabel?: string;
+  consent?: string;
+};
+
+export type ListingInquiryPrivacy = {
+  href: string;
+  consentLabel: string;
+  linkLabel: string;
+  error: string;
 };
 
 type Props = {
@@ -26,6 +34,7 @@ type Props = {
   copy?: ListingInquiryCopy;
   classNames?: ListingInquiryFormClassNames;
   inputIdPrefix?: string;
+  privacy?: ListingInquiryPrivacy;
 };
 
 export function ListingInquiryForm({
@@ -35,9 +44,13 @@ export function ListingInquiryForm({
   copy,
   classNames,
   inputIdPrefix = "",
+  privacy,
 }: Props) {
   const { error, pending, sent, phone, onPhoneChange, onSubmit } =
-    useListingInquiry(slug, copy);
+    useListingInquiry(slug, copy, {
+      privacyRequired: Boolean(privacy),
+      privacyError: privacy?.error,
+    });
   const isSale = parseOfferType(offerType) === "sale";
   const fieldId = (name: string) =>
     inputIdPrefix ? `${inputIdPrefix}-${name}` : name;
@@ -139,6 +152,23 @@ export function ListingInquiryForm({
           className={textareaClass}
         />
       </div>
+      {privacy ? (
+        <label className={classNames?.consent ?? "flex items-start gap-2 text-sm text-zinc-600"}>
+          <input
+            id={fieldId("privacy")}
+            type="checkbox"
+            name="privacyAccepted"
+            value="on"
+            required
+          />
+          <span>
+            {privacy.consentLabel}{" "}
+            <a href={privacy.href} className="underline underline-offset-2">
+              {privacy.linkLabel}
+            </a>
+          </span>
+        </label>
+      ) : null}
       <button type="submit" disabled={pending} className={submitClass}>
         {classNames?.submitLabel ? (
           <span className={classNames.submitLabel}>{submitLabel}</span>

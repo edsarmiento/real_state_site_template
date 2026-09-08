@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { galleryIndexAfterKey, wrapGalleryIndex } from "@/lib/listing-gallery-nav";
 import type { ListingPhoto } from "@/lib/listing-types";
 import { fillTemplate } from "@/lib/site-i18n";
 
@@ -91,7 +92,7 @@ export function ListingPhotoGallery({
   const goTo = useCallback(
     (index: number) => {
       if (count === 0) return;
-      setActiveIndex(((index % count) + count) % count);
+      setActiveIndex(wrapGalleryIndex(index, count));
     },
     [count],
   );
@@ -102,17 +103,14 @@ export function ListingPhotoGallery({
   useEffect(() => {
     if (count <= 1) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        goPrev();
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        goNext();
-      }
+      const next = galleryIndexAfterKey(e.key, activeIndex, count);
+      if (next == null) return;
+      e.preventDefault();
+      setActiveIndex(next);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [count, goNext, goPrev]);
+  }, [activeIndex, count]);
 
   const activeUrl = urls[activeIndex] ?? null;
 

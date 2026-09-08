@@ -11,7 +11,7 @@ export type LocaleSwitcherBaseProps = {
   label: string;
   optionLabel: (locale: SiteLocale) => string;
   optionAriaLabel: (locale: SiteLocale) => string;
-  variant?: "default" | "luxury" | "beige";
+  variant?: "default" | "luxury" | "beige" | "elegant";
   className?: string;
 };
 
@@ -43,8 +43,13 @@ export function LocaleSwitcherBase({
     router.replace(href, { scroll: false });
   }
 
-  if (variant === "luxury" || variant === "beige") {
-    const prefix = variant === "beige" ? "beige-locale" : "luxury-locale";
+  if (variant === "luxury" || variant === "beige" || variant === "elegant") {
+    const prefix =
+      variant === "beige"
+        ? "beige-locale"
+        : variant === "elegant"
+          ? "elegant-locale"
+          : "luxury-locale";
     return (
       <div className={prefix} role="group" aria-label={label}>
         {supportedLocales.map((code, index) => {

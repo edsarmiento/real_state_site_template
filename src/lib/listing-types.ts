@@ -1,3 +1,4 @@
+import { listingPublicPath } from "@/lib/listing-public-path";
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import {
   localizedHref,
@@ -15,40 +16,7 @@ export type ListingPhoto = {
   position: number;
 };
 
-function listingPhotoKey(url: string): string {
-  try {
-    const parsed = new URL(url);
-    return `${parsed.origin}${parsed.pathname}`;
-  } catch {
-    return url;
-  }
-}
-
-/** Cover first, then gallery by position. Skips empty URLs and signed-URL duplicates. */
-export function listingGalleryUrls(listing: {
-  photos?: ListingPhoto[] | null;
-  photo_url?: string | null;
-}): string[] {
-  const seen = new Set<string>();
-  const urls: string[] = [];
-  const push = (raw: string | null | undefined) => {
-    const url = raw?.trim();
-    if (!url) return;
-    const key = listingPhotoKey(url);
-    if (seen.has(key)) return;
-    seen.add(key);
-    urls.push(url);
-  };
-
-  push(listing.photo_url);
-  const photos = [...(listing.photos ?? [])].sort(
-    (a, b) => a.position - b.position,
-  );
-  for (const photo of photos) {
-    push(photo.url);
-  }
-  return urls;
-}
+export { listingGalleryUrls } from "./listing-gallery";
 
 export type StaffListing = {
   id: number;
@@ -135,21 +103,10 @@ export function parseOfferType(
   return value === "sale" ? "sale" : "rent";
 }
 
-export function parseCatalogOfferFilter(
-  value: string | undefined,
-): CatalogOfferFilter {
-  const v = value?.trim().toLowerCase();
-  if (v === "venta" || v === "sale") return "sale";
-  if (v === "renta" || v === "rent") return "rent";
-  if (v === "todas" || v === "all") return "all";
-  return "all";
-}
-
-export function catalogOfferQueryValue(filter: CatalogOfferFilter): string {
-  if (filter === "sale") return "venta";
-  if (filter === "all") return "todas";
-  return "renta";
-}
+export {
+  catalogOfferQueryValue,
+  parseCatalogOfferFilter,
+} from "./listing-offer-filter";
 
 export function formatRentCents(cents: number, currency: string): string {
   return new Intl.NumberFormat("es-MX", {
@@ -280,15 +237,11 @@ export function publicListingCardModel(
 ) {
   const { dict, locale, defaultLocale } = options;
   const offerType = parseOfferType(listing.offer_type);
+  const path = listingPublicPath(listing.slug);
   const href =
     locale && defaultLocale
-      ? localizedHref(
-          `/inmueble/${listing.slug}`,
-          locale,
-          null,
-          defaultLocale,
-        )
-      : `/inmueble/${listing.slug}`;
+      ? localizedHref(path, locale, null, defaultLocale)
+      : path;
 
   return {
     offerType,
@@ -306,20 +259,4 @@ export function publicListingCardModel(
   };
 }
 
-export function parseApiFailureMessage(data: unknown): string {
-  if (!data || typeof data !== "object") return "No se pudo completar la solicitud.";
-  const obj = data as Record<string, unknown>;
-  if (typeof obj.error === "string") return obj.error;
-  if (typeof obj.message === "string") return obj.message;
-  const errors = obj.errors;
-  if (Array.isArray(errors) && errors.length > 0) {
-    return errors.map(String).join(". ");
-  }
-  if (errors && typeof errors === "object") {
-    return Object.values(errors as Record<string, unknown>)
-      .flat()
-      .map(String)
-      .join(". ");
-  }
-  return "No se pudo completar la solicitud.";
-}
+export { parseApiFailureMessage } from "./listing-inquiry-request";
