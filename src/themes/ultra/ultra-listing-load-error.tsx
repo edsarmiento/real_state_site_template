@@ -15,7 +15,9 @@ export async function UltraListingLoadError({
   return (
     <UltraShell lang={lang}>
       <UltraHeader lang={lang} />
-      <p className="ultra-load-error">{message}</p>
+      <main>
+        <p className="ultra-load-error">{message}</p>
+      </main>
       <UltraFooter lang={lang} />
     </UltraShell>
   );

@@ -11079,41 +11079,41 @@ html:has([data-site-theme="ultra"])::-webkit-scrollbar-thumb {
   transform: translateY(0);
 }
 
-[data-site-theme="ultra"] .ultra-card .text-blue-700,
-[data-site-theme="ultra"] .ultra-card .group-hover\:text-blue-800 {
-  color: var(--ultra-wine) !important;
+[data-site-theme="ultra"] .ultra-card .public-listing-card__price,
+[data-site-theme="ultra"] .ultra-card .public-listing-card__title {
+  color: var(--ultra-wine);
 }
 
-[data-site-theme="ultra"] .ultra-card span.inline-flex.rounded-full {
-  background: var(--ultra-wine) !important;
+[data-site-theme="ultra"] .ultra-card .listing-offer-badge {
+  background: var(--ultra-wine);
 }
 
-[data-site-theme="ultra"] .ultra-card p.font-semibold.leading-snug {
+[data-site-theme="ultra"] .ultra-card .public-listing-card__title {
   font-size: 1.125rem;
   line-height: 1.45;
 }
 
-[data-site-theme="ultra"] .ultra-card p.line-clamp-1,
-[data-site-theme="ultra"] .ultra-card p.text-sm {
+[data-site-theme="ultra"] .ultra-card .public-listing-card__location,
+[data-site-theme="ultra"] .ultra-card .public-listing-card__specifications {
   font-size: 0.875rem;
   line-height: 1.5;
 }
 
-[data-site-theme="ultra"] .ultra-card p.text-xs {
+[data-site-theme="ultra"] .ultra-card .public-listing-card__type {
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   line-height: 1.4;
 }
 
 @media (max-width: 767px) {
-  [data-site-theme="ultra"] .ultra-card p.font-semibold.leading-snug {
+  [data-site-theme="ultra"] .ultra-card .public-listing-card__title {
     font-size: 1.125rem;
     line-height: 1.45;
   }
 
-  [data-site-theme="ultra"] .ultra-card p.line-clamp-1,
-  [data-site-theme="ultra"] .ultra-card p.text-sm,
-  [data-site-theme="ultra"] .ultra-card p.text-xs {
+  [data-site-theme="ultra"] .ultra-card .public-listing-card__location,
+  [data-site-theme="ultra"] .ultra-card .public-listing-card__specifications,
+  [data-site-theme="ultra"] .ultra-card .public-listing-card__type {
     font-size: 0.875rem;
     line-height: 1.5;
   }
@@ -12125,4 +12125,3 @@ html:has([data-site-theme="ultra"])::-webkit-scrollbar-thumb {
     display: none !important;
   }
 }
-

@@ -32,18 +32,18 @@ function representativeListingPhoto(
   listings: PublicListingCard[],
 ): string | null {
   const needle = city ? cityKey(city) : "";
-  if (needle) {
-    const match = listings.find((listing) => {
-      const cityMatch = cityKey(listing.city || "") === needle;
-      const labelMatch = cityKey(listing.location_label || "").includes(needle);
-      return (cityMatch || labelMatch) && Boolean(listing.photo_url?.trim());
-    });
-    if (match?.photo_url?.trim()) return match.photo_url.trim();
-  }
-  return (
-    listings.find((listing) => listing.photo_url?.trim())?.photo_url?.trim() ||
-    null
-  );
+  if (!needle) return null;
+
+  const matchingListings = listings.filter((listing) => {
+    const cityMatch = cityKey(listing.city || "") === needle;
+    const labelMatch = cityKey(listing.location_label || "").includes(needle);
+    return cityMatch || labelMatch;
+  });
+  const photo = matchingListings
+    .map((listing) => listing.photo_url?.trim())
+    .find((candidate): candidate is string => Boolean(candidate));
+
+  return photo || null;
 }
 
 function fallbackLocations(listings: PublicListingCard[]): PublicLocation[] {

@@ -52,9 +52,7 @@ export function UltraParticles({ density = "ambient" }: Props) {
       const root = canvasEl.closest("[data-site-theme='ultra']");
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = Math.floor(root?.clientWidth || window.innerWidth);
-      height = Math.floor(
-        Math.max(root?.scrollHeight || 0, window.innerHeight),
-      );
+      height = Math.floor(window.innerHeight);
       canvasEl.width = Math.floor(width * dpr);
       canvasEl.height = Math.floor(height * dpr);
       canvasEl.style.width = `${width}px`;
