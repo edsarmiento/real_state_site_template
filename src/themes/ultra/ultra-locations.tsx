@@ -13,38 +13,8 @@ import {
   type SiteLocale,
 } from "@/lib/site-i18n";
 import { UltraIconArrowRight } from "@/themes/ultra/ultra-icons";
+import { representativeListingPhoto } from "@/themes/ultra/ultra-location-photo";
 import { UltraReveal } from "@/themes/ultra/ultra-reveal";
-
-function normalizeCity(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-}
-
-function cityKey(value: string): string {
-  return normalizeCity(value).split(",")[0]?.trim() || "";
-}
-
-function representativeListingPhoto(
-  city: string | undefined,
-  listings: PublicListingCard[],
-): string | null {
-  const needle = city ? cityKey(city) : "";
-  if (!needle) return null;
-
-  const matchingListings = listings.filter((listing) => {
-    const cityMatch = cityKey(listing.city || "") === needle;
-    const labelMatch = cityKey(listing.location_label || "").includes(needle);
-    return cityMatch || labelMatch;
-  });
-  const photo = matchingListings
-    .map((listing) => listing.photo_url?.trim())
-    .find((candidate): candidate is string => Boolean(candidate));
-
-  return photo || null;
-}
 
 function fallbackLocations(listings: PublicListingCard[]): PublicLocation[] {
   const fromCity = locationsFromListings(listings);
