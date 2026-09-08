@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   catalogPageItems,
+  catalogSearchParams,
   catalogTotalPages,
   parseCatalogPage,
   resolveCatalogPage,
@@ -122,5 +123,50 @@ describe("catalogPageItems", () => {
       9,
     ]);
     assert.deepEqual(catalogPageItems(9, 9), [1, "ellipsis", 6, 7, 8, 9]);
+  });
+});
+
+describe("catalogSearchParams", () => {
+  it("omits default filters so clearing them yields an empty query", () => {
+    assert.deepEqual(
+      catalogSearchParams({
+        oferta: "all",
+        city: "",
+        propertyType: "",
+        bedrooms: "",
+      }),
+      {},
+    );
+  });
+
+  it("keeps combined filters and skips page 1", () => {
+    assert.deepEqual(
+      catalogSearchParams({
+        oferta: "sale",
+        city: "Tijuana",
+        propertyType: "house",
+        bedrooms: "3",
+        page: 1,
+      }),
+      {
+        oferta: "venta",
+        city: "Tijuana",
+        tipo: "house",
+        recamaras: "3",
+      },
+    );
+  });
+
+  it("includes page when it is greater than 1", () => {
+    assert.deepEqual(
+      catalogSearchParams({
+        oferta: "rent",
+        city: "",
+        propertyType: "",
+        bedrooms: "2",
+        page: 2,
+      }),
+      { oferta: "renta", recamaras: "2", page: "2" },
+    );
   });
 });

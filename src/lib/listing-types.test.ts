@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { listingGalleryUrls } from "./listing-types.ts";
+import { listingGalleryUrls } from "./listing-gallery.ts";
 
 const signed = (path: string, sig: string) =>
   `https://cdn.example/uploads/${path}?X-Amz-Signature=${sig}`;

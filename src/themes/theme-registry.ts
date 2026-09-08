@@ -2,6 +2,10 @@ import { BeigeCatalog } from "@/themes/beige/beige-catalog";
 import { BeigeListingDetail } from "@/themes/beige/beige-listing-detail";
 import { BeigeListingLoadError } from "@/themes/beige/beige-listing-load-error";
 import { BeigeLegalPage } from "@/themes/beige/beige-legal-page";
+import { ElegantCatalog } from "@/themes/elegant/elegant-catalog";
+import { ElegantListingDetail } from "@/themes/elegant/elegant-listing-detail";
+import { ElegantListingLoadError } from "@/themes/elegant/elegant-listing-load-error";
+import { ElegantLegalPage } from "@/themes/elegant/elegant-legal-page";
 import { DefaultCatalog } from "@/themes/default/default-catalog";
 import { DefaultListingDetail } from "@/themes/default/default-listing-detail";
 import { DefaultLegalPage } from "@/themes/default/default-legal-page";
@@ -21,6 +25,7 @@ const LAYOUT_KEYS_BY_THEME = Object.fromEntries(
 
 const DEFAULT_CATALOG = { pageSize: 24, heroGallery: false } as const;
 const BEIGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
+const ELEGANT_CATALOG = { pageSize: 12, heroGallery: true } as const;
 
 /**
  * Public themes. Add a theme: folder under src/themes/<name>/ + entry here
@@ -52,6 +57,15 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     ListingDetail: BeigeListingDetail,
     ListingLoadError: BeigeListingLoadError,
     LegalPage: BeigeLegalPage,
+  },
+  elegant: {
+    name: "elegant",
+    layoutKeys: LAYOUT_KEYS_BY_THEME.elegant,
+    catalog: ELEGANT_CATALOG,
+    Catalog: ElegantCatalog,
+    ListingDetail: ElegantListingDetail,
+    ListingLoadError: ElegantListingLoadError,
+    LegalPage: ElegantLegalPage,
   },
 };
 

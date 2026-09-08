@@ -16,6 +16,8 @@ type Props = {
   dict?: SiteDictionary;
   locale?: SiteLocale;
   defaultLocale?: SiteLocale;
+  className?: string;
+  ctaLabel?: string;
 };
 
 export function PublicListingCard({
@@ -24,6 +26,8 @@ export function PublicListingCard({
   dict,
   locale,
   defaultLocale,
+  className,
+  ctaLabel,
 }: Props) {
   const { offerType, href, suffix, typeLabel, specLine } = publicListingCardModel(
     listing,
@@ -41,9 +45,15 @@ export function PublicListingCard({
   return (
     <Link
       href={href}
-      className={`group flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 transition hover:-translate-y-0.5 hover:shadow-lg ${cardRing}`}
+      className={[
+        "public-listing-card group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl bg-white ring-1 transition hover:-translate-y-0.5 hover:shadow-lg",
+        cardRing,
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
+      <div className="public-listing-card__media relative aspect-[4/3] overflow-hidden bg-zinc-100">
         {listing.photo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -52,7 +62,7 @@ export function PublicListingCard({
             className="h-full w-full object-cover transition group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-zinc-400">
+          <div className="public-listing-card__placeholder flex h-full items-center justify-center text-sm text-zinc-400">
             {dict?.listing.noPhoto ?? "Sin foto"}
           </div>
         )}
@@ -65,23 +75,41 @@ export function PublicListingCard({
         />
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <p className={`text-xl font-semibold tabular-nums ${priceClass}`}>
+      <div className="public-listing-card__body flex flex-1 flex-col gap-2 p-4">
+        <p
+          className={`public-listing-card__price text-xl font-semibold tabular-nums ${priceClass}`}
+        >
           {formatRentCents(listing.rent_cents, listing.currency)}
           {suffix ? (
             <span className="ml-1 text-sm font-medium text-zinc-500">{suffix}</span>
           ) : null}
         </p>
-        <p className={`line-clamp-2 font-semibold leading-snug text-zinc-950 ${titleHover}`}>
+        <p
+          className={`public-listing-card__title line-clamp-2 font-semibold leading-snug text-zinc-950 ${titleHover}`}
+        >
           {listing.title}
         </p>
-        <p className="line-clamp-1 text-sm text-zinc-600">{listing.location_label}</p>
+        <p className="public-listing-card__location line-clamp-1 text-sm text-zinc-600">
+          {listing.location_label}
+        </p>
         {specLine ? (
-          <p className="text-sm font-medium text-zinc-700">{specLine}</p>
+          <p className="public-listing-card__specifications text-sm font-medium text-zinc-700">
+            {specLine}
+          </p>
         ) : null}
-        <p className="mt-auto pt-2 text-xs font-medium uppercase tracking-wide text-zinc-400">
+        <p
+          className={[
+            "public-listing-card__type pt-2 text-xs font-medium uppercase tracking-wide text-zinc-400",
+            ctaLabel ? null : "mt-auto",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
           {typeLabel}
         </p>
+        {ctaLabel ? (
+          <span className="public-listing-card__cta mt-auto">{ctaLabel}</span>
+        ) : null}
       </div>
     </Link>
   );
