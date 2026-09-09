@@ -28,3 +28,14 @@ export function listingsFromCatalogResult(result: {
     return source ? [source] : [];
   });
 }
+
+/** Optional hero fallback: a thrown fetch must not fail UltraCatalog SSR. */
+export async function listingsFromCatalogLoad(
+  load: () => Promise<{ ok: boolean; data: unknown }>,
+): Promise<PhotoSource[]> {
+  try {
+    return listingsFromCatalogResult(await load());
+  } catch {
+    return [];
+  }
+}

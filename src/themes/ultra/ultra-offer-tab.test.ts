@@ -40,6 +40,14 @@ describe("isUltraOfferTabHref", () => {
     );
   });
 
+  it("resolves relative hrefs against the current origin", () => {
+    assert.equal(isUltraOfferTabHref("/?oferta=renta", origin, catalogPath), true);
+  });
+
+  it("rejects an unparsable href", () => {
+    assert.equal(isUltraOfferTabHref("http://", origin, catalogPath), false);
+  });
+
   it("rejects a different origin or listing pathname", () => {
     assert.equal(
       isUltraOfferTabHref("https://other.example/?oferta=venta", origin, catalogPath),

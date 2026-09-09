@@ -11192,13 +11192,6 @@ html:has([data-site-theme="ultra"])::-webkit-scrollbar-thumb {
 }
 
 @media (max-width: 767px) {
-  [data-site-theme="ultra"] .ultra-card .line-clamp-2 {
-    font-size: 1.125rem;
-    line-height: 1.45;
-  }
-
-  [data-site-theme="ultra"] .ultra-card .line-clamp-1,
-  [data-site-theme="ultra"] .ultra-card .font-medium.text-zinc-700,
   [data-site-theme="ultra"] .ultra-card .uppercase.tracking-wide {
     font-size: 0.875rem;
     line-height: 1.5;

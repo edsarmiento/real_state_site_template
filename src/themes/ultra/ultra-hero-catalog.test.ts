@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { listingsFromCatalogResult } from "./ultra-hero-catalog-result.ts";
+import {
+  listingsFromCatalogLoad,
+  listingsFromCatalogResult,
+} from "./ultra-hero-catalog-result.ts";
 
 describe("listingsFromCatalogResult", () => {
   it("returns photo sources from a valid listings payload", () => {
@@ -61,6 +64,27 @@ describe("listingsFromCatalogResult", () => {
       listingsFromCatalogResult({
         ok: false,
         data: { listings: [{ photo_url: "https://cdn.example/a.jpg" }] },
+      }),
+      [],
+    );
+  });
+});
+
+describe("listingsFromCatalogLoad", () => {
+  it("keeps a valid payload", async () => {
+    assert.deepEqual(
+      await listingsFromCatalogLoad(async () => ({
+        ok: true,
+        data: { listings: [{ photo_url: "https://cdn.example/a.jpg" }] },
+      })),
+      [{ photo_url: "https://cdn.example/a.jpg" }],
+    );
+  });
+
+  it("returns an empty list when the optional fetch throws", async () => {
+    assert.deepEqual(
+      await listingsFromCatalogLoad(async () => {
+        throw new Error("network down");
       }),
       [],
     );
