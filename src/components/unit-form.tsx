@@ -116,7 +116,7 @@ export function UnitForm(props: Props) {
     setFieldErrors(null);
 
     if (!form.name.trim()) {
-      setError("El nombre de la unidad es obligatorio.");
+      setError("El nombre del espacio es obligatorio.");
       return;
     }
 
@@ -163,7 +163,7 @@ export function UnitForm(props: Props) {
       {error ? <ErrorBanner>{error}</ErrorBanner> : null}
       {fieldErrors ? <ValidationErrorList errors={fieldErrors} /> : null}
 
-      <Section legend="Datos de la unidad">
+      <Section legend="Datos del espacio">
         <TextField
           id="name"
           label="Nombre"
@@ -240,7 +240,7 @@ export function UnitForm(props: Props) {
           {pending
             ? "Guardando…"
             : mode === "create"
-              ? "Crear unidad y anunciar"
+              ? "Crear espacio y anunciar"
               : "Guardar cambios"}
         </Button>
         <Button

@@ -95,7 +95,7 @@ export default async function PropertyDetailPage({
           href={`/properties/${p.id}?tab=units`}
           className={`${tabBase} ${tab === "units" ? tabActive : tabIdle}`}
         >
-          Unidades
+          Espacios
         </Link>
       </nav>
 
@@ -135,32 +135,32 @@ export default async function PropertyDetailPage({
         <div className="mt-6">
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-zinc-600">
-              Unidades disponibles para anunciar.
+              Espacios disponibles para anunciar.
             </p>
             <Link
               href={`/properties/${p.id}/units/new`}
               className={buttonClass({ size: "sm", className: "shrink-0" })}
             >
-              Nueva unidad
+              Nuevo espacio
             </Link>
           </div>
 
           {unitsResult && !unitsResult.ok ? (
             <div className="mt-6">
               <WarningBanner>
-                No se pudieron cargar las unidades ({unitsResult.status}).
+                No se pudieron cargar los espacios ({unitsResult.status}).
               </WarningBanner>
             </div>
           ) : units.length === 0 ? (
             <p className="mt-10 text-center text-sm text-zinc-600">
-              Esta propiedad aún no tiene unidades.
+              Esta propiedad aún no tiene espacios.
             </p>
           ) : (
             <Card className="mt-6 overflow-x-auto">
               <table className="min-w-full text-left text-sm">
                 <thead className="border-b border-zinc-200 text-zinc-500">
                   <tr>
-                    <th className="px-4 py-3 font-medium">Unidad</th>
+                    <th className="px-4 py-3 font-medium">Espacio</th>
                     <th className="px-4 py-3 font-medium">Estado</th>
                     <th className="px-4 py-3 font-medium">Rec.</th>
                     <th className="px-4 py-3 font-medium">Baños</th>

@@ -144,21 +144,21 @@ export function ListingForm({ listing, units, emailConfirmed = true }: Props) {
         visibleUnits.length === 0 ? (
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             {offerType === "rent"
-              ? "No hay unidades disponibles para rentar. Libera una unidad o publica una venta."
-              : "No hay unidades para anunciar en venta."}
+              ? "No hay espacios disponibles para rentar. Libera un espacio o publica una venta."
+              : "No hay espacios para anunciar en venta."}
           </p>
         ) : (
           <SelectField
             id="unit_id"
             name="unit_id"
-            label="Unidad"
+            label="Espacio"
             required
             key={offerType}
           >
             <option value="">
               {offerType === "sale"
-                ? "Selecciona una unidad…"
-                : "Selecciona una unidad disponible…"}
+                ? "Selecciona un espacio…"
+                : "Selecciona un espacio disponible…"}
             </option>
             {visibleUnits.map((u) => (
               <option key={u.id} value={u.id}>

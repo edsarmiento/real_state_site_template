@@ -198,7 +198,7 @@ export function PropertySetupForm() {
 
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={pending}>
-          {pending ? "Guardando…" : "Continuar → unidad"}
+          {pending ? "Guardando…" : "Continuar → espacio"}
         </Button>
         <Button
           type="button"

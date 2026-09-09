@@ -11,8 +11,8 @@ import {
 
 const unitStatusHint: Record<string, string> = {
   available: "disponible",
-  occupied: "ocupada",
-  inactive: "inactiva",
+  occupied: "ocupado",
+  inactive: "inactivo",
 };
 
 export default async function NewListingPage() {
@@ -43,18 +43,18 @@ export default async function NewListingPage() {
         Nuevo anuncio
       </h1>
       <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-        Renta: solo unidades disponibles. Venta: también ocupadas (en renta y
+        Renta: solo espacios disponibles. Venta: también ocupados (en renta y
         en venta). Al publicar aparecen en el catálogo público.
       </p>
 
       {units.length === 0 ? (
         <div className="mt-8 space-y-3 text-sm text-zinc-600">
-          <p>No hay unidades para anunciar. Primero registra un inmueble.</p>
+          <p>No hay espacios para anunciar. Primero registra un inmueble.</p>
           <Link
             href="/listings/setup"
             className={buttonClass({ className: "inline-flex" })}
           >
-            Configurar propiedad y unidad
+            Configurar propiedad y espacio
           </Link>
         </div>
       ) : (

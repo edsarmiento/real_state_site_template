@@ -38,7 +38,7 @@ export default async function PropertiesPage() {
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900">Propiedades</h1>
           <p className="mt-1 text-sm text-zinc-600">
-            Inmuebles y unidades disponibles para anunciar.
+            Inmuebles y espacios disponibles para anunciar.
           </p>
         </div>
         <Link href="/properties/new" className={buttonClass({ className: "shrink-0" })}>
@@ -75,7 +75,7 @@ export default async function PropertiesPage() {
                 <th className="px-4 py-3 font-medium">Propiedad</th>
                 <th className="px-4 py-3 font-medium">Tipo</th>
                 <th className="px-4 py-3 font-medium">Ciudad</th>
-                <th className="px-4 py-3 font-medium">Unidades</th>
+                <th className="px-4 py-3 font-medium">Espacios</th>
                 <th className="px-4 py-3 font-medium" />
               </tr>
             </thead>
@@ -102,7 +102,7 @@ export default async function PropertiesPage() {
                       href={`/properties/${p.id}?tab=units`}
                       className="font-medium text-zinc-800 underline"
                     >
-                      Unidades
+                      Espacios
                     </Link>
                     {" · "}
                     <Link

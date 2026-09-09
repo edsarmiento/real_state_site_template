@@ -18,7 +18,7 @@ export default async function NewPropertyPage() {
         Nueva propiedad
       </h1>
       <p className="mt-1 text-sm text-zinc-600">
-        Registra el inmueble; en el siguiente paso agregas la unidad para
+        Registra el inmueble; en el siguiente paso agregas el espacio para
         anunciar.
       </p>
       <Card className="mt-6 p-6">

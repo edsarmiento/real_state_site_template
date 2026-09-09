@@ -24,7 +24,7 @@ export default async function EditUnitPage({ params }: PageProps) {
     return (
       <PageContainer size="sm">
         <ErrorBanner>
-          Error al cargar la unidad ({unitResult.status}).
+          Error al cargar el espacio ({unitResult.status}).
         </ErrorBanner>
         <Link
           href={`/properties/${id}?tab=units`}
@@ -53,9 +53,9 @@ export default async function EditUnitPage({ params }: PageProps) {
         href={`/properties/${propertyResult.data.id}?tab=units`}
         className="text-sm font-medium text-zinc-600 underline"
       >
-        ← Volver a unidades
+        ← Volver a espacios
       </Link>
-      <h1 className="mt-4 text-2xl font-semibold text-zinc-900">Editar unidad</h1>
+      <h1 className="mt-4 text-2xl font-semibold text-zinc-900">Editar espacio</h1>
       <UnitForm
         mode="edit"
         propertyId={propertyResult.data.id}

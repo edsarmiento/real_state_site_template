@@ -5,6 +5,7 @@ Next.js para **un sitio por inmobiliaria**: catálogo público + admin lite en e
 ## Reglas
 
 - Lee [`../real_state_api/BUSINESS_RULES.md`](../real_state_api/BUSINESS_RULES.md) §6b (anuncios) y §SiteConfig (white-label).
+- **Léxico UI:** **Espacio** = `Unit` (ver glosario en BUSINESS_RULES). Copy de producto en español; IDs/rutas siguen `unit` / `/units`.
 - **No** reimplementar dominio en el front: usar respuestas del API.
 - **`ACCOUNT_ID`** es server-only; scope fijo del deploy (no selector de workspace).
 - El BFF añade `account_id` a `/api/public/*` y `X-Account-Id` a `/api/v1/*`.

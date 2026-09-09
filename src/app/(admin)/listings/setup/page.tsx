@@ -18,7 +18,7 @@ export default async function ListingSetupPage() {
         Configura tu inmueble
       </h1>
       <p className="mt-1 text-sm text-zinc-600">
-        Crea la propiedad y su unidad en un solo paso. Después podrás publicar
+        Crea la propiedad y su espacio en un solo paso. Después podrás publicar
         el anuncio con fotos y precio.
       </p>
       <Card className="mt-6 p-6">

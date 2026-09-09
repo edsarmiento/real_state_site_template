@@ -83,7 +83,7 @@ export function ListingSetupForm() {
       return;
     }
     if (!form.unitName.trim()) {
-      setError("Indica un nombre para la unidad.");
+      setError("Indica un nombre para el espacio.");
       return;
     }
 
@@ -246,24 +246,24 @@ export function ListingSetupForm() {
         )}
       </Section>
 
-      <Section legend="Unidad">
+      <Section legend="Espacio">
         <TextField
           id="unitName"
-          label="Nombre de la unidad"
+          label="Nombre del espacio"
           required
           hint='Para una casa o depto único usa "Principal".'
           value={form.unitName}
           onChange={(e) => set("unitName", e.target.value)}
         />
         <p className="text-sm text-zinc-600">
-          La unidad queda disponible para renta o venta. Luego creas el anuncio
+          El espacio queda disponible para renta o venta. Luego creas el anuncio
           con fotos y precio.
         </p>
       </Section>
 
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={pending}>
-          {pending ? "Guardando…" : "Crear propiedad y unidad"}
+          {pending ? "Guardando…" : "Crear propiedad y espacio"}
         </Button>
         <Button
           type="button"

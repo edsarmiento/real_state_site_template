@@ -38,10 +38,10 @@ export default async function NewUnitPage({ params }: PageProps) {
         ← Propiedades
       </Link>
       <h1 className="mt-4 text-2xl font-semibold text-zinc-900">
-        Nueva unidad · {property.name}
+        Nuevo espacio · {property.name}
       </h1>
       <p className="mt-1 text-sm text-zinc-600">
-        La unidad disponible se podrá seleccionar al crear un anuncio.
+        El espacio disponible se podrá seleccionar al crear un anuncio.
       </p>
       <Card className="mt-6 p-6">
         <UnitForm

@@ -38,10 +38,10 @@ El BFF inyecta `account_id` en `/api/public/*`. Las rutas staff (`/api/v1/*`) en
 |------|-------------|
 | `/login` | Inicio de sesión (solo usuarios del workspace `ACCOUNT_ID`) |
 | `/listings` | CRUD de anuncios |
-| `/listings/setup` | Crear propiedad + unidad (onboarding) |
+| `/listings/setup` | Crear propiedad + espacio (onboarding) |
 | `/listings/inquiries` | Leads del catálogo |
-| `/properties` | Listado de propiedades; agregar unidades |
-| `/properties/[id]/units` | Crear y editar unidades |
+| `/properties` | Listado de propiedades; agregar espacios |
+| `/properties/[id]/units` | Crear y editar espacios (`Unit`) |
 | `/account` | Perfil, logo y datos de la inmobiliaria |
 
 El header público muestra «Acceder» o «Administrar» según la sesión. No hay sidebar CRM: solo anuncios + mi cuenta.

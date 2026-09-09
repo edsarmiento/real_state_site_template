@@ -19,7 +19,7 @@ export const API_FIELD_LABELS: Record<string, string> = {
   tax_id: "Identificación fiscal",
   notes: "Notas",
   tenant_id: "Inquilino",
-  unit_id: "Unidad",
+  unit_id: "Espacio",
   start_date: "Fecha de inicio",
   end_date: "Fecha de fin",
   rent_cents: "Precio",
