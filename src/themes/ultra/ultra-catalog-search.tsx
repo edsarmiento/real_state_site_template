@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { PublicCatalogSearch } from "@/components/public-catalog-search";
 import type { CatalogOfferFilter } from "@/lib/listing-types";
 import type { SiteDictionary, SiteLocale } from "@/lib/site-i18n";
+import { isUltraOfferTabHref } from "@/themes/ultra/ultra-offer-tab";
 
 type Props = {
   oferta: CatalogOfferFilter;
@@ -38,10 +39,14 @@ function isModifiedClick(event: {
 }
 
 function isOfferTabLink(root: HTMLElement, link: HTMLAnchorElement): boolean {
+  if (!root.contains(link)) return false;
   const nav = link.closest("nav");
-  if (!nav || !root.contains(nav) || !root.contains(link)) return false;
-  const sibling = nav.nextElementSibling;
-  return sibling instanceof HTMLFormElement;
+  if (!nav || !root.contains(nav)) return false;
+  return isUltraOfferTabHref(
+    link.href,
+    window.location.origin,
+    window.location.pathname,
+  );
 }
 
 function destinationWithoutHash(link: HTMLAnchorElement): string | null {

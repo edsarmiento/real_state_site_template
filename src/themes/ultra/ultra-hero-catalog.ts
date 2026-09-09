@@ -1,6 +1,6 @@
 import { cache } from "react";
-import type { PublicListingCard } from "@/lib/listing-types";
 import { publicApiFetch } from "@/lib/public-api-fetch";
+import { listingsFromCatalogResult } from "@/themes/ultra/ultra-hero-catalog-result";
 import { listingPhotoUrls } from "@/themes/ultra/ultra-hero-media";
 
 /**
@@ -9,9 +9,8 @@ import { listingPhotoUrls } from "@/themes/ultra/ultra-hero-media";
  * React cache() dedupes the call within the same request.
  */
 export const fetchUnfilteredHeroPhotoUrls = cache(async (): Promise<string[]> => {
-  const result = await publicApiFetch<{ listings: PublicListingCard[] }>(
+  const result = await publicApiFetch<{ listings: unknown } | null>(
     "/api/public/listings?limit=3&offset=0",
   );
-  if (!result.ok || !Array.isArray(result.data.listings)) return [];
-  return listingPhotoUrls(result.data.listings, 3);
+  return listingPhotoUrls(listingsFromCatalogResult(result), 3);
 });

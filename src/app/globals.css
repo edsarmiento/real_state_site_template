@@ -10720,11 +10720,27 @@ html:has([data-site-theme="ultra"])::-webkit-scrollbar-thumb {
   color: color-mix(in srgb, var(--ultra-cream) 82%, transparent);
 }
 
+[data-site-theme="ultra"] .ultra-hero-fallback::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 46%;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(45, 11, 18, 0.78),
+    rgba(74, 21, 33, 0.28) 55%,
+    transparent
+  );
+}
+
 [data-site-theme="ultra"] .ultra-hero-fallback__label {
   position: absolute;
   left: 1.15rem;
   right: 1.15rem;
   bottom: 1.1rem;
+  z-index: 1;
   margin: 0;
   color: var(--ultra-cream);
   font-size: 0.78rem;
@@ -12262,13 +12278,16 @@ html:has([data-site-theme="ultra"])::-webkit-scrollbar-thumb {
   [data-site-theme="ultra"] .ultra-mobile-nav__panel,
   [data-site-theme="ultra"] .ultra-gallery .listing-gallery__thumb,
   [data-site-theme="ultra"] .ultra-gallery .listing-gallery__nav,
-  [data-site-theme="ultra"] .ultra-card::after,
   [data-site-theme="ultra"] .ultra-detail__price-card,
   [data-site-theme="ultra"] .ultra-hero-fallback {
     animation: none !important;
     transition: none !important;
     transform: none !important;
     opacity: 1 !important;
+  }
+
+  [data-site-theme="ultra"] .ultra-card::after {
+    transition: none !important;
   }
 
   [data-site-theme="ultra"] .ultra-particles {

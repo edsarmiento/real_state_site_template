@@ -1,5 +1,3 @@
-"use client";
-
 import type { CSSProperties } from "react";
 import { PublicListingCard } from "@/components/public-listing-card";
 import type { PublicListingCard as PublicListingCardType } from "@/lib/listing-types";
