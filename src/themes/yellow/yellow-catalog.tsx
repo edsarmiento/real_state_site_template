@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { catalogTotalPages } from "@/lib/catalog-pagination";
-import type { PublicListingCard } from "@/lib/listing-types";
 import {
   fillTemplate,
   localizeSiteHref,
@@ -50,7 +49,7 @@ export async function YellowCatalog({
 }: CatalogThemeProps) {
   const { content, dict, locale, defaultLocale } = await getYellowUi(lang);
   const copy = getYellowCopy(locale);
-  const listingCards = yellowSafeListingArray<PublicListingCard>(listings);
+  const listingCards = yellowSafeListingArray(listings);
   const collage = resolveYellowHeroUrls(
     content.hero.imageUrl,
     heroPhotoUrls,

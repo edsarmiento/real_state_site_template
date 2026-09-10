@@ -1,6 +1,8 @@
 import Link from "next/link";
 import {
+  listingPublicSpecsLocalized,
   publicListingCardModel,
+  type ListingSpecKey,
   type PublicListingCard,
 } from "@/lib/listing-types";
 import { fillTemplate, type SiteDictionary, type SiteLocale } from "@/lib/site-i18n";
@@ -24,6 +26,12 @@ type Props = {
   index?: number;
 };
 
+function specIcon(key: ListingSpecKey) {
+  if (key === "bedrooms") return <YellowIconBed className="yellow-card__icon" />;
+  if (key === "bathrooms") return <YellowIconBath className="yellow-card__icon" />;
+  return <YellowIconRuler className="yellow-card__icon" />;
+}
+
 export function YellowListingCard({
   listing,
   locale,
@@ -41,7 +49,7 @@ export function YellowListingCard({
     locale,
   );
   const title = displayListingTitle(listing.title) || listing.title;
-  const land = listing.land_area?.trim() || listing.built_area?.trim() || "";
+  const specs = listingPublicSpecsLocalized(listing, dict);
 
   return (
     <YellowReveal variant="up" delayMs={(index % 3) * 80}>
@@ -82,30 +90,14 @@ export function YellowListingCard({
               <span className="line-clamp-1">{listing.location_label}</span>
             </p>
           ) : null}
-          {listing.bedrooms != null || listing.bathrooms || land ? (
+          {specs.length > 0 ? (
             <div className="yellow-card__specs">
-              {listing.bedrooms != null ? (
-                <span>
-                  <YellowIconBed className="yellow-card__icon" />
-                  {fillTemplate(dict.listing.specBedroomsShort, {
-                    count: listing.bedrooms,
-                  })}
+              {specs.map((spec) => (
+                <span key={spec.key}>
+                  {specIcon(spec.key)}
+                  {spec.value}
                 </span>
-              ) : null}
-              {listing.bathrooms ? (
-                <span>
-                  <YellowIconBath className="yellow-card__icon" />
-                  {listing.bathrooms} {dict.listing.specs.bathrooms.toLowerCase()}
-                </span>
-              ) : null}
-              {land ? (
-                <span>
-                  <YellowIconRuler className="yellow-card__icon" />
-                  {land} m²
-                </span>
-              ) : specLine ? (
-                <span>{specLine}</span>
-              ) : null}
+              ))}
             </div>
           ) : specLine ? (
             <p className="yellow-card__specs">{specLine}</p>

@@ -2,7 +2,7 @@ Handoff: implementar theme Yellow en real_state_site_template
 =====================================================================
 
 Antes de usar este archivo:
-  1. Copialo a docs/yellow-theme-agent-prompt.txt (ej. docs/beige-theme-agent-prompt.txt).
+  1. Este archivo es el brief operativo de Yellow; leelo directamente.
   2. Reemplaza todos los marcadores <...> abajo.
   3. Completa la seccion "Pre-requisitos API + Ops" segun el estado real del monorepo.
   4. Pegale el .txt al agente o desarrollador.

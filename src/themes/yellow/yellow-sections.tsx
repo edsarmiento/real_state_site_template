@@ -56,7 +56,7 @@ export function YellowLocations({
     .map((location) => {
       const city = location.filter.city?.trim();
       if (!city) return null;
-      const href = localizedHref("/", locale, { city }, defaultLocale);
+      const href = localizedHref("/#catalogo", locale, { city }, defaultLocale);
       const configured = location.imageUrl?.trim() || null;
       const listingPhoto = configured
         ? null

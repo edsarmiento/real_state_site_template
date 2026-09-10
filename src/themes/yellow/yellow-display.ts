@@ -11,7 +11,7 @@ export function displayListingTitle(title: string): string {
 export function brandInitial(name: string): string {
   const clean = name.trim();
   if (!clean) return "";
-  return clean.charAt(0).toUpperCase();
+  return Array.from(clean)[0]?.toLocaleUpperCase() ?? "";
 }
 
 export const YELLOW_LOGO_NAV_CLASS = "yellow-logo--nav";

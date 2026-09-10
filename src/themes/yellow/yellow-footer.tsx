@@ -33,7 +33,7 @@ export async function YellowFooter({ lang }: Props) {
             {brand.logoUrl ? (
               <YellowLogo
                 src={brand.logoUrl}
-                alt={brand.name}
+                alt=""
                 className={YELLOW_LOGO_FOOTER_CLASS}
                 fallbackClassName="yellow-footer__mark"
               />

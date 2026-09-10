@@ -1,12 +1,55 @@
-function isYellowListingCard(value: unknown): boolean {
-  if (value == null || typeof value !== "object") return false;
-  const photo = (value as { photo_url?: unknown }).photo_url;
-  return photo == null || typeof photo === "string";
+import type { ListingOfferType, PublicListingCard } from "@/lib/listing-types";
+
+function isOfferType(value: unknown): value is ListingOfferType {
+  return value === "rent" || value === "sale";
 }
 
-export function yellowSafeListingArray<T>(value: unknown): T[] {
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isNullableString(value: unknown): value is string | null {
+  return value === null || typeof value === "string";
+}
+
+function isNullableFiniteNumber(value: unknown): value is number | null {
+  return value === null || isFiniteNumber(value);
+}
+
+function isOptionalFiniteNumber(value: unknown): boolean {
+  return value === undefined || isFiniteNumber(value);
+}
+
+export function isYellowListingCard(value: unknown): value is PublicListingCard {
+  if (value == null || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+  const card = value as Record<string, unknown>;
+  if (typeof card.slug !== "string" || !card.slug.trim()) return false;
+  if (typeof card.title !== "string") return false;
+  if (!isFiniteNumber(card.rent_cents)) return false;
+  if (typeof card.currency !== "string") return false;
+  if (!isOfferType(card.offer_type)) return false;
+  if (typeof card.city !== "string") return false;
+  if (!isNullableString(card.state_or_region)) return false;
+  if (!isNullableString(card.colony)) return false;
+  if (typeof card.location_label !== "string") return false;
+  if (typeof card.property_type !== "string") return false;
+  if (!isNullableFiniteNumber(card.bedrooms)) return false;
+  if (!isNullableString(card.bathrooms)) return false;
+  if (!isNullableString(card.built_area)) return false;
+  if (!isNullableString(card.land_area)) return false;
+  if (!isNullableString(card.photo_url)) return false;
+  if (typeof card.agency_name !== "string") return false;
+  if (!isNullableString(card.agency_logo_url)) return false;
+  if (!isOptionalFiniteNumber(card.latitude)) return false;
+  if (!isOptionalFiniteNumber(card.longitude)) return false;
+  return true;
+}
+
+export function yellowSafeListingArray(value: unknown): PublicListingCard[] {
   if (!Array.isArray(value)) return [];
-  return value.filter((item): item is T => isYellowListingCard(item));
+  return value.filter(isYellowListingCard);
 }
 
 /**

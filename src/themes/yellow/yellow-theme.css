@@ -57,10 +57,11 @@ html:has([data-site-theme="yellow"])::-webkit-scrollbar-thumb {
   --yellow-glass-border: rgba(214, 230, 242, 0.6);
   --yellow-glass-shadow: 0 10px 30px -5px rgba(30, 45, 56, 0.05);
   --yellow-hover-shadow: 0 20px 40px -10px rgba(42, 111, 151, 0.15);
-  --font-yellow-heading: var(--font-yellow-playfair), Georgia, serif;
+  --font-yellow-heading: var(--font-yellow-playfair), georgia, serif;
   --font-yellow-body: var(--font-yellow-jakarta), system-ui, sans-serif;
   --yellow-delay: 0ms;
   --yellow-duration: 700ms;
+
   background: var(--yellow-bg);
   color: var(--yellow-text);
   font-family: var(--font-yellow-body);
