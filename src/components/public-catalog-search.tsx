@@ -81,21 +81,21 @@ export function PublicCatalogSearch({
       ];
 
   const focusField =
-    "rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-base outline-none focus:bg-white " +
+    "public-catalog-search__control rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-base outline-none focus:bg-white " +
     (styledLayout
       ? "focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
       : "focus:border-zinc-400 focus:ring-2 focus:ring-zinc-200");
 
   return (
     <div
-      className={`overflow-hidden rounded-2xl bg-white ${
+      className={`public-catalog-search overflow-hidden rounded-2xl bg-white ${
         styledLayout
           ? "shadow-[0_24px_48px_-24px_rgba(15,23,42,0.35)] ring-1 ring-blue-950/10"
           : "border border-zinc-200 shadow-sm"
       }`}
     >
       <nav
-        className="flex border-b border-zinc-100"
+        className="public-catalog-search__tabs flex border-b border-zinc-100"
         aria-label={dict?.search.intentLegend ?? "Tipo de oferta"}
       >
         {offerTabs.map((tab) => {
@@ -112,7 +112,7 @@ export function PublicCatalogSearch({
                 defaultLocale,
               )}
               className={[
-                "flex-1 px-4 py-3.5 text-center text-sm font-semibold transition sm:px-6",
+                "public-catalog-search__tab flex-1 px-4 py-3.5 text-center text-sm font-semibold transition sm:px-6",
                 active
                   ? styledLayout
                     ? "border-b-2 border-blue-600 bg-blue-50/80 text-blue-800"
@@ -128,7 +128,7 @@ export function PublicCatalogSearch({
       </nav>
 
       <form
-        className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.75fr)_auto]"
+        className="public-catalog-search__form grid gap-3 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.75fr)_auto]"
         method="get"
       >
         {oferta !== "all" ? (
@@ -142,8 +142,8 @@ export function PublicCatalogSearch({
           <input type="hidden" name="lang" value={locale} />
         ) : null}
 
-        <label className="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-1">
-          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+        <label className="public-catalog-search__field flex flex-col gap-1.5 sm:col-span-2 lg:col-span-1">
+          <span className="public-catalog-search__label text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
             {dict?.search.location ?? "Ubicación"}
           </span>
           <input
@@ -155,8 +155,8 @@ export function PublicCatalogSearch({
           />
         </label>
 
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+        <label className="public-catalog-search__field flex flex-col gap-1.5">
+          <span className="public-catalog-search__label text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
             {dict?.search.propertyType ?? "Tipo de inmueble"}
           </span>
           <select
@@ -173,8 +173,8 @@ export function PublicCatalogSearch({
           </select>
         </label>
 
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+        <label className="public-catalog-search__field flex flex-col gap-1.5">
+          <span className="public-catalog-search__label text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
             {dict?.search.bedrooms ?? "Recámaras"}
           </span>
           <select
@@ -190,10 +190,10 @@ export function PublicCatalogSearch({
           </select>
         </label>
 
-        <div className="flex items-end sm:col-span-2 lg:col-span-1">
+        <div className="public-catalog-search__actions flex items-end sm:col-span-2 lg:col-span-1">
           <button
             type="submit"
-            className={`w-full rounded-xl px-6 py-3.5 text-sm font-semibold text-white ${
+            className={`public-catalog-search__submit w-full rounded-xl px-6 py-3.5 text-sm font-semibold text-white ${
               styledLayout
                 ? "bg-blue-600 hover:bg-blue-500"
                 : "bg-zinc-900 hover:bg-zinc-800"

@@ -2401,7 +2401,7 @@ html:has([data-site-theme="orange"]) {
 [data-site-theme="orange"][data-orange-motion="none"] .orange-service:hover,
 [data-site-theme="orange"][data-orange-motion="none"] .orange-btn:hover:not(:disabled),
 [data-site-theme="orange"][data-orange-motion="none"] .orange-hero__frame:hover .orange-hero__image,
-[data-site-theme="orange"][data-orange-motion="none"] .orange-gallery__thumb.is-active,
+[data-site-theme="orange"][data-orange-motion="none"] .orange-gallery .listing-gallery__thumb--active,
 [data-site-theme="orange"][data-orange-motion="none"] .orange-service:hover .orange-service__icon {
   animation: none;
   transform: none;
