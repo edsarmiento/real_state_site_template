@@ -31,6 +31,6 @@ describe("ExecutiveContactForm contract (source)", () => {
     assert.match(source, /formMode === "hidden"/);
     assert.match(source, /executive-consult--preview/);
     const disabledControls = source.match(/\bdisabled\b/g) ?? [];
-    assert.ok(disabledControls.length >= 5);
+    assert.equal(disabledControls.length, 6);
   });
 });

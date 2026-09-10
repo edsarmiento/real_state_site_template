@@ -16,12 +16,12 @@ export function executiveContactChannels(
   content: PublicSiteContent,
 ): ExecutiveContactChannels {
   return {
-    whatsappNumber: absentToNull(
-      content.whatsapp.number ?? content.contact.whatsappNumber,
-    ),
-    whatsappHref: absentToNull(
-      content.whatsapp.href ?? content.contact.whatsappHref,
-    ),
+    whatsappNumber:
+      absentToNull(content.whatsapp.number) ??
+      absentToNull(content.contact.whatsappNumber),
+    whatsappHref:
+      absentToNull(content.whatsapp.href) ??
+      absentToNull(content.contact.whatsappHref),
     phone: absentToNull(content.contact.phone),
     phoneHref: absentToNull(content.contact.phoneHref),
   };
