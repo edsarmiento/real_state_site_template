@@ -124,6 +124,38 @@ describe("catalogPageItems", () => {
     ]);
     assert.deepEqual(catalogPageItems(9, 9), [1, "ellipsis", 6, 7, 8, 9]);
   });
+
+  it("widens the neighbor window when siblingCount is 2 (orange)", () => {
+    assert.deepEqual(catalogPageItems(1, 15, 2), [
+      1,
+      2,
+      3,
+      4,
+      5,
+      "ellipsis",
+      15,
+    ]);
+    assert.deepEqual(catalogPageItems(8, 15, 2), [
+      1,
+      "ellipsis",
+      6,
+      7,
+      8,
+      9,
+      10,
+      "ellipsis",
+      15,
+    ]);
+    assert.deepEqual(catalogPageItems(15, 15, 2), [
+      1,
+      "ellipsis",
+      11,
+      12,
+      13,
+      14,
+      15,
+    ]);
+  });
 });
 
 describe("catalogSearchParams", () => {
