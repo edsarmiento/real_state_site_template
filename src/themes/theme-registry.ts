@@ -20,6 +20,10 @@ import { UltraCatalog } from "@/themes/ultra/ultra-catalog";
 import { UltraListingDetail } from "@/themes/ultra/ultra-listing-detail";
 import { UltraListingLoadError } from "@/themes/ultra/ultra-listing-load-error";
 import { UltraLegalPage } from "@/themes/ultra/ultra-legal-page";
+import { YellowCatalog } from "@/themes/yellow/yellow-catalog";
+import { YellowListingDetail } from "@/themes/yellow/yellow-listing-detail";
+import { YellowListingLoadError } from "@/themes/yellow/yellow-listing-load-error";
+import { YellowLegalPage } from "@/themes/yellow/yellow-legal-page";
 import {
   THEME_DEFINITIONS,
   type SiteThemeName,
@@ -35,6 +39,7 @@ const BEIGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ELEGANT_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ORANGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ULTRA_CATALOG = { pageSize: 12, heroGallery: true } as const;
+const YELLOW_CATALOG = { pageSize: 12, heroGallery: true } as const;
 
 /**
  * Public themes. Add a theme: folder under src/themes/<name>/ + entry here
@@ -92,6 +97,15 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     ListingDetail: UltraListingDetail,
     ListingLoadError: UltraListingLoadError,
     LegalPage: UltraLegalPage,
+  },
+  yellow: {
+    name: "yellow",
+    layoutKeys: LAYOUT_KEYS_BY_THEME.yellow,
+    catalog: YELLOW_CATALOG,
+    Catalog: YellowCatalog,
+    ListingDetail: YellowListingDetail,
+    ListingLoadError: YellowListingLoadError,
+    LegalPage: YellowLegalPage,
   },
 };
 
