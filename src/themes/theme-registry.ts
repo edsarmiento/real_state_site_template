@@ -24,6 +24,10 @@ import { YellowCatalog } from "@/themes/yellow/yellow-catalog";
 import { YellowListingDetail } from "@/themes/yellow/yellow-listing-detail";
 import { YellowListingLoadError } from "@/themes/yellow/yellow-listing-load-error";
 import { YellowLegalPage } from "@/themes/yellow/yellow-legal-page";
+import { ExecutiveCatalog } from "@/themes/executive/executive-catalog";
+import { ExecutiveListingDetail } from "@/themes/executive/executive-listing-detail";
+import { ExecutiveListingLoadError } from "@/themes/executive/executive-listing-load-error";
+import { ExecutiveLegalPage } from "@/themes/executive/executive-legal-page";
 import {
   THEME_DEFINITIONS,
   type SiteThemeName,
@@ -41,6 +45,7 @@ const ELEGANT_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ORANGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ULTRA_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const YELLOW_CATALOG = { pageSize: 12, heroGallery: true } as const;
+const EXECUTIVE_CATALOG = { pageSize: 12, heroGallery: true } as const;
 
 /**
  * Public themes. Add a theme: folder under src/themes/<name>/ + entry here
@@ -110,6 +115,15 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     ListingDetail: withResolvedThemeProps(YellowListingDetail),
     ListingLoadError: withResolvedThemeProps(YellowListingLoadError),
     LegalPage: withResolvedThemeProps(YellowLegalPage),
+  },
+  executive: {
+    name: "executive",
+    layoutKeys: LAYOUT_KEYS_BY_THEME.executive,
+    catalog: EXECUTIVE_CATALOG,
+    Catalog: withResolvedThemeProps(ExecutiveCatalog),
+    ListingDetail: withResolvedThemeProps(ExecutiveListingDetail),
+    ListingLoadError: withResolvedThemeProps(ExecutiveListingLoadError),
+    LegalPage: withResolvedThemeProps(ExecutiveLegalPage),
   },
 };
 
