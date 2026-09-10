@@ -11,16 +11,24 @@ describe("themeNameFromLayoutKey", () => {
     assert.equal(themeNameFromLayoutKey("Elegant"), "elegant");
   });
 
+  it("selects ultra for layout_key ultra", () => {
+    assert.equal(themeNameFromLayoutKey("ultra"), "ultra");
+    assert.equal(themeNameFromLayoutKey("Ultra"), "ultra");
+  });
+
   it("keeps existing layout keys on their themes", () => {
     assert.equal(themeNameFromLayoutKey("default"), "default");
     assert.equal(themeNameFromLayoutKey("beige"), "beige");
     assert.equal(themeNameFromLayoutKey("deo"), "luxury");
     assert.equal(themeNameFromLayoutKey("luxury"), "luxury");
+    assert.equal(themeNameFromLayoutKey("elegant"), "elegant");
     assert.equal(themeNameFromLayoutKey("orange"), "orange");
+    assert.equal(themeNameFromLayoutKey("ultra"), "ultra");
   });
 
   it("falls back to default for unknown keys", () => {
-    assert.equal(themeNameFromLayoutKey("ultra"), "default");
+    assert.equal(themeNameFromLayoutKey("unknown-theme"), "default");
+    assert.equal(themeNameFromLayoutKey("nonexistent"), "default");
     assert.equal(themeNameFromLayoutKey(""), "default");
   });
 });
@@ -28,6 +36,10 @@ describe("themeNameFromLayoutKey", () => {
 describe("normalizeLayoutKey", () => {
   it("persists elegant when the stored key is elegant", () => {
     assert.equal(normalizeLayoutKey("elegant"), "elegant");
+  });
+
+  it("persists ultra when the stored key is ultra", () => {
+    assert.equal(normalizeLayoutKey("ultra"), "ultra");
   });
 
   it("does not coerce unknown keys to elegant", () => {

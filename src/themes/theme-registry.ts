@@ -16,6 +16,10 @@ import { LuxuryLegalPage } from "@/themes/luxury/luxury-legal-page";
 import { OrangeCatalog } from "@/themes/orange/orange-catalog";
 import { OrangeListingDetail } from "@/themes/orange/orange-listing-detail";
 import { OrangeLegalPage } from "@/themes/orange/orange-legal-page";
+import { UltraCatalog } from "@/themes/ultra/ultra-catalog";
+import { UltraListingDetail } from "@/themes/ultra/ultra-listing-detail";
+import { UltraListingLoadError } from "@/themes/ultra/ultra-listing-load-error";
+import { UltraLegalPage } from "@/themes/ultra/ultra-legal-page";
 import {
   THEME_DEFINITIONS,
   type SiteThemeName,
@@ -30,6 +34,7 @@ const DEFAULT_CATALOG = { pageSize: 24, heroGallery: false } as const;
 const BEIGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ELEGANT_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ORANGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
+const ULTRA_CATALOG = { pageSize: 12, heroGallery: true } as const;
 
 /**
  * Public themes. Add a theme: folder under src/themes/<name>/ + entry here
@@ -78,6 +83,15 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     Catalog: OrangeCatalog,
     ListingDetail: OrangeListingDetail,
     LegalPage: OrangeLegalPage,
+  },
+  ultra: {
+    name: "ultra",
+    layoutKeys: LAYOUT_KEYS_BY_THEME.ultra,
+    catalog: ULTRA_CATALOG,
+    Catalog: UltraCatalog,
+    ListingDetail: UltraListingDetail,
+    ListingLoadError: UltraListingLoadError,
+    LegalPage: UltraLegalPage,
   },
 };
 

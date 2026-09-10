@@ -164,6 +164,7 @@ Server Components (header, footer, catálogo, metadata, login/admin props)
 | Tema Beige | `src/themes/beige/` |
 | Tema Elegant | `src/themes/elegant/` |
 | Tema Orange | `src/themes/orange/` |
+| Tema Ultra | `src/themes/ultra/` |
 | Contenido marketing del tema | `src/lib/public-site-content.ts` (lee `getResolvedSiteConfig` + env `SITE_*`) |
 | Páginas legales | `src/app/terminos/`, `cookies/`, `aviso-de-privacidad/` + `*-legal-page.tsx` por theme |
 | Admin anuncios | `src/app/(admin)/listings/` |
@@ -209,6 +210,7 @@ Fuente de verdad: `THEME_DEFINITIONS` en `src/themes/theme-definitions.ts` (keys
 | `beige` | `beige` | Catalog, ListingDetail, LegalPage |
 | `elegant` | `elegant` | Catalog, ListingDetail, LegalPage |
 | `orange` | `orange` | Catalog, ListingDetail, LegalPage |
+| `ultra` | `ultra` | Catalog, ListingDetail, LegalPage |
 
 Unknown `layout_key` → `default` (nunca beige).
 
