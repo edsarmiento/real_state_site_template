@@ -156,7 +156,7 @@ export async function YellowCatalog({
       </section>
 
       <main id="propiedades" className="yellow-catalog" tabIndex={-1}>
-        <div id="catalogo" className="yellow-shell">
+        <div id="catalogo" className="yellow-shell" tabIndex={-1}>
           {!catalogOk ? (
             <p className="yellow-lead">
               {fillTemplate(dict.results.catalogError, {

@@ -49,7 +49,7 @@ export async function YellowHeader({ lang }: Props) {
           {brand.logoUrl ? (
             <YellowLogo
               src={brand.logoUrl}
-              alt={brand.name}
+              alt=""
               className={YELLOW_LOGO_NAV_CLASS}
               fallbackClassName="yellow-logo-mark"
             />

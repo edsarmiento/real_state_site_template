@@ -64,15 +64,33 @@ export function resolveYellowCurrency(currency?: string | null): string {
   return "MXN";
 }
 
+function yellowCurrencySymbol(code: string, intlLocale: string): string {
+  try {
+    const symbol = new Intl.NumberFormat(intlLocale, {
+      style: "currency",
+      currency: code,
+      currencyDisplay: "narrowSymbol",
+    })
+      .formatToParts(0)
+      .find((part) => part.type === "currency")
+      ?.value?.trim();
+    return symbol || code;
+  } catch {
+    return "$";
+  }
+}
+
 export function formatYellowPriceParts(
   cents: number,
   currency: string | null | undefined,
   locale: SiteLocale,
 ): { amount: string; currency: string } {
   const code = resolveYellowCurrency(currency);
-  const grouped = new Intl.NumberFormat(locale === "en" ? "en-US" : "es-MX", {
+  const intlLocale = locale === "en" ? "en-US" : "es-MX";
+  const grouped = new Intl.NumberFormat(intlLocale, {
     maximumFractionDigits: 0,
     minimumFractionDigits: 0,
   }).format(Math.round(cents / 100));
-  return { amount: `$${grouped}`, currency: code };
+  const symbol = yellowCurrencySymbol(code, intlLocale);
+  return { amount: `${symbol}${grouped}`, currency: code };
 }

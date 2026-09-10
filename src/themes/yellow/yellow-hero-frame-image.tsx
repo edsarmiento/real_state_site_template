@@ -45,7 +45,17 @@ function YellowHeroFrameImageInner({
   const [failed, setFailed] = useState(false);
 
   if (!src || failed) {
-    return <div className={placeholderClassName} aria-hidden />;
+    const label = alt.trim();
+    if (!label) {
+      return <div className={placeholderClassName} aria-hidden />;
+    }
+    return (
+      <div
+        className={placeholderClassName}
+        role="img"
+        aria-label={label}
+      />
+    );
   }
 
   return (

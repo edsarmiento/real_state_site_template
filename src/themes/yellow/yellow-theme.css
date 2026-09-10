@@ -85,7 +85,7 @@ html:has([data-site-theme="yellow"])::-webkit-scrollbar-thumb {
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
@@ -2219,7 +2219,6 @@ html:has([data-site-theme="yellow"])::-webkit-scrollbar-thumb {
   font-weight: 700;
   line-height: 1.2;
   overflow-wrap: break-word;
-  word-break: break-word;
 }
 
 [data-site-theme="yellow"] .yellow-share-button {
@@ -2295,7 +2294,6 @@ html:has([data-site-theme="yellow"])::-webkit-scrollbar-thumb {
   line-height: 1.85;
   white-space: pre-line;
   overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 [data-site-theme="yellow"] .yellow-detail__price {

@@ -48,7 +48,7 @@ Monorepo Real State. Trabaja SOLO en:
 1 deploy = 1 inmobiliaria (ACCOUNT_ID + API_URL). Marca, layout, idiomas y dominio
 vienen de SiteConfig via GET /api/public/site_config?account_id=.
 
-Objetivo: cuando Opsguarde layout_key: "yellow", el template renderiza el theme
+Objetivo: cuando Ops guarde layout_key: "yellow", el template renderiza el theme
 yellow en / y /inmueble/[slug].
 
 Lee:
