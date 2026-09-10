@@ -12,19 +12,21 @@ type Props = {
 };
 
 export function ExecutiveSocialLinks({ social, dict, heading }: Props) {
+  const instagramUrl = social.instagramUrl?.trim() || null;
+  const facebookUrl = social.facebookUrl?.trim() || null;
   const items = [
-    social.instagramUrl
+    instagramUrl
       ? {
           key: "instagram" as const,
-          href: social.instagramUrl,
+          href: instagramUrl,
           label: dict.social.instagram,
           icon: ExecutiveIconInstagram,
         }
       : null,
-    social.facebookUrl
+    facebookUrl
       ? {
           key: "facebook" as const,
-          href: social.facebookUrl,
+          href: facebookUrl,
           label: dict.social.facebook,
           icon: ExecutiveIconFacebook,
         }

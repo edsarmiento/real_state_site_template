@@ -47,6 +47,7 @@ export function ExecutiveListingCard({
     locale,
     defaultLocale,
   });
+  const locationLabel = listing.location_label?.trim() || null;
   const price = formatExecutivePriceParts(
     listing.rent_cents,
     listing.currency,
@@ -87,10 +88,10 @@ export function ExecutiveListingCard({
         <h3 className="executive-card__title" title={listing.title}>
           <span className="line-clamp-2">{listing.title}</span>
         </h3>
-        {listing.location_label ? (
+        {locationLabel ? (
           <p className="executive-card__location">
             <ExecutiveIconMapPin className="executive-card__pin" />
-            <span className="line-clamp-1">{listing.location_label}</span>
+            <span className="line-clamp-1">{locationLabel}</span>
           </p>
         ) : null}
         {specs.length > 0 ? (

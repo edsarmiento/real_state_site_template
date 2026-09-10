@@ -47,10 +47,9 @@ export async function ExecutiveListingDetail({
   const isSale = offerType === "sale";
   const agency = listing.agency_name || content.brand.name;
   const hasMap = listing.latitude != null && listing.longitude != null;
-  const hasPlace =
-    Boolean(listing.address_label?.trim()) ||
-    Boolean(listing.location_label?.trim()) ||
-    hasMap;
+  const addressLabel = listing.address_label?.trim() || null;
+  const locationLabel = listing.location_label?.trim() || null;
+  const hasPlace = Boolean(addressLabel) || Boolean(locationLabel) || hasMap;
   const backHref = localizedHref("/#propiedades", locale, null, defaultLocale);
   const listingUrl = listingPublicUrl(
     listing.slug,
@@ -99,7 +98,7 @@ export async function ExecutiveListingDetail({
               <div className="executive-identity">
                 <div className="executive-identity__head">
                   <p className="executive-kicker">
-                    {listing.location_label || typeLabel}
+                    {locationLabel || typeLabel}
                   </p>
                   {showShareButton ? (
                     <ListingShareButton
@@ -217,10 +216,10 @@ export async function ExecutiveListingDetail({
                     </span>
                     <div>
                       <p className="executive-place-card__agency">{agency}</p>
-                      {listing.address_label ? (
-                        <p>{listing.address_label}</p>
-                      ) : listing.location_label ? (
-                        <p>{listing.location_label}</p>
+                      {addressLabel ? (
+                        <p>{addressLabel}</p>
+                      ) : locationLabel ? (
+                        <p>{locationLabel}</p>
                       ) : null}
                     </div>
                   </div>
