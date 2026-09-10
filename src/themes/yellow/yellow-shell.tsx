@@ -1,17 +1,17 @@
 import type { ReactNode } from "react";
 import "./yellow-theme.css";
+import type { PublicSiteContent } from "@/lib/public-site-content";
+import type { SiteLocale } from "@/lib/site-i18n";
 import { YELLOW_FONT_CLASS } from "@/themes/yellow/yellow-fonts";
 import { YellowMotionRoot } from "@/themes/yellow/yellow-motion-root";
-import { getYellowUi } from "@/themes/yellow/yellow-ui";
 
 type Props = {
   children: ReactNode;
-  lang?: string;
+  content: PublicSiteContent;
+  locale: SiteLocale;
 };
 
-export async function YellowShell({ children, lang }: Props) {
-  const { content, locale } = await getYellowUi(lang);
-
+export function YellowShell({ children, content, locale }: Props) {
   return (
     <div
       data-site-theme="yellow"

@@ -18,3 +18,27 @@ export function yellowGalleryUrlAfterFailure(
     null
   );
 }
+
+/** Clamp index to [0, count-1] — Yellow strip/lightbox do not wrap. */
+export function clampYellowGalleryIndex(index: number, count: number): number {
+  if (count <= 0) return 0;
+  return Math.max(0, Math.min(count - 1, index));
+}
+
+/** Arrow keys without wrap; returns null when at an end or key unused. */
+export function yellowGalleryIndexAfterKey(
+  key: string,
+  index: number,
+  count: number,
+): number | null {
+  if (count <= 1) return null;
+  if (key === "ArrowLeft") {
+    return index > 0 ? index - 1 : null;
+  }
+  if (key === "ArrowRight") {
+    return index < count - 1 ? index + 1 : null;
+  }
+  return null;
+}
+
+export const YELLOW_GALLERY_ASPECT_FALLBACK = 4 / 3;

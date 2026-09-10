@@ -29,12 +29,14 @@ import { YellowReveal } from "@/themes/yellow/yellow-reveal";
 import { YellowShell } from "@/themes/yellow/yellow-shell";
 import { formatYellowPriceParts, getYellowUi } from "@/themes/yellow/yellow-ui";
 
-export async function YellowListingDetail({
+export function YellowListingDetail({
   listing,
-  lang,
+  content,
+  config,
+  locale,
 }: ListingDetailThemeProps) {
-  const { content, dict, locale, defaultLocale, showShareButton, siteOrigin } =
-    await getYellowUi(lang);
+  const ui = getYellowUi({ content, config, locale });
+  const { dict, defaultLocale, showShareButton, siteOrigin } = ui;
   const copy = getYellowCopy(locale);
   const photos = Array.isArray(listing.photos) ? listing.photos : [];
   const offerType = parseOfferType(listing.offer_type);
@@ -64,8 +66,8 @@ export async function YellowListingDetail({
   const offerLabel = isSale ? dict.listing.sale : dict.listing.rent;
 
   return (
-    <YellowShell lang={lang}>
-      <YellowHeader lang={lang} />
+    <YellowShell content={content} locale={locale}>
+      <YellowHeader ui={ui} />
 
       <main className="yellow-detail">
         <div className="yellow-shell yellow-detail__wrap">
@@ -85,7 +87,7 @@ export async function YellowListingDetail({
                   fallbackUrl={listing.photo_url}
                   labels={dict.listing.gallery}
                   offerLabel={offerLabel}
-                  expandLabel={copy.expandGallery}
+                  viewAllLabel={copy.viewAllPhotos}
                   closeLabel={copy.closeGallery}
                 />
               </YellowReveal>
@@ -253,7 +255,7 @@ export async function YellowListingDetail({
         </div>
       </main>
 
-      <YellowFooter lang={lang} />
+      <YellowFooter ui={ui} />
     </YellowShell>
   );
 }

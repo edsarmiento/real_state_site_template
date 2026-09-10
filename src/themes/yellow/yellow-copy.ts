@@ -7,7 +7,7 @@ export type YellowCopy = {
   paginationAria: string;
   goToPage: string;
   selectedProperties: string;
-  expandGallery: string;
+  viewAllPhotos: string;
   closeGallery: string;
 };
 
@@ -18,7 +18,7 @@ const ES: YellowCopy = {
   paginationAria: "Paginación de propiedades",
   goToPage: "Ir a la página {page}",
   selectedProperties: "Propiedades seleccionadas",
-  expandGallery: "Ampliar galería",
+  viewAllPhotos: "Ver todas las fotos",
   closeGallery: "Cerrar galería",
 };
 
@@ -29,7 +29,7 @@ const EN: YellowCopy = {
   paginationAria: "Property pagination",
   goToPage: "Go to page {page}",
   selectedProperties: "Selected properties",
-  expandGallery: "Expand gallery",
+  viewAllPhotos: "See all photos",
   closeGallery: "Close gallery",
 };
 

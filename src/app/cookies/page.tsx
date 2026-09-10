@@ -1,6 +1,7 @@
 import { legalPlaceholderMetadata } from "@/lib/legal-placeholder";
 import { firstSearchParam } from "@/lib/search-params";
 import { resolveSiteThemeFromConfig } from "@/themes/resolve-site-theme";
+import { resolveThemeProps } from "@/themes/resolve-theme-props";
 
 export const metadata = legalPlaceholderMetadata("Política de cookies");
 
@@ -14,5 +15,6 @@ export default async function CookiesPage({
   const theme = await resolveSiteThemeFromConfig();
   const LegalPage = theme.LegalPage;
   const lang = firstSearchParam((await searchParams).lang);
-  return <LegalPage kind="cookies" lang={lang} />;
+  const themeProps = await resolveThemeProps(lang);
+  return <LegalPage {...themeProps} kind="cookies" lang={lang} />;
 }

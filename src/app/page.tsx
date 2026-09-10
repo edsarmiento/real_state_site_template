@@ -24,6 +24,7 @@ import {
 } from "@/lib/site-i18n";
 import { firstSearchParam } from "@/lib/search-params";
 import { resolveSiteThemeFromConfig } from "@/themes/resolve-site-theme";
+import { resolveThemeProps } from "@/themes/resolve-theme-props";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -82,7 +83,8 @@ export default async function CatalogPage({
   searchParams: SearchParams;
 }) {
   const sp = await searchParams;
-  const config = await getResolvedSiteConfig();
+  const lang = firstSearchParam(sp.lang);
+  const themeProps = await resolveThemeProps(lang);
   const theme = await resolveSiteThemeFromConfig();
   const city = firstSearchParam(sp.city).trim();
   const oferta = parseCatalogOfferFilter(firstSearchParam(sp.oferta));
@@ -120,14 +122,10 @@ export default async function CatalogPage({
       pageSize,
     );
     if (resolved.outOfRange) {
-      const locale = resolveRequestLocale(
-        firstSearchParam(sp.lang),
-        config.locale,
-      );
       redirect(
         localizedHref(
           "/",
-          locale,
+          themeProps.locale,
           catalogSearchParams({
             oferta,
             city,
@@ -135,7 +133,7 @@ export default async function CatalogPage({
             bedrooms,
             page: resolved.page,
           }),
-          config.locale.defaultLocale,
+          themeProps.config.locale.defaultLocale,
         ) + "#catalogo",
       );
     }
@@ -158,8 +156,7 @@ export default async function CatalogPage({
     }
   }
 
-  const locale = resolveRequestLocale(firstSearchParam(sp.lang), config.locale);
-  const dict = getDictionary(locale);
+  const dict = getDictionary(themeProps.locale);
   const typeLabel = propertyType
     ? (dict.propertyTypes[propertyType as PropertyType] ?? propertyType)
     : null;
@@ -169,6 +166,7 @@ export default async function CatalogPage({
 
   return (
     <Catalog
+      {...themeProps}
       oferta={oferta}
       city={city}
       propertyType={propertyType}
@@ -182,7 +180,7 @@ export default async function CatalogPage({
       catalogOk={result.ok}
       catalogStatus={result.status}
       isAdmin={session?.isStaffUser === true}
-      lang={firstSearchParam(sp.lang)}
+      lang={lang}
       heroPhotoUrls={heroPhotoUrls}
     />
   );

@@ -1,15 +1,14 @@
-import { getPublicSiteContent } from "@/lib/public-site-content";
-import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import {
   getDictionary,
   localizedHref,
-  resolveRequestLocale,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
+import type { PublicSiteContent } from "@/lib/public-site-content";
+import type { ThemeResolvedProps } from "@/themes/theme-types";
 
 export type YellowUi = {
-  content: Awaited<ReturnType<typeof getPublicSiteContent>>;
+  content: PublicSiteContent;
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   dict: SiteDictionary;
@@ -17,12 +16,15 @@ export type YellowUi = {
   siteOrigin: string;
 };
 
-export async function getYellowUi(lang?: string): Promise<YellowUi> {
-  const [content, config] = await Promise.all([
-    getPublicSiteContent(),
-    getResolvedSiteConfig(),
-  ]);
-  const locale = resolveRequestLocale(lang, content.locale);
+/**
+ * Pure derivation of Yellow UI values from already-resolved integration props.
+ * Does not fetch SiteConfig or public content.
+ */
+export function getYellowUi({
+  content,
+  config,
+  locale,
+}: ThemeResolvedProps): YellowUi {
   return {
     content,
     locale,

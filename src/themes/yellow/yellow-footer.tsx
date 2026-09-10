@@ -7,14 +7,14 @@ import {
 } from "@/themes/yellow/yellow-display";
 import { YellowLogo } from "@/themes/yellow/yellow-logo";
 import { YellowSocialLinks } from "@/themes/yellow/yellow-social-links";
-import { getYellowUi, yellowNavLinks } from "@/themes/yellow/yellow-ui";
+import { type YellowUi, yellowNavLinks } from "@/themes/yellow/yellow-ui";
 
 type Props = {
-  lang?: string;
+  ui: YellowUi;
 };
 
-export async function YellowFooter({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getYellowUi(lang);
+export function YellowFooter({ ui }: Props) {
+  const { content, dict, locale, defaultLocale } = ui;
   const { brand, footer, legal, social, contact } = content;
   const links = yellowNavLinks(dict, locale, defaultLocale);
   const whatsappHref = yellowContactChannels(content).whatsappHref;
@@ -81,7 +81,10 @@ export async function YellowFooter({ lang }: Props) {
               ) : null}
               {contact.emailHref && contact.email ? (
                 <li>
-                  <a href={contact.emailHref} className="yellow-footer__link yellow-footer__link--accent">
+                  <a
+                    href={contact.emailHref}
+                    className="yellow-footer__link yellow-footer__link--accent"
+                  >
                     {contact.email}
                   </a>
                 </li>

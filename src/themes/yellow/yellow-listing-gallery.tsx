@@ -1,14 +1,22 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { ListingPhotoGallery, type ListingGalleryLabels } from "@/components/listing-photo-gallery";
 import {
-  galleryIndexAfterKey,
-  wrapGalleryIndex,
-} from "@/lib/listing-gallery-nav";
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
+import type { ListingGalleryLabels } from "@/components/listing-photo-gallery";
 import type { ListingPhoto } from "@/lib/listing-types";
 import { fillTemplate } from "@/lib/site-i18n";
-import { yellowGalleryUrlAfterFailure } from "@/themes/yellow/yellow-gallery-urls";
+import {
+  YELLOW_GALLERY_ASPECT_FALLBACK,
+  clampYellowGalleryIndex,
+  yellowGalleryIndexAfterKey,
+  yellowGalleryUrlAfterFailure,
+} from "@/themes/yellow/yellow-gallery-urls";
 import {
   YellowIconArrowLeft,
   YellowIconArrowRight,
@@ -22,7 +30,7 @@ type Props = {
   fallbackUrl?: string | null;
   labels: ListingGalleryLabels;
   offerLabel: string;
-  expandLabel: string;
+  viewAllLabel: string;
   closeLabel: string;
 };
 
@@ -44,49 +52,96 @@ export function YellowListingGallery({
   fallbackUrl,
   labels,
   offerLabel,
-  expandLabel,
+  viewAllLabel,
   closeLabel,
 }: Props) {
   const sourceUrls = galleryUrls(photos, fallbackUrl);
   const [failedUrls, setFailedUrls] = useState<Set<string>>(() => new Set());
+  const [aspectByUrl, setAspectByUrl] = useState<Record<string, number>>({});
   const urls = sourceUrls.filter((url) => !failedUrls.has(url));
   const count = urls.length;
+  const multi = count > 1;
+
   const dialogId = useId();
   const titleId = `${dialogId}-title`;
-  const expandRef = useRef<HTMLButtonElement>(null);
+  const regionId = `${dialogId}-region`;
+  const viewAllRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const touchStartX = useRef<number | null>(null);
+  const focusReturnRef = useRef<HTMLElement | null>(null);
+
   const [open, setOpen] = useState(false);
-  const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
-  const activeUrl =
-    (selectedUrl && urls.includes(selectedUrl) ? selectedUrl : null) ??
-    urls[0] ??
-    null;
-  const safeIndex = activeUrl ? Math.max(0, urls.indexOf(activeUrl)) : 0;
+  const [index, setIndex] = useState(0);
+  const [trackOffset, setTrackOffset] = useState(0);
+
+  const safeIndex = clampYellowGalleryIndex(index, count);
+  const activeUrl = urls[safeIndex] ?? null;
   const lightboxOpen = open && Boolean(activeUrl);
+  const canPrev = multi && safeIndex > 0;
+  const canNext = multi && safeIndex < count - 1;
 
   function markUrlFailed(url: string) {
+    const nextSelected = yellowGalleryUrlAfterFailure(urls, url, activeUrl);
     setFailedUrls((prev) => {
       if (prev.has(url)) return prev;
       const next = new Set(prev);
       next.add(url);
       return next;
     });
-    setSelectedUrl((current) => yellowGalleryUrlAfterFailure(urls, url, current));
+    setAspectByUrl((prev) => {
+      if (!(url in prev)) return prev;
+      const next = { ...prev };
+      delete next[url];
+      return next;
+    });
+    const remaining = urls.filter((item) => item !== url);
+    if (!nextSelected || remaining.length === 0) {
+      setIndex(0);
+      return;
+    }
+    const nextIndex = remaining.indexOf(nextSelected);
+    setIndex(nextIndex >= 0 ? nextIndex : 0);
   }
 
-  function openLightbox() {
-    setSelectedUrl(urls[0] ?? null);
+  function rememberAspect(url: string, width: number, height: number) {
+    if (!(width > 0 && height > 0)) return;
+    const ratio = width / height;
+    setAspectByUrl((prev) =>
+      prev[url] === ratio ? prev : { ...prev, [url]: ratio },
+    );
+  }
+
+  function goTo(nextIndex: number) {
+    if (count <= 0) return;
+    setIndex(clampYellowGalleryIndex(nextIndex, count));
+  }
+
+  function openLightbox(fromIndex = safeIndex, trigger?: HTMLElement | null) {
+    focusReturnRef.current = trigger ?? viewAllRef.current;
+    setIndex(clampYellowGalleryIndex(fromIndex, count));
     setOpen(true);
-  }
-
-  function showUrlAt(nextIndex: number) {
-    setSelectedUrl(urls[nextIndex] ?? null);
   }
 
   function closeLightbox() {
     setOpen(false);
   }
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+    const slide = slideRefs.current[safeIndex];
+    if (!viewport || !track || !slide) {
+      setTrackOffset(0);
+      return;
+    }
+    const max = Math.max(0, track.scrollWidth - viewport.clientWidth);
+    const next = Math.min(Math.max(0, slide.offsetLeft), max);
+    setTrackOffset(next);
+  }, [safeIndex, urls, aspectByUrl, count]);
 
   useEffect(() => {
     const node = dialogRef.current;
@@ -108,11 +163,12 @@ export function YellowListingGallery({
     document.body.style.overflow = "hidden";
 
     function onKey(event: KeyboardEvent) {
-      const next = galleryIndexAfterKey(event.key, safeIndex, count);
+      if (event.key === "Escape") return;
+      const next = yellowGalleryIndexAfterKey(event.key, safeIndex, count);
       if (next == null) return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      setSelectedUrl(urls[next] ?? null);
+      setIndex(next);
     }
 
     window.addEventListener("keydown", onKey, true);
@@ -120,43 +176,229 @@ export function YellowListingGallery({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey, true);
     };
-  }, [lightboxOpen, count, safeIndex, urls]);
+  }, [lightboxOpen, count, safeIndex]);
 
   useEffect(() => {
-    if (!lightboxOpen) return;
-    const expandButton = expandRef.current;
-    return () => {
-      expandButton?.focus();
-    };
+    if (lightboxOpen) return;
+    const target = focusReturnRef.current;
+    if (!target) return;
+    target.focus();
+    focusReturnRef.current = null;
   }, [lightboxOpen]);
+
+  useEffect(() => {
+    if (lightboxOpen || count <= 1) return;
+
+    function onKey(event: KeyboardEvent) {
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      const region = document.getElementById(regionId);
+      if (!region) return;
+      const next = yellowGalleryIndexAfterKey(event.key, safeIndex, count);
+      if (next == null) return;
+      event.preventDefault();
+      setIndex(next);
+    }
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxOpen, count, safeIndex, regionId]);
+
+  if (count === 0 || !activeUrl) {
+    return (
+      <div className="yellow-gallery-wrap">
+        <div
+          className="yellow-gallery yellow-gallery--empty"
+          role="status"
+          aria-live="polite"
+        >
+          {labels.empty}
+        </div>
+        <span className="yellow-gallery__badge">{offerLabel}</span>
+      </div>
+    );
+  }
 
   return (
     <div className="yellow-gallery-wrap">
-      <ListingPhotoGallery
-        title={title}
-        photos={photos}
-        fallbackUrl={fallbackUrl}
+      <div
+        id={regionId}
         className="yellow-gallery"
-        styledLayout={false}
-        labels={labels}
-      />
-      <span className="yellow-gallery__badge">{offerLabel}</span>
-      {count > 0 ? (
-        <button
-          ref={expandRef}
-          type="button"
-          className="yellow-gallery__expand"
-          onClick={openLightbox}
-          aria-haspopup="dialog"
-          aria-expanded={lightboxOpen}
-          aria-controls={dialogId}
+        role="region"
+        aria-roledescription={labels.carouselRole}
+        aria-label={fillTemplate(labels.photosOf, { title })}
+      >
+        <div
+          ref={viewportRef}
+          className="yellow-gallery__viewport"
+          onTouchStart={(event) => {
+            touchStartX.current = event.changedTouches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={(event) => {
+            if (touchStartX.current == null || !multi) return;
+            const endX =
+              event.changedTouches[0]?.clientX ?? touchStartX.current;
+            const delta = endX - touchStartX.current;
+            touchStartX.current = null;
+            if (Math.abs(delta) < 40) return;
+            if (delta > 0) goTo(safeIndex - 1);
+            else goTo(safeIndex + 1);
+          }}
         >
-          <YellowIconExpand className="h-4 w-4" />
-          {expandLabel}
-        </button>
+          <div
+            ref={trackRef}
+            className="yellow-gallery__track"
+            style={{ transform: `translate3d(-${trackOffset}px, 0, 0)` }}
+          >
+            {urls.map((url, photoIndex) => {
+              const ratio =
+                aspectByUrl[url] ?? YELLOW_GALLERY_ASPECT_FALLBACK;
+              const selected = photoIndex === safeIndex;
+              const style = {
+                "--yellow-slide-ar": String(ratio),
+              } as CSSProperties;
+              return (
+                <button
+                  key={`${url}-${photoIndex}`}
+                  ref={(node) => {
+                    slideRefs.current[photoIndex] = node;
+                  }}
+                  type="button"
+                  className={
+                    selected
+                      ? "yellow-gallery__slide is-active"
+                      : "yellow-gallery__slide"
+                  }
+                  style={style}
+                  aria-current={selected ? "true" : undefined}
+                  aria-label={fillTemplate(labels.view, {
+                    index: photoIndex + 1,
+                  })}
+                  onClick={(event) => {
+                    if (photoIndex !== safeIndex) {
+                      goTo(photoIndex);
+                      return;
+                    }
+                    openLightbox(photoIndex, event.currentTarget);
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt={fillTemplate(labels.photoAlt, {
+                      title,
+                      index: photoIndex + 1,
+                      count,
+                    })}
+                    draggable={false}
+                    onLoad={(event) => {
+                      rememberAspect(
+                        url,
+                        event.currentTarget.naturalWidth,
+                        event.currentTarget.naturalHeight,
+                      );
+                    }}
+                    onError={() => markUrlFailed(url)}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {multi ? (
+          <>
+            <button
+              type="button"
+              className="yellow-gallery__nav yellow-gallery__nav--prev"
+              onClick={() => goTo(safeIndex - 1)}
+              disabled={!canPrev}
+              aria-label={labels.prev}
+            >
+              <YellowIconArrowLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              className="yellow-gallery__nav yellow-gallery__nav--next"
+              onClick={() => goTo(safeIndex + 1)}
+              disabled={!canNext}
+              aria-label={labels.next}
+            >
+              <YellowIconArrowRight className="h-5 w-5" />
+            </button>
+            <div className="yellow-gallery__chrome">
+              <p className="yellow-gallery__counter" aria-live="polite">
+                {safeIndex + 1} / {count}
+              </p>
+              <button
+                ref={viewAllRef}
+                type="button"
+                className="yellow-gallery__view-all"
+                onClick={(event) =>
+                  openLightbox(safeIndex, event.currentTarget)
+                }
+                aria-haspopup="dialog"
+                aria-expanded={lightboxOpen}
+                aria-controls={dialogId}
+              >
+                <YellowIconExpand className="h-4 w-4" />
+                {viewAllLabel}
+              </button>
+            </div>
+          </>
+        ) : null}
+      </div>
+
+      <span className="yellow-gallery__badge">{offerLabel}</span>
+
+      {multi ? (
+        <ul className="yellow-gallery__thumbs" aria-label={labels.indicators}>
+          {urls.map((url, photoIndex) => {
+            const selected = photoIndex === safeIndex;
+            return (
+              <li key={`${url}-thumb-${photoIndex}`}>
+                <button
+                  type="button"
+                  className={
+                    selected
+                      ? "yellow-gallery__thumb is-active"
+                      : "yellow-gallery__thumb"
+                  }
+                  aria-current={selected ? "true" : undefined}
+                  aria-label={fillTemplate(labels.goTo, {
+                    index: photoIndex + 1,
+                  })}
+                  onClick={() => goTo(photoIndex)}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt=""
+                    onLoad={(event) => {
+                      rememberAspect(
+                        url,
+                        event.currentTarget.naturalWidth,
+                        event.currentTarget.naturalHeight,
+                      );
+                    }}
+                    onError={() => markUrlFailed(url)}
+                  />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       ) : null}
 
-      {count > 0 && activeUrl ? (
+      {activeUrl ? (
         <dialog
           ref={dialogRef}
           id={dialogId}
@@ -193,12 +435,13 @@ export function YellowListingGallery({
                 className="yellow-lightbox__image"
                 onError={() => markUrlFailed(activeUrl)}
               />
-              {count > 1 ? (
+              {multi ? (
                 <>
                   <button
                     type="button"
                     className="yellow-lightbox__nav yellow-lightbox__nav--prev"
-                    onClick={() => showUrlAt(wrapGalleryIndex(safeIndex - 1, count))}
+                    onClick={() => goTo(safeIndex - 1)}
+                    disabled={!canPrev}
                     aria-label={labels.prev}
                   >
                     <YellowIconArrowLeft className="h-5 w-5" />
@@ -206,23 +449,24 @@ export function YellowListingGallery({
                   <button
                     type="button"
                     className="yellow-lightbox__nav yellow-lightbox__nav--next"
-                    onClick={() => showUrlAt(wrapGalleryIndex(safeIndex + 1, count))}
+                    onClick={() => goTo(safeIndex + 1)}
+                    disabled={!canNext}
                     aria-label={labels.next}
                   >
                     <YellowIconArrowRight className="h-5 w-5" />
                   </button>
-                  <p className="yellow-lightbox__counter">
+                  <p className="yellow-lightbox__counter" aria-live="polite">
                     {safeIndex + 1} / {count}
                   </p>
                 </>
               ) : null}
             </div>
-            {count > 1 ? (
+            {multi ? (
               <ul className="yellow-lightbox__thumbs">
                 {urls.map((url, photoIndex) => {
                   const selected = photoIndex === safeIndex;
                   return (
-                    <li key={`${url}-${photoIndex}`}>
+                    <li key={`${url}-lb-${photoIndex}`}>
                       <button
                         type="button"
                         className={
@@ -234,7 +478,7 @@ export function YellowListingGallery({
                         aria-label={fillTemplate(labels.view, {
                           index: photoIndex + 1,
                         })}
-                        onClick={() => showUrlAt(photoIndex)}
+                        onClick={() => goTo(photoIndex)}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img

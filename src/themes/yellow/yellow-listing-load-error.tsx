@@ -6,16 +6,19 @@ import { YellowShell } from "@/themes/yellow/yellow-shell";
 import { getYellowUi } from "@/themes/yellow/yellow-ui";
 import type { ListingLoadErrorThemeProps } from "@/themes/theme-types";
 
-export async function YellowListingLoadError({
+export function YellowListingLoadError({
   status,
-  lang,
+  content,
+  config,
+  locale,
 }: ListingLoadErrorThemeProps) {
-  const { dict, locale, defaultLocale } = await getYellowUi(lang);
+  const ui = getYellowUi({ content, config, locale });
+  const { dict, defaultLocale } = ui;
   const message = fillTemplate(dict.results.listingError, { status });
 
   return (
-    <YellowShell lang={lang}>
-      <YellowHeader lang={lang} />
+    <YellowShell content={content} locale={locale}>
+      <YellowHeader ui={ui} />
       <main className="yellow-legal">
         <div className="yellow-shell yellow-state">
           <h1 className="yellow-section__title">{message}</h1>
@@ -27,7 +30,7 @@ export async function YellowListingLoadError({
           </Link>
         </div>
       </main>
-      <YellowFooter lang={lang} />
+      <YellowFooter ui={ui} />
     </YellowShell>
   );
 }

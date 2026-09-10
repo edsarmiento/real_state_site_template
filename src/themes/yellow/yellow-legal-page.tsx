@@ -4,8 +4,14 @@ import { YellowHeader } from "@/themes/yellow/yellow-header";
 import { YellowShell } from "@/themes/yellow/yellow-shell";
 import { getYellowUi } from "@/themes/yellow/yellow-ui";
 
-export async function YellowLegalPage({ kind, lang }: LegalPageThemeProps) {
-  const { dict } = await getYellowUi(lang);
+export function YellowLegalPage({
+  kind,
+  content,
+  config,
+  locale,
+}: LegalPageThemeProps) {
+  const ui = getYellowUi({ content, config, locale });
+  const { dict } = ui;
   const title =
     kind === "privacy"
       ? dict.legal.privacyTitle
@@ -14,8 +20,8 @@ export async function YellowLegalPage({ kind, lang }: LegalPageThemeProps) {
         : dict.legal.cookiesTitle;
 
   return (
-    <YellowShell lang={lang}>
-      <YellowHeader lang={lang} />
+    <YellowShell content={content} locale={locale}>
+      <YellowHeader ui={ui} />
       <main className="yellow-legal">
         <div className="yellow-shell yellow-legal__inner">
           <p className="yellow-eyebrow">{dict.legal.kicker}</p>
@@ -24,7 +30,7 @@ export async function YellowLegalPage({ kind, lang }: LegalPageThemeProps) {
           <p className="yellow-legal__body">{dict.legal.body}</p>
         </div>
       </main>
-      <YellowFooter lang={lang} />
+      <YellowFooter ui={ui} />
     </YellowShell>
   );
 }

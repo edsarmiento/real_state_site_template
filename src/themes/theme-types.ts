@@ -4,11 +4,25 @@ import type {
   PublicListingCard,
   PublicListingDetail,
 } from "@/lib/listing-types";
+import type { PublicSiteContent } from "@/lib/public-site-content";
+import type { ResolvedSiteConfig } from "@/lib/site-config-types";
+import type { SiteLocale } from "@/lib/site-i18n";
 import type { SiteThemeName } from "@/themes/theme-definitions";
 
 export type { SiteThemeName } from "@/themes/theme-definitions";
 
-export type CatalogThemeProps = {
+/**
+ * Values resolved once at the App Router integration boundary and passed into
+ * every theme surface. Themes should paint these props — not re-fetch SiteConfig
+ * or public content.
+ */
+export type ThemeResolvedProps = {
+  content: PublicSiteContent;
+  config: ResolvedSiteConfig;
+  locale: SiteLocale;
+};
+
+export type CatalogThemeProps = ThemeResolvedProps & {
   oferta: CatalogOfferFilter;
   city: string;
   propertyType: string;
@@ -27,20 +41,20 @@ export type CatalogThemeProps = {
   heroPhotoUrls?: string[];
 };
 
-export type ListingDetailThemeProps = {
+export type ListingDetailThemeProps = ThemeResolvedProps & {
   listing: PublicListingDetail;
   isAdmin: boolean;
   lang?: string;
 };
 
-export type ListingLoadErrorThemeProps = {
+export type ListingLoadErrorThemeProps = ThemeResolvedProps & {
   status: number;
   lang?: string;
 };
 
 export type LegalPageKind = "privacy" | "terms" | "cookies";
 
-export type LegalPageThemeProps = {
+export type LegalPageThemeProps = ThemeResolvedProps & {
   kind: LegalPageKind;
   lang?: string;
 };

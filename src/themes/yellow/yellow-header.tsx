@@ -10,14 +10,14 @@ import { YellowIconWhatsApp } from "@/themes/yellow/yellow-icons";
 import { YellowLocaleSwitcher } from "@/themes/yellow/yellow-locale-switcher";
 import { YellowLogo } from "@/themes/yellow/yellow-logo";
 import { YellowMobileNav } from "@/themes/yellow/yellow-mobile-nav";
-import { getYellowUi, yellowNavLinks } from "@/themes/yellow/yellow-ui";
+import { type YellowUi, yellowNavLinks } from "@/themes/yellow/yellow-ui";
 
 type Props = {
-  lang?: string;
+  ui: YellowUi;
 };
 
-export async function YellowHeader({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getYellowUi(lang);
+export function YellowHeader({ ui }: Props) {
+  const { content, dict, locale, defaultLocale } = ui;
   const { brand } = content;
   const links = yellowNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);

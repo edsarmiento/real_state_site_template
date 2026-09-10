@@ -31,7 +31,7 @@ import {
 import { YellowShell } from "@/themes/yellow/yellow-shell";
 import { getYellowUi } from "@/themes/yellow/yellow-ui";
 
-export async function YellowCatalog({
+export function YellowCatalog({
   oferta,
   city,
   propertyType,
@@ -44,10 +44,13 @@ export async function YellowCatalog({
   typeLabel,
   catalogOk,
   catalogStatus,
-  lang,
   heroPhotoUrls,
+  content,
+  config,
+  locale,
 }: CatalogThemeProps) {
-  const { content, dict, locale, defaultLocale } = await getYellowUi(lang);
+  const ui = getYellowUi({ content, config, locale });
+  const { dict, defaultLocale } = ui;
   const copy = getYellowCopy(locale);
   const listingCards = yellowSafeListingArray(listings);
   const collage = resolveYellowHeroUrls(
@@ -93,8 +96,8 @@ export async function YellowCatalog({
       : fillTemplate(dict.results.many, { count: total });
 
   return (
-    <YellowShell lang={lang}>
-      <YellowHeader lang={lang} />
+    <YellowShell content={content} locale={locale}>
+      <YellowHeader ui={ui} />
 
       <section className="yellow-hero">
         <div className="yellow-hero__atmosphere" aria-hidden>
@@ -254,7 +257,7 @@ export async function YellowCatalog({
         </div>
       </section>
 
-      <YellowFooter lang={lang} />
+      <YellowFooter ui={ui} />
     </YellowShell>
   );
 }
