@@ -57,8 +57,9 @@ html:has([data-site-theme="executive"])::-webkit-scrollbar-thumb {
   --executive-header-h: 5rem;
   --executive-glass: rgba(26, 41, 79, 0.4);
   --executive-glass-border: rgba(197, 168, 128, 0.2);
-  --font-executive-heading: var(--font-executive-playfair), Georgia, serif;
+  --font-executive-heading: var(--font-executive-playfair), georgia, serif;
   --font-executive-body: var(--font-executive-jakarta), system-ui, sans-serif;
+
   background: var(--executive-navy-900);
   color: var(--executive-sand-100);
   font-family: var(--font-executive-body);
@@ -89,7 +90,7 @@ html:has([data-site-theme="executive"])::-webkit-scrollbar-thumb {
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
@@ -1688,6 +1689,53 @@ html:has([data-site-theme="executive"])::-webkit-scrollbar-thumb {
   border: 1px solid var(--executive-glass-border);
 }
 
+[data-site-theme="executive"] .executive-consult--preview {
+  display: grid;
+  gap: 0.85rem;
+}
+
+[data-site-theme="executive"] .executive-consult--preview .executive-search__field {
+  display: block;
+}
+
+[data-site-theme="executive"] .executive-consult--preview .executive-search__submit {
+  margin-top: 0.35rem;
+}
+
+[data-site-theme="executive"] .executive-consult__badge {
+  margin: 0;
+  width: fit-content;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--executive-navy-800);
+  border: 1px solid rgba(197, 168, 128, 0.28);
+  color: var(--executive-sand-400);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-site-theme="executive"] .executive-consult__optional {
+  color: var(--executive-slate-400);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+[data-site-theme="executive"] .executive-consult__consent {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  color: var(--executive-slate-300);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+[data-site-theme="executive"] .executive-consult__consent input {
+  margin-top: 0.2rem;
+}
+
 [data-site-theme="executive"] .executive-consult h3 {
   margin: 0.35rem 0 0;
   padding-bottom: 1rem;
@@ -1702,6 +1750,13 @@ html:has([data-site-theme="executive"])::-webkit-scrollbar-thumb {
   color: var(--executive-slate-300);
   font-size: 0.875rem;
   line-height: 1.7;
+}
+
+[data-site-theme="executive"] .executive-consult__note {
+  margin: 0;
+  color: var(--executive-slate-400);
+  font-size: 0.8125rem;
+  line-height: 1.6;
 }
 
 [data-site-theme="executive"] .executive-consult__wa {
@@ -1938,6 +1993,7 @@ html:has([data-site-theme="executive"])::-webkit-scrollbar-thumb {
 
 [data-site-theme="executive"] .executive-gallery .listing-gallery__thumb--active {
   --tw-ring-color: var(--executive-sand-500);
+
   transform: scale(0.95);
 }
 

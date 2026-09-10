@@ -13,7 +13,8 @@ Variables (reemplazar)
   Executive              PascalCase para componentes
   Executive              etiqueta humana
   default                theme a copiar estructura: default | luxury
-  true                   usar styledLayout en search/cards/forms compartidos
+  false                  styledLayout en widgets publicos compartidos (cards/search/forms);
+                         admin/login: true via isStyledSiteLayout(layout_key !== "default")
   Navy #0a1128 / sand #c5a880, Playfair Display + Plus Jakarta Sans, hero collage 3 marcos, glass cards
 
 
@@ -86,9 +87,13 @@ Identidad visual:
   (no estan en el HTML). Sin copy de tenant: marca, ciudades y contacto salen
   de SiteConfig / listings.
 
-styledLayout en componentes compartidos: true
-  (admin/login via isStyledSiteLayout; widgets publicos se skinean con CSS del
-  theme y styledLayout={false} para no filtrar azul default)
+styledLayout:
+  - Admin/login: true via isStyledSiteLayout (layout_key distinto de default).
+  - Widgets publicos compartidos (ListingInquiryForm, ListingWhatsAppButton,
+    ListingPhotoGallery, LocaleSwitcherBase, PublicCatalogSearch si se usa):
+    styledLayout={false}. La misma regla aplica a cards y formularios publicos
+    que acepten esa prop; los adaptadores propios usan CSS de Executive. El look de Executive vive en CSS bajo
+    [data-site-theme="executive"], no en el azul default de styledLayout.
 
 
 Minimo obligatorio en src/themes/executive/
@@ -104,9 +109,9 @@ Recomendado:
 Catalog debe incluir:
   - SiteHeader / SiteFooter (prop lang) — chrome propio del theme
   - Hero con siteName, siteTagline (getSiteUi)
-  - PublicCatalogSearch + PublicListingCard (styledLayout segun true)
-    Adaptador local de search/cards si el markup HTML es distinto; helpers
-    compartidos de filtros, publicListingCardModel y specs.
+  - Adaptador local de search/cards si el markup HTML es distinto; helpers
+    compartidos de filtros (catalogSearchParams), publicListingCardModel y specs.
+    Si se usa PublicCatalogSearch u otro widget compartido: styledLayout={false}.
   - Empty state / error catalogo (ui.dict.results.*)
   - Barra admin -> /login (el HTML no la trae; no se añade en el chrome
     publico para no romper la composicion. Acceso via /login)
@@ -115,7 +120,8 @@ Catalog debe incluir:
 Listing detail debe incluir:
   - Paridad funcional con default-listing-detail (galeria, specs, inquiry, WhatsApp, maps)
   - listingUrl con listingPublicUrl(slug, ui.config.siteOrigin, localizedHref(...))
-  - ListingInquiryForm + ListingWhatsAppButton (classNames del theme; sin form propio)
+  - ListingInquiryForm + ListingWhatsAppButton + ListingPhotoGallery con
+    styledLayout={false} y classNames/CSS del theme (sin form propio)
   - listingPublicSpecsLocalized / publicListingCardModel; sin *-specs.ts del theme
 
 
@@ -140,7 +146,9 @@ i18n (desde Ops)
 Admin / login
 -------------
 
-  isStyledSiteLayout(): layout_key !== "default" -> acentos de marca en admin/login.
+  isStyledSiteLayout(layout_key): true para Executive (layout_key !== "default").
+  Acentos de marca en admin/login. No confundir con widgets publicos del catalogo,
+  que usan styledLayout={false} + CSS [data-site-theme="executive"].
 
 
 Verificacion

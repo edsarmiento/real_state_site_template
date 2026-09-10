@@ -2,6 +2,7 @@ import Link from "next/link";
 import { fillTemplate, localizeSiteHref } from "@/lib/site-i18n";
 import { executiveContactChannels } from "@/themes/executive/executive-contact-channels";
 import { executiveBrandInitial } from "@/themes/executive/executive-brand";
+import { executiveHasVisibleContact } from "@/themes/executive/executive-footer-contact";
 import { ExecutiveLogo } from "@/themes/executive/executive-logo";
 import { ExecutiveSocialLinks } from "@/themes/executive/executive-social-links";
 import { executiveNavLinks, getExecutiveUi } from "@/themes/executive/executive-ui";
@@ -15,9 +16,13 @@ export async function ExecutiveFooter({ lang }: Props) {
   const { brand, footer, legal, social, contact } = content;
   const links = executiveNavLinks(dict, locale, defaultLocale);
   const whatsappHref = executiveContactChannels(content).whatsappHref;
-  const hasContact = Boolean(
-    whatsappHref || contact.phoneHref || contact.emailHref,
-  );
+  const hasContact = executiveHasVisibleContact({
+    whatsappHref,
+    phone: contact.phone,
+    phoneHref: contact.phoneHref,
+    email: contact.email,
+    emailHref: contact.emailHref,
+  });
   const year = new Date().getFullYear();
   const initial = executiveBrandInitial(brand.name);
 

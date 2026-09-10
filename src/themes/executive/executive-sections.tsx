@@ -13,6 +13,7 @@ import {
   type SiteLocale,
 } from "@/lib/site-i18n";
 import { executiveContactChannels } from "@/themes/executive/executive-contact-channels";
+import { ExecutiveContactForm } from "@/themes/executive/executive-contact-form";
 import { ExecutiveCoverImage } from "@/themes/executive/executive-cover-image";
 import type { ExecutiveCopy } from "@/themes/executive/executive-copy";
 import {
@@ -333,7 +334,7 @@ export function ExecutiveContact({
   locale,
   defaultLocale,
 }: Shared) {
-  const { contact, social } = content;
+  const { contact, contactForm, legal, social } = content;
   const catalogHref = localizedHref("/#propiedades", locale, null, defaultLocale);
   const channels = collectChannels(content, dict);
   const whatsappHref = executiveContactChannels(content).whatsappHref;
@@ -398,28 +399,16 @@ export function ExecutiveContact({
           />
         </div>
 
-        <aside className="executive-consult" aria-label={dict.contact.formEyebrow}>
-          <p className="executive-kicker">{dict.contact.formEyebrow}</p>
-          <h3>{dict.contact.formTitle}</h3>
-          <p>{dict.contact.formUnavailable}</p>
-          {whatsappHref ? (
-            <div className="executive-consult__wa">
-              <p>{copy.immediatePrompt}</p>
-              <a
-                href={whatsappHref}
-                className="executive-whatsapp-cta executive-whatsapp-cta--block"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${copy.openWhatsApp}. ${dict.a11y.opensInNewTab}`}
-              >
-                <ExecutiveIconWhatsApp className="executive-whatsapp-cta__icon" />
-                {copy.openWhatsApp}
-              </a>
-            </div>
-          ) : contact.attentionNote ? (
-            <p className="executive-consult__note">{contact.attentionNote}</p>
-          ) : null}
-        </aside>
+        <ExecutiveContactForm
+          contact={contact}
+          contactForm={contactForm}
+          legal={legal}
+          dict={dict}
+          copy={copy}
+          locale={locale}
+          defaultLocale={defaultLocale}
+          whatsappHref={whatsappHref}
+        />
       </div>
     </section>
   );

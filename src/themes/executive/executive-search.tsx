@@ -2,6 +2,7 @@
 
 import { type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { catalogSearchParams } from "@/lib/catalog-pagination";
 import {
   catalogOfferQueryValue,
   parseCatalogOfferFilter,
@@ -35,16 +36,14 @@ function catalogHref(
   bedrooms: string,
   locale: SiteLocale,
   defaultLocale: SiteLocale,
-  langFromForm?: string,
 ): string {
-  const params: Record<string, string> = {};
-  if (oferta !== "all") params.oferta = catalogOfferQueryValue(oferta);
-  if (city.trim()) params.city = city.trim();
-  if (propertyType) params.tipo = propertyType;
-  if (bedrooms) params.recamaras = bedrooms;
-  const resolved =
-    langFromForm === "en" || langFromForm === "es" ? langFromForm : locale;
-  return `${localizedHref("/", resolved, params, defaultLocale)}#propiedades`;
+  const params = catalogSearchParams({
+    oferta,
+    city,
+    propertyType,
+    bedrooms,
+  });
+  return `${localizedHref("/", locale, params, defaultLocale)}#propiedades`;
 }
 
 export function ExecutiveSearch({
@@ -63,15 +62,17 @@ export function ExecutiveSearch({
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const nextLocaleRaw = String(data.get("lang") || "");
+    const nextLocale =
+      nextLocaleRaw === "en" || nextLocaleRaw === "es" ? nextLocaleRaw : locale;
     router.push(
       catalogHref(
         parseCatalogOfferFilter(String(data.get("oferta") || "")),
         String(data.get("city") || ""),
         String(data.get("tipo") || ""),
         String(data.get("recamaras") || ""),
-        locale,
+        nextLocale,
         defaultLocale,
-        String(data.get("lang") || ""),
       ),
       { scroll: false },
     );
