@@ -8,6 +8,8 @@ type Props = {
   className: string;
   placeholderClassName: string;
   placeholder: ReactNode;
+  /** When true, the fallback is decorative and hidden from assistive tech. */
+  decorative?: boolean;
 };
 
 export function YellowCoverImage({
@@ -16,6 +18,7 @@ export function YellowCoverImage({
   className,
   placeholderClassName,
   placeholder,
+  decorative = false,
 }: Props) {
   const imageSrc = src?.trim() || null;
   return (
@@ -26,6 +29,7 @@ export function YellowCoverImage({
       className={className}
       placeholderClassName={placeholderClassName}
       placeholder={placeholder}
+      decorative={decorative}
     />
   );
 }
@@ -36,14 +40,13 @@ function YellowCoverImageInner({
   className,
   placeholderClassName,
   placeholder,
-}: Omit<Props, "src"> & { src: string | null }) {
+  decorative,
+}: Omit<Props, "src"> & { src: string | null; decorative: boolean }) {
   const [failed, setFailed] = useState(false);
 
   if (!src || failed) {
-    const announce =
-      typeof placeholder === "string" && placeholder.trim() !== "";
     return (
-      <div className={placeholderClassName} aria-hidden={!announce}>
+      <div className={placeholderClassName} aria-hidden={decorative}>
         {placeholder}
       </div>
     );

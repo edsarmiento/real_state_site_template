@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { catalogTotalPages } from "@/lib/catalog-pagination";
 import type { PublicListingCard } from "@/lib/listing-types";
-import { locationsFromListings } from "@/lib/public-site-content";
 import {
   fillTemplate,
   localizeSiteHref,
@@ -57,10 +56,7 @@ export async function YellowCatalog({
     heroPhotoUrls,
     listingCards.map((item) => item.photo_url),
   );
-  const locations =
-    content.locations.length > 0
-      ? content.locations
-      : locationsFromListings(listingCards);
+  const locations = content.locations;
   const cityOptions = yellowUniqueCities(
     [
       ...locations.map((location) => ({

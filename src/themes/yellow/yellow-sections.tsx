@@ -121,6 +121,7 @@ export function YellowLocations({
                           className="yellow-img-zoom absolute inset-0 h-full w-full object-cover"
                           placeholderClassName="yellow-hero-frame__placeholder"
                           placeholder=""
+                          decorative
                         />
                       ) : (
                         <div className="yellow-hero-frame__placeholder" />
@@ -201,6 +202,7 @@ export function YellowAbout({
               className="yellow-about__image"
               placeholderClassName="yellow-about__icon"
               placeholder={<YellowIconHome className="h-10 w-10" />}
+              decorative
             />
             <h3 className="yellow-about__cta-title">{dict.finalCta.title}</h3>
             <p className="yellow-lead">

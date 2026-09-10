@@ -8,6 +8,7 @@ import {
 } from "@/lib/listing-gallery-nav";
 import type { ListingPhoto } from "@/lib/listing-types";
 import { fillTemplate } from "@/lib/site-i18n";
+import { yellowGalleryUrlAfterFailure } from "@/themes/yellow/yellow-gallery-urls";
 import {
   YellowIconArrowLeft,
   YellowIconArrowRight,
@@ -56,9 +57,12 @@ export function YellowListingGallery({
   const closeRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
-  const [index, setIndex] = useState(0);
-  const safeIndex = count > 0 ? Math.min(index, count - 1) : 0;
-  const activeUrl = urls[safeIndex] ?? null;
+  const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
+  const activeUrl =
+    (selectedUrl && urls.includes(selectedUrl) ? selectedUrl : null) ??
+    urls[0] ??
+    null;
+  const safeIndex = activeUrl ? Math.max(0, urls.indexOf(activeUrl)) : 0;
   const lightboxOpen = open && Boolean(activeUrl);
 
   function markUrlFailed(url: string) {
@@ -68,11 +72,16 @@ export function YellowListingGallery({
       next.add(url);
       return next;
     });
+    setSelectedUrl((current) => yellowGalleryUrlAfterFailure(urls, url, current));
   }
 
   function openLightbox() {
-    setIndex(0);
+    setSelectedUrl(urls[0] ?? null);
     setOpen(true);
+  }
+
+  function showUrlAt(nextIndex: number) {
+    setSelectedUrl(urls[nextIndex] ?? null);
   }
 
   function closeLightbox() {
@@ -103,17 +112,23 @@ export function YellowListingGallery({
       if (next == null) return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      setIndex(next);
+      setSelectedUrl(urls[next] ?? null);
     }
 
     window.addEventListener("keydown", onKey, true);
-    const expandButton = expandRef.current;
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey, true);
+    };
+  }, [lightboxOpen, count, safeIndex, urls]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const expandButton = expandRef.current;
+    return () => {
       expandButton?.focus();
     };
-  }, [lightboxOpen, count, safeIndex]);
+  }, [lightboxOpen]);
 
   return (
     <div className="yellow-gallery-wrap">
@@ -183,7 +198,7 @@ export function YellowListingGallery({
                   <button
                     type="button"
                     className="yellow-lightbox__nav yellow-lightbox__nav--prev"
-                    onClick={() => setIndex(wrapGalleryIndex(safeIndex - 1, count))}
+                    onClick={() => showUrlAt(wrapGalleryIndex(safeIndex - 1, count))}
                     aria-label={labels.prev}
                   >
                     <YellowIconArrowLeft className="h-5 w-5" />
@@ -191,7 +206,7 @@ export function YellowListingGallery({
                   <button
                     type="button"
                     className="yellow-lightbox__nav yellow-lightbox__nav--next"
-                    onClick={() => setIndex(wrapGalleryIndex(safeIndex + 1, count))}
+                    onClick={() => showUrlAt(wrapGalleryIndex(safeIndex + 1, count))}
                     aria-label={labels.next}
                   >
                     <YellowIconArrowRight className="h-5 w-5" />
@@ -219,7 +234,7 @@ export function YellowListingGallery({
                         aria-label={fillTemplate(labels.view, {
                           index: photoIndex + 1,
                         })}
-                        onClick={() => setIndex(photoIndex)}
+                        onClick={() => showUrlAt(photoIndex)}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
