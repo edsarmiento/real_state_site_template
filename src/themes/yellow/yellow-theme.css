@@ -420,6 +420,11 @@ html:has([data-site-theme="yellow"])::-webkit-scrollbar-thumb {
 @media (hover: hover) and (pointer: fine) {
   [data-site-theme="yellow"] .yellow-locale:hover {
     background: var(--yellow-sky-200);
+    color: var(--yellow-navy);
+  }
+
+  [data-site-theme="yellow"] .yellow-locale:hover button:not([aria-pressed="true"]) {
+    color: var(--yellow-navy);
   }
 }
 

@@ -82,7 +82,6 @@ export default async function CatalogPage({
   searchParams: SearchParams;
 }) {
   const sp = await searchParams;
-  const lang = firstSearchParam(sp.lang);
   const config = await getResolvedSiteConfig();
   const theme = await resolveSiteThemeFromConfig();
   const city = firstSearchParam(sp.city).trim();
@@ -114,8 +113,6 @@ export default async function CatalogPage({
       : [];
   const total = result.ok ? (result.data.meta?.total ?? listings.length) : 0;
 
-  const locale = resolveRequestLocale(lang, config.locale);
-
   if (result.ok) {
     const resolved = resolveCatalogPage(
       firstSearchParam(sp.page),
@@ -123,6 +120,10 @@ export default async function CatalogPage({
       pageSize,
     );
     if (resolved.outOfRange) {
+      const locale = resolveRequestLocale(
+        firstSearchParam(sp.lang),
+        config.locale,
+      );
       redirect(
         localizedHref(
           "/",
@@ -157,6 +158,7 @@ export default async function CatalogPage({
     }
   }
 
+  const locale = resolveRequestLocale(firstSearchParam(sp.lang), config.locale);
   const dict = getDictionary(locale);
   const typeLabel = propertyType
     ? (dict.propertyTypes[propertyType as PropertyType] ?? propertyType)
@@ -180,7 +182,7 @@ export default async function CatalogPage({
       catalogOk={result.ok}
       catalogStatus={result.status}
       isAdmin={session?.isStaffUser === true}
-      lang={lang}
+      lang={firstSearchParam(sp.lang)}
       heroPhotoUrls={heroPhotoUrls}
     />
   );

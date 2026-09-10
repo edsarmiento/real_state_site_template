@@ -175,6 +175,7 @@ export function YellowListingDetail({
                       className="yellow-soft-btn"
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`${dict.listing.viewMap}. ${dict.a11y.opensInNewTab}`}
                     >
                       <YellowIconExternal className="h-3.5 w-3.5" />
                       {dict.listing.viewMap}
