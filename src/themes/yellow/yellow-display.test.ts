@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { brandInitial } from "./yellow-display.ts";
+import { brandInitial } from "./yellow-display";
 
 describe("brandInitial", () => {
   it("returns the first letter in uppercase", () => {

@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { listingPublicPath } from "../../lib/listing-public-path.ts";
-import type { PublicListingCard } from "../../lib/listing-types.ts";
+import { listingPublicPath } from "../../lib/listing-public-path";
+import type { PublicListingCard } from "../../lib/listing-types";
 import {
   resolveYellowHeroUrls,
   yellowHeroFrameCount,
   yellowSafeListingArray,
-} from "./yellow-hero-urls.ts";
+} from "./yellow-hero-urls";
 
 const validCard: PublicListingCard = {
   slug: "casa-centro",

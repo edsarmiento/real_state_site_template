@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { yellowGalleryUrlAfterFailure } from "./yellow-gallery-urls.ts";
+import { yellowGalleryUrlAfterFailure } from "./yellow-gallery-urls";
 
 describe("yellowGalleryUrlAfterFailure", () => {
   it("keeps the active photo when an earlier URL fails", () => {

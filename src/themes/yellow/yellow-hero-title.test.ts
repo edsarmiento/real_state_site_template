@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { yellowHeroTitleParts } from "./yellow-hero-title.ts";
+import { yellowHeroTitleParts } from "./yellow-hero-title";
 
 describe("yellowHeroTitleParts", () => {
   it("returns empty parts for blank titles", () => {

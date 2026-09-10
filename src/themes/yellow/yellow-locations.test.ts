@@ -8,8 +8,8 @@ import {
   yellowLocationSlot,
   yellowRepresentativeListingPhoto,
   yellowUniqueCities,
-} from "./yellow-locations.ts";
-import { localizedHref } from "../../lib/site-i18n.ts";
+} from "./yellow-locations";
+import { localizedHref } from "../../lib/site-i18n";
 
 describe("yellowCityKey", () => {
   it("normalizes case, accents and the first comma segment", () => {
