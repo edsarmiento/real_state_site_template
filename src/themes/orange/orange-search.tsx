@@ -84,6 +84,7 @@ export function OrangeSearch({
 
   return (
     <form
+      key={`${oferta}-${city}-${propertyType}-${bedrooms}`}
       className="orange-search"
       method="get"
       action="/#propiedades"

@@ -187,6 +187,12 @@ export function OrangeContact({
   );
   const whatsappNumber =
     content.whatsapp.number ?? content.contact.whatsappNumber;
+  const email = content.contact.email;
+  const formChannel = whatsappNumber
+    ? ("whatsapp" as const)
+    : email
+      ? ("email" as const)
+      : ("none" as const);
   const hasChannel = Boolean(
     whatsappHref || content.contact.phoneHref || content.contact.emailHref,
   );
@@ -229,8 +235,9 @@ export function OrangeContact({
           <OrangeContactForm
             dict={dict}
             copy={copy}
+            channel={formChannel}
             whatsappNumber={whatsappNumber}
-            email={content.contact.email}
+            email={email}
             privacyHref={privacyHref}
             unavailableNote={copy.formUnavailable}
           />

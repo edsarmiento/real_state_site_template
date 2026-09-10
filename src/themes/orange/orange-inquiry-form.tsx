@@ -1,11 +1,7 @@
 "use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
-import {
-  parseApiFailureMessage,
-  parseOfferType,
-  type ListingOfferType,
-} from "@/lib/listing-types";
+import { parseOfferType, type ListingOfferType } from "@/lib/listing-types";
+import { useListingInquiry } from "@/lib/listing-inquiry";
 import {
   localizeSiteHref,
   type SiteDictionary,
@@ -21,12 +17,6 @@ type Props = {
   privacyHref: string;
 };
 
-const PHONE_DIGITS = /^\d{10}$/;
-
-function onlyPhoneDigits(value: string): string {
-  return value.replace(/\D/g, "").slice(0, 10);
-}
-
 export function OrangeInquiryForm({
   slug,
   offerType,
@@ -35,63 +25,13 @@ export function OrangeInquiryForm({
   defaultLocale,
   privacyHref,
 }: Props) {
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [phone, setPhone] = useState("");
+  const { error, pending, sent, phone, onPhoneChange, onSubmit } =
+    useListingInquiry(slug, dict.inquiry, {
+      privacyRequired: true,
+      privacyError: dict.contact.privacyConsent,
+    });
   const isSale = parseOfferType(offerType) === "sale";
   const privacyUrl = localizeSiteHref(privacyHref, locale, defaultLocale);
-
-  function onPhoneChange(e: ChangeEvent<HTMLInputElement>) {
-    setPhone(onlyPhoneDigits(e.target.value));
-  }
-
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const phoneDigits = onlyPhoneDigits(String(fd.get("phone") || phone));
-    if (!PHONE_DIGITS.test(phoneDigits)) {
-      setError(dict.inquiry.phoneError);
-      return;
-    }
-    if (!fd.get("privacyAccepted")) {
-      setError(dict.contact.privacyConsent);
-      return;
-    }
-    setError(null);
-    setPending(true);
-    try {
-      const res = await fetch(
-        `/api/public/listings/${encodeURIComponent(slug)}/inquiries`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            inquiry: {
-              name: String(fd.get("name") || "").trim(),
-              phone: phoneDigits,
-              message: String(fd.get("message") || "").trim(),
-            },
-          }),
-        },
-      );
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        const message = parseApiFailureMessage(data);
-        setError(
-          !message || message === "No se pudo completar la solicitud."
-            ? dict.inquiry.requestFailed
-            : message,
-        );
-        return;
-      }
-      setSent(true);
-      setPhone("");
-      e.currentTarget.reset();
-    } finally {
-      setPending(false);
-    }
-  }
 
   if (sent) {
     return (
@@ -135,7 +75,7 @@ export function OrangeInquiryForm({
         />
       </label>
       <label className="orange-check">
-        <input type="checkbox" name="privacyAccepted" required />
+        <input type="checkbox" name="privacyAccepted" value="on" required />
         <span>
           {dict.contact.privacyConsent}{" "}
           <a href={privacyUrl} className="orange-inline-link">

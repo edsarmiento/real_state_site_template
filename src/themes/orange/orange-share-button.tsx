@@ -1,59 +1,40 @@
 "use client";
 
-import { useState } from "react";
-import { OrangeIconShare } from "@/themes/orange/orange-icons";
+import { ListingShareButton } from "@/components/listing-share-button";
 
 type Props = {
-  slug: string;
+  /** Absolute or site-relative listing URL (resolved by the caller). */
+  url: string;
   title: string;
   label: string;
   copiedLabel: string;
-  path?: string;
+  copyLabel?: string;
+  failedLabel?: string;
+  closeLabel?: string;
   className?: string;
 };
 
+/** Orange skin over shared Web Share / clipboard behavior. */
 export function OrangeShareButton({
-  slug,
+  url,
   title,
   label,
   copiedLabel,
-  path,
+  copyLabel,
+  failedLabel,
+  closeLabel,
   className,
 }: Props) {
-  const [copied, setCopied] = useState(false);
-
-  async function share() {
-    const url = new URL(path ?? `/inmueble/${slug}`, window.location.origin).href;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title, url });
-        return;
-      }
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      try {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        window.setTimeout(() => setCopied(false), 2000);
-      } catch {
-        /* user cancelled share */
-      }
-    }
-  }
-
   return (
-    <button
-      type="button"
+    <ListingShareButton
+      url={url}
+      title={title}
+      label={label}
+      copiedLabel={copiedLabel}
+      copyLabel={copyLabel}
+      failedLabel={failedLabel}
+      closeLabel={closeLabel}
       className={className ?? "orange-soft-btn"}
-      onClick={() => void share()}
-    >
-      <OrangeIconShare className="h-3.5 w-3.5" />
-      {copied ? copiedLabel : label}
-      <span className="sr-only" role="status">
-        {copied ? copiedLabel : ""}
-      </span>
-    </button>
+    />
   );
 }

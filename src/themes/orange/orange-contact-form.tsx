@@ -7,9 +7,13 @@ import type { SiteDictionary } from "@/lib/site-i18n";
 import type { OrangeCopy } from "@/themes/orange/orange-copy";
 import { OrangeToast } from "@/themes/orange/orange-toast";
 
+export type OrangeContactChannel = "whatsapp" | "email" | "none";
+
 type Props = {
   dict: SiteDictionary;
   copy: OrangeCopy;
+  /** Preferred launch channel, resolved by the caller from site content. */
+  channel: OrangeContactChannel;
   whatsappNumber: string | null;
   email: string | null;
   privacyHref: string;
@@ -37,6 +41,7 @@ function buildMessage(
 export function OrangeContactForm({
   dict,
   copy,
+  channel,
   whatsappNumber,
   email,
   privacyHref,
@@ -44,7 +49,6 @@ export function OrangeContactForm({
 }: Props) {
   const fieldId = useId();
   const [status, setStatus] = useState({ message: "", token: 0 });
-  const channel = whatsappNumber ? "whatsapp" : email ? "email" : "none";
 
   function announce(message: string) {
     setStatus((prev) => ({ message, token: prev.token + 1 }));
@@ -55,7 +59,7 @@ export function OrangeContactForm({
     const data = new FormData(event.currentTarget);
     const body = buildMessage(data, dict, copy);
 
-    if (whatsappNumber) {
+    if (channel === "whatsapp" && whatsappNumber) {
       window.open(
         buildWhatsAppHref(whatsappNumber, body),
         "_blank",
@@ -64,7 +68,7 @@ export function OrangeContactForm({
       announce(copy.formOpenedWhatsApp);
       return;
     }
-    if (email) {
+    if (channel === "email" && email) {
       const subject = encodeURIComponent(copy.formEmailSubject);
       window.location.href = `mailto:${email}?subject=${subject}&body=${encodeURIComponent(body)}`;
       announce(copy.formOpenedEmail);

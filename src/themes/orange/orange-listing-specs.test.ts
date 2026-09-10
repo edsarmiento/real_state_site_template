@@ -60,6 +60,16 @@ describe("orangeVisibleSpecs", () => {
     ]);
   });
 
+  it("omits zero, undefined, and null bathroom strings", () => {
+    for (const bathrooms of ["0", "0.0", "undefined", "null"] as const) {
+      assert.deepEqual(
+        keys(orangeVisibleSpecs(listing({ bathrooms }))),
+        ["bedrooms", "land", "built"],
+        bathrooms,
+      );
+    }
+  });
+
   it("omits missing land", () => {
     const specs = orangeVisibleSpecs(listing({ land_area: null }));
     assert.deepEqual(keys(specs), ["bedrooms", "bathrooms", "built"]);

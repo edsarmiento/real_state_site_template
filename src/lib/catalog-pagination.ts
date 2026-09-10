@@ -58,26 +58,33 @@ export function resolveCatalogPage(
 export function catalogPageItems(
   current: number,
   total: number,
-  _siblingCount = 1,
+  siblingCount = 1,
 ): Array<number | "ellipsis"> {
+  const siblings =
+    Number.isSafeInteger(siblingCount) && siblingCount > 0 ? siblingCount : 1;
   if (total <= 1) return [1];
-  if (total <= 7) {
+  // Show every page while the list stays short enough that ellipsis adds little value.
+  if (total <= 2 * siblings + 5) {
     return Array.from({ length: total }, (_, index) => index + 1);
   }
   const set = new Set<number>([1, total]);
   const windowCurrent = Math.min(Math.max(current, 1), total);
-  for (let n = windowCurrent - 1; n <= windowCurrent + 1; n += 1) {
+  for (
+    let n = windowCurrent - siblings;
+    n <= windowCurrent + siblings;
+    n += 1
+  ) {
     if (n >= 1 && n <= total) set.add(n);
   }
-  if (windowCurrent <= 3) {
-    set.add(2);
-    set.add(3);
-    set.add(4);
+  if (windowCurrent <= siblings + 2) {
+    for (let n = 2; n <= siblings + 3; n += 1) {
+      if (n < total) set.add(n);
+    }
   }
-  if (windowCurrent >= total - 2) {
-    set.add(total - 3);
-    set.add(total - 2);
-    set.add(total - 1);
+  if (windowCurrent >= total - (siblings + 1)) {
+    for (let n = total - (siblings + 2); n <= total - 1; n += 1) {
+      if (n > 1) set.add(n);
+    }
   }
   const sorted = [...set].sort((a, b) => a - b);
   const items: Array<number | "ellipsis"> = [];

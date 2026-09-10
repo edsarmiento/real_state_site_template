@@ -37,8 +37,11 @@ export function themeNameFromLayoutKey(
   return "default";
 }
 
-/** Normalize unknown layout keys to a known key (fallback: default). */
-export function normalizeLayoutKey(layoutKey: string): SiteLayoutKey {
+/** Normalize unknown or missing layout keys to a known key (fallback: default). */
+export function normalizeLayoutKey(
+  layoutKey?: string | null,
+): SiteLayoutKey {
+  if (layoutKey == null) return "default";
   const value = layoutKey.trim().toLowerCase();
   if (isSiteLayoutKey(value)) return value;
   return "default";

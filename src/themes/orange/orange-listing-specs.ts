@@ -1,16 +1,11 @@
+import { isAbsentSpecValue } from "@/lib/listing-spec-value";
+
 export type OrangeSpecKey = "bedrooms" | "bathrooms" | "land" | "built";
 
 export type OrangeSpec = {
   key: OrangeSpecKey;
   value: string;
 };
-
-function isAbsentSpecValue(value: string): boolean {
-  const trimmed = value.trim().toLowerCase();
-  if (!trimmed || trimmed === "undefined" || trimmed === "null") return true;
-  const numeric = Number.parseFloat(trimmed.replace(",", "."));
-  return Number.isFinite(numeric) && numeric === 0;
-}
 
 export function orangeVisibleSpecs(listing: {
   property_type: string;
@@ -25,7 +20,7 @@ export function orangeVisibleSpecs(listing: {
   if (!land && listing.bedrooms != null) {
     specs.push({ key: "bedrooms", value: String(listing.bedrooms) });
   }
-  if (!land && listing.bathrooms?.trim()) {
+  if (!land && listing.bathrooms && !isAbsentSpecValue(listing.bathrooms)) {
     specs.push({ key: "bathrooms", value: listing.bathrooms.trim() });
   }
   if (listing.land_area && !isAbsentSpecValue(String(listing.land_area))) {

@@ -1,5 +1,6 @@
 import { listingPublicPath } from "@/lib/listing-public-path";
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
+import { isAbsentSpecValue } from "@/lib/listing-spec-value";
 import {
   localizedHref,
   type SiteDictionary,
@@ -17,6 +18,7 @@ export type ListingPhoto = {
 };
 
 export { listingGalleryUrls } from "./listing-gallery";
+export { isAbsentSpecValue };
 
 export type StaffListing = {
   id: number;
@@ -124,13 +126,6 @@ export type ListingSpecKey = "bedrooms" | "bathrooms" | "land" | "built";
 
 export type ListingSpec = { key: ListingSpecKey; label: string; value: string };
 
-function isAbsentSpecValue(value: string): boolean {
-  const trimmed = value.trim().toLowerCase();
-  if (!trimmed || trimmed === "undefined" || trimmed === "null") return true;
-  const numeric = Number.parseFloat(trimmed.replace(",", "."));
-  return Number.isFinite(numeric) && numeric === 0;
-}
-
 export function listingPublicSpecsLocalized(
   listing: {
     property_type: string;
@@ -151,7 +146,11 @@ export function listingPublicSpecsLocalized(
       value: String(listing.bedrooms),
     });
   }
-  if (!land && listing.bathrooms?.trim()) {
+  if (
+    !land &&
+    listing.bathrooms &&
+    !isAbsentSpecValue(listing.bathrooms)
+  ) {
     specs.push({
       key: "bathrooms",
       label: dict.listing.specs.bathrooms,
@@ -212,7 +211,7 @@ export function listingCardSpecLine(
         : `${listing.bedrooms} rec.`,
     );
   }
-  if (!land && listing.bathrooms?.trim()) {
+  if (!land && listing.bathrooms && !isAbsentSpecValue(listing.bathrooms)) {
     parts.push(listing.bathrooms.trim());
   }
   if (listing.land_area && !isAbsentSpecValue(String(listing.land_area))) {

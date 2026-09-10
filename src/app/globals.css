@@ -8395,7 +8395,7 @@ html:has([data-site-theme="orange"]) {
     color: var(--orange-terracotta-light);
   }
 
-  [data-site-theme="orange"] .orange-gallery__thumb:hover {
+  [data-site-theme="orange"] .orange-gallery .listing-gallery__thumb:hover {
     opacity: 1;
     border-color: color-mix(in srgb, var(--orange-terracotta) 50%, transparent);
     transform: scale(0.97);
@@ -9478,86 +9478,60 @@ html:has([data-site-theme="orange"]) {
   gap: 0.75rem;
 }
 
-[data-site-theme="orange"] .orange-gallery__stage,
-[data-site-theme="orange"] .orange-gallery__empty {
+[data-site-theme="orange"] .orange-gallery .listing-gallery__stage {
   position: relative;
+  margin-inline: 0;
   min-height: 21rem;
-  border-radius: var(--orange-radius-16);
   overflow: hidden;
+  border-radius: var(--orange-radius-16);
   background: var(--orange-charcoal);
   box-shadow: var(--orange-shadow-md);
 }
 
 @media (min-width: 640px) {
-  [data-site-theme="orange"] .orange-gallery__stage,
-  [data-site-theme="orange"] .orange-gallery__empty {
+  [data-site-theme="orange"] .orange-gallery .listing-gallery__stage {
     min-height: 26.25rem;
   }
 }
 
-[data-site-theme="orange"] .orange-gallery__image {
-  position: absolute;
-  inset: 0;
-  object-fit: cover;
+[data-site-theme="orange"] .orange-gallery .listing-gallery__stage > div {
+  min-height: inherit;
 }
 
-[data-site-theme="orange"] .orange-gallery__empty {
-  display: grid;
-  place-items: center;
-  color: var(--orange-cream);
-}
-
-[data-site-theme="orange"] .orange-gallery__nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 2.5rem;
-  height: 2.5rem;
+[data-site-theme="orange"] .orange-gallery .listing-gallery__nav {
   border: 0;
-  border-radius: 999px;
   background: rgba(0, 0, 0, 0.6);
   color: #fff;
-  display: grid;
-  place-items: center;
+  box-shadow: none;
 }
 
-[data-site-theme="orange"] .orange-gallery__nav:hover {
+[data-site-theme="orange"] .orange-gallery .listing-gallery__nav:hover {
   background: var(--orange-terracotta);
 }
 
-[data-site-theme="orange"] .orange-gallery__nav--prev {
-  left: 1rem;
-}
-
-[data-site-theme="orange"] .orange-gallery__nav--next {
-  right: 1rem;
-}
-
-[data-site-theme="orange"] .orange-gallery__count {
-  position: absolute;
-  left: 50%;
-  bottom: 1rem;
-  transform: translateX(-50%);
+[data-site-theme="orange"] .orange-gallery .listing-gallery__counter {
   background: rgba(0, 0, 0, 0.6);
   color: var(--orange-cream);
-  border-radius: 999px;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.75rem;
 }
 
-[data-site-theme="orange"] .orange-gallery__thumbs {
+[data-site-theme="orange"] .orange-gallery .listing-gallery__thumbs {
+  margin-top: 0;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.75rem;
+  overflow: visible;
+  padding-bottom: 0;
 }
 
-[data-site-theme="orange"] .orange-gallery__thumb {
-  position: relative;
+[data-site-theme="orange"] .orange-gallery .listing-gallery__thumb {
+  height: auto;
+  width: 100%;
   aspect-ratio: 1;
   border-radius: 0.75rem;
-  overflow: hidden;
   border: 2px solid transparent;
+  background: var(--orange-charcoal);
   opacity: 0.7;
+  box-shadow: none;
   transition:
     opacity var(--orange-duration) var(--orange-ease),
     transform var(--orange-duration) var(--orange-ease),
@@ -9565,19 +9539,15 @@ html:has([data-site-theme="orange"]) {
     box-shadow var(--orange-duration) var(--orange-ease);
 }
 
-[data-site-theme="orange"] .orange-gallery__thumb:focus-visible {
+[data-site-theme="orange"] .orange-gallery .listing-gallery__thumb:focus-visible {
   opacity: 1;
 }
 
-[data-site-theme="orange"] .orange-gallery__thumb.is-active {
+[data-site-theme="orange"] .orange-gallery .listing-gallery__thumb--active {
   border-color: var(--orange-terracotta);
   opacity: 1;
   transform: scale(0.95);
   box-shadow: var(--orange-shadow-md);
-}
-
-[data-site-theme="orange"] .orange-gallery__image {
-  transition: opacity var(--orange-duration) var(--orange-ease);
 }
 
 [data-site-theme="orange"] .orange-detail__masthead {
@@ -9925,8 +9895,8 @@ html:has([data-site-theme="orange"]) {
   [data-site-theme="orange"] .orange-service:hover,
   [data-site-theme="orange"] .orange-btn:hover:not(:disabled),
   [data-site-theme="orange"] .orange-btn:focus-visible,
-  [data-site-theme="orange"] .orange-gallery__thumb,
-  [data-site-theme="orange"] .orange-gallery__thumb.is-active {
+  [data-site-theme="orange"] .orange-gallery .listing-gallery__thumb,
+  [data-site-theme="orange"] .orange-gallery .listing-gallery__thumb--active {
     transform: none !important;
   }
 

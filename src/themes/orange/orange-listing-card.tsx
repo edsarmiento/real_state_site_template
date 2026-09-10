@@ -1,8 +1,11 @@
 import Link from "next/link";
-import { parseOfferType, type PublicListingCard } from "@/lib/listing-types";
+import {
+  listingPublicSpecsLocalized,
+  publicListingCardModel,
+  type PublicListingCard,
+} from "@/lib/listing-types";
 import {
   fillTemplate,
-  localizedHref,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
@@ -14,7 +17,6 @@ import {
   OrangeIconMaximize,
 } from "@/themes/orange/orange-icons";
 import { OrangeShareButton } from "@/themes/orange/orange-share-button";
-import { orangeVisibleSpecs } from "@/themes/orange/orange-listing-specs";
 import { formatOrangePriceParts } from "@/themes/orange/orange-ui";
 
 type Props = {
@@ -43,71 +45,66 @@ export function OrangeListingCard({
   shareLabel,
   shareCopied,
 }: Props) {
-  const offerType = parseOfferType(listing.offer_type);
-  const href = localizedHref(
-    `/inmueble/${listing.slug}`,
-    locale,
-    null,
-    defaultLocale,
+  const { href, suffix, typeLabel, offerLabel } = publicListingCardModel(
+    listing,
+    { dict, locale, defaultLocale },
   );
   const price = formatOrangePriceParts(
     listing.rent_cents,
     listing.currency,
     locale,
   );
-  const typeLabel =
-    dict.propertyTypes[
-      listing.property_type as keyof typeof dict.propertyTypes
-    ] ?? listing.property_type;
-  const specs = orangeVisibleSpecs(listing).slice(0, 3);
+  const specs = listingPublicSpecsLocalized(listing, dict).slice(0, 3);
   const title = listing.title;
 
   return (
-    <article className="orange-card">
+    <article className="orange-card public-listing-card">
       <Link
         href={href}
-        className="orange-card__media"
+        className="orange-card__media public-listing-card__media"
         aria-label={fillTemplate(dict.listing.viewPropertyAria, { title })}
       >
         <OrangeCoverImage
           src={listing.photo_url}
           alt={title}
           className="orange-card__image"
-          placeholderClassName="orange-card__placeholder"
+          placeholderClassName="orange-card__placeholder public-listing-card__placeholder"
           placeholder={dict.listing.noPhoto}
         />
         <span className="orange-card__badges">
           <span className="orange-card__badge orange-card__badge--offer">
-            {offerType === "sale" ? dict.listing.sale : dict.listing.rent}
+            {offerLabel}
           </span>
           <span className="orange-card__badge orange-card__badge--type">
             {typeLabel}
           </span>
         </span>
-        <span className="orange-card__price">
+        <span className="orange-card__price public-listing-card__price">
           {price.amount}
           <span>
             {price.currency}
-            {offerType === "rent" ? ` ${dict.listing.perMonth}` : ""}
+            {suffix ? ` ${suffix.trim()}` : ""}
           </span>
         </span>
       </Link>
-      <div className="orange-card__body">
+      <div className="orange-card__body public-listing-card__body">
         <div className="orange-card__headline">
           {listing.location_label ? (
-            <p className="orange-card__location">{listing.location_label}</p>
+            <p className="orange-card__location public-listing-card__location">
+              {listing.location_label}
+            </p>
           ) : null}
-          <h3 className="orange-card__title">
+          <h3 className="orange-card__title public-listing-card__title">
             <Link href={href}>{title}</Link>
           </h3>
         </div>
         {specs.length > 0 ? (
-          <dl className="orange-card__specs">
+          <dl className="orange-card__specs public-listing-card__specifications">
             {specs.map((spec) => (
               <div key={spec.key}>
                 <dt>
                   <span aria-hidden>{specIcon(spec.key)}</span>
-                  {dict.listing.specs[spec.key]}
+                  {spec.label}
                 </dt>
                 <dd>{spec.value}</dd>
               </div>
@@ -115,15 +112,17 @@ export function OrangeListingCard({
           </dl>
         ) : null}
         <div className="orange-card__actions">
-          <Link href={href} className="orange-soft-btn">
+          <Link href={href} className="orange-soft-btn public-listing-card__cta">
             {dict.listing.viewProperty}
           </Link>
           <OrangeShareButton
-            slug={listing.slug}
+            url={href}
             title={title}
-            path={href}
             label={shareLabel}
             copiedLabel={shareCopied}
+            copyLabel={dict.listing.shareCopy}
+            failedLabel={dict.listing.shareFailed}
+            closeLabel={dict.listing.shareClose}
           />
         </div>
       </div>

@@ -109,11 +109,13 @@ export async function OrangeListingDetail({
                   </span>
                 </p>
                 <OrangeShareButton
-                  slug={listing.slug}
+                  url={listingPath}
                   title={listing.title}
-                  path={listingPath}
                   label={copy.share}
                   copiedLabel={copy.shareCopied}
+                  copyLabel={dict.listing.shareCopy}
+                  failedLabel={dict.listing.shareFailed}
+                  closeLabel={dict.listing.shareClose}
                 />
               </div>
             </header>
