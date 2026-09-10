@@ -46,7 +46,7 @@ function resultsHeading(
   const place = city
     ? fillTemplate(dict.results.inPlace, { city })
     : "";
-  return `${count} ${kind}${place}`;
+  return place ? `${count} ${kind} ${place}` : `${count} ${kind}`;
 }
 
 export async function generateMetadata({

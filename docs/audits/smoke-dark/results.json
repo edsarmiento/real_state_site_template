@@ -1,0 +1,147 @@
+{
+  "base": "http://localhost:3002",
+  "generatedAt": "2026-09-10T22:09:25.540Z",
+  "findings": [
+    {
+      "id": "theme-attr",
+      "status": "PASS",
+      "detail": "data-site-theme=\"dark\""
+    },
+    {
+      "id": "no-override-marker",
+      "status": "PASS",
+      "detail": "no getTheme(dark) string in HTML"
+    },
+    {
+      "id": "empty-results",
+      "status": "PASS",
+      "detail": "cards=0; snippet=Propiedades Sobre nosotros Cómo trabajamos Opiniones Contacto WHATSAPP Acceder DEO REAL ESTATE Encuentra tu próximo in"
+    },
+    {
+      "id": "location-filter",
+      "status": "PASS",
+      "detail": "href=/?city=San+Quintin#propiedades → http://localhost:3002/?city=San+Quintin#propiedades"
+    },
+    {
+      "id": "catalog-overflow-360",
+      "status": "PASS",
+      "detail": "scrollWidth=360 clientWidth=360"
+    },
+    {
+      "id": "catalog-overflow-390",
+      "status": "PASS",
+      "detail": "scrollWidth=390 clientWidth=390"
+    },
+    {
+      "id": "catalog-overflow-768",
+      "status": "PASS",
+      "detail": "scrollWidth=768 clientWidth=768"
+    },
+    {
+      "id": "catalog-overflow-1024",
+      "status": "PASS",
+      "detail": "scrollWidth=1024 clientWidth=1024"
+    },
+    {
+      "id": "catalog-overflow-1440",
+      "status": "PASS",
+      "detail": "scrollWidth=1440 clientWidth=1440"
+    },
+    {
+      "id": "detail-theme",
+      "status": "PASS",
+      "detail": "theme=dark path=/inmueble/casa-de-3-recamaras-en-santa-fe-tijuana-residencial-burdeos"
+    },
+    {
+      "id": "detail-content",
+      "status": "PASS",
+      "detail": "{\"hasPrice\":true,\"hasTitle\":true,\"hasGallery\":true,\"hasInquiry\":true,\"hasShare\":true,\"hasWhatsApp\":true,\"descriptionLen\":28,\"specs\":8}"
+    },
+    {
+      "id": "gallery-structure",
+      "status": "PASS",
+      "detail": "{\"slideCount\":9,\"thumbCount\":9,\"counter\":\"1 / 9\",\"stripOverflow\":true,\"ratios\":[{\"r\":\"0.765625 / 1\",\"w\":352,\"h\":460,\"landscape\":false},{\"r\":\"1.33333 / 1\",\"w\":613,\"h\":460,\"landscape\":true},{\"r\":\"1.33333 / 1\",\"w\":613,\"h\":460,\"landscape\":true},{\"r\":\"1.33333 / 1\",\"w\":613,\"h\":460,\"landscape\":true},{\"r\":\"1.33333 / 1\",\"w\":613,\"h\":460,\"landscape\":true},{\"r\":\"1.33333 / 1\",\"w\":613,\"h\":460,\"landscape\":true},{\"r\":\"1.33333 / 1\",\"w\":613,\"h\":460,\"landscape\":true},{\"r\":\"1.33333 / 1\",\"w\":613,\"h\":460,\"landscape\":true},{\"r\":\"1.33333 / 1\",\"w\":613,\"h\":460,\"landscape\":true}]}"
+    },
+    {
+      "id": "gallery-thumb-sync",
+      "status": "PASS",
+      "detail": "before=1 / 9 after={\"counter\":\"3 / 9\",\"activeThumb\":2}"
+    },
+    {
+      "id": "gallery-arrow",
+      "status": "PASS",
+      "detail": "3 / 9 → 4 / 9"
+    },
+    {
+      "id": "lightbox-open",
+      "status": "PASS",
+      "detail": "dialog present"
+    },
+    {
+      "id": "lightbox-escape-focus",
+      "status": "PASS",
+      "detail": "closed=true focusViewAll=true"
+    },
+    {
+      "id": "lightbox-scrim",
+      "status": "PASS",
+      "detail": "closed=true"
+    },
+    {
+      "id": "inquiry-form-present",
+      "status": "PASS",
+      "detail": "{\"present\":true,\"action\":null,\"method\":null,\"required\":[\"name\",\"phone\",\"message\"],\"submitLabel\":\"Enviar mensaje\"}"
+    },
+    {
+      "id": "inquiry-no-send-empty",
+      "status": "PASS",
+      "detail": "{\"hasInvalid\":true,\"path\":\"/inmueble/casa-de-3-recamaras-en-santa-fe-tijuana-residencial-burdeos\"}"
+    },
+    {
+      "id": "whatsapp-href",
+      "status": "PASS",
+      "detail": "{\"whatsapp\":[\"https://wa.me/525512345678?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20inmuebles.\",\"https://wa.me/525586767239?text=Hola%2C%20me%20interesar%C3%ADa%20saber%20m%C3%A1s%20informaci%C3%B3n%20respecto%20a%20la%20publicaci%C3%B3n%20%C2%ABCasa%20de%203%20Rec%C3%A1maras%20En%20Santa%20Fe%20Tijuana%20Residencial%20Burdeos%C2%BB.%0A%0Ahttp%3A%2F%2Flocalhost%3A3002%2Finmueble%2Fcasa-de-3-recamaras-en-santa-fe-tijuana-residencial-burdeos\",\"https://wa.me/525512345678?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20inmuebles.\"],\"hasShareControl\":true}"
+    },
+    {
+      "id": "share-ui",
+      "status": "PASS",
+      "detail": "ui=Compartir"
+    },
+    {
+      "id": "detail-overflow-360",
+      "status": "PASS",
+      "detail": "scrollWidth=360 clientWidth=360"
+    },
+    {
+      "id": "detail-overflow-390",
+      "status": "PASS",
+      "detail": "scrollWidth=390 clientWidth=390"
+    },
+    {
+      "id": "detail-overflow-768",
+      "status": "PASS",
+      "detail": "scrollWidth=768 clientWidth=768"
+    },
+    {
+      "id": "detail-overflow-1024",
+      "status": "PASS",
+      "detail": "scrollWidth=1024 clientWidth=1024"
+    },
+    {
+      "id": "detail-overflow-1440",
+      "status": "PASS",
+      "detail": "scrollWidth=1440 clientWidth=1440"
+    },
+    {
+      "id": "keyboard-focus",
+      "status": "PASS",
+      "detail": "{\"tag\":\"DIV\",\"className\":\"listing-gallery__strip\",\"outline\":\"auto\"}"
+    }
+  ],
+  "summary": {
+    "pass": 27,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  }
+}

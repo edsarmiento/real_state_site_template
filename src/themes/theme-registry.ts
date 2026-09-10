@@ -28,6 +28,10 @@ import { ExecutiveCatalog } from "@/themes/executive/executive-catalog";
 import { ExecutiveListingDetail } from "@/themes/executive/executive-listing-detail";
 import { ExecutiveListingLoadError } from "@/themes/executive/executive-listing-load-error";
 import { ExecutiveLegalPage } from "@/themes/executive/executive-legal-page";
+import { DarkCatalog } from "@/themes/dark/dark-catalog";
+import { DarkListingDetail } from "@/themes/dark/dark-listing-detail";
+import { DarkListingLoadError } from "@/themes/dark/dark-listing-load-error";
+import { DarkLegalPage } from "@/themes/dark/dark-legal-page";
 import {
   THEME_DEFINITIONS,
   type SiteThemeName,
@@ -46,6 +50,7 @@ const ORANGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ULTRA_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const YELLOW_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const EXECUTIVE_CATALOG = { pageSize: 12, heroGallery: true } as const;
+const DARK_CATALOG = { pageSize: 12, heroGallery: true } as const;
 
 /**
  * Public themes. Add a theme: folder under src/themes/<name>/ + entry here
@@ -124,6 +129,15 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     ListingDetail: withResolvedThemeProps(ExecutiveListingDetail),
     ListingLoadError: withResolvedThemeProps(ExecutiveListingLoadError),
     LegalPage: withResolvedThemeProps(ExecutiveLegalPage),
+  },
+  dark: {
+    name: "dark",
+    layoutKeys: LAYOUT_KEYS_BY_THEME.dark,
+    catalog: DARK_CATALOG,
+    Catalog: DarkCatalog,
+    ListingDetail: DarkListingDetail,
+    ListingLoadError: DarkListingLoadError,
+    LegalPage: DarkLegalPage,
   },
 };
 

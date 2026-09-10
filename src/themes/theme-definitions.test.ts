@@ -26,6 +26,11 @@ describe("themeNameFromLayoutKey", () => {
     assert.equal(themeNameFromLayoutKey("Executive"), "executive");
   });
 
+  it("selects dark for layout_key dark", () => {
+    assert.equal(themeNameFromLayoutKey("dark"), "dark");
+    assert.equal(themeNameFromLayoutKey("Dark"), "dark");
+  });
+
   it("keeps existing layout keys on their themes", () => {
     assert.equal(themeNameFromLayoutKey("default"), "default");
     assert.equal(themeNameFromLayoutKey("beige"), "beige");
@@ -36,6 +41,7 @@ describe("themeNameFromLayoutKey", () => {
     assert.equal(themeNameFromLayoutKey("ultra"), "ultra");
     assert.equal(themeNameFromLayoutKey("yellow"), "yellow");
     assert.equal(themeNameFromLayoutKey("executive"), "executive");
+    assert.equal(themeNameFromLayoutKey("dark"), "dark");
   });
 
   it("falls back to default for unknown keys", () => {
@@ -60,6 +66,10 @@ describe("normalizeLayoutKey", () => {
 
   it("persists executive when the stored key is executive", () => {
     assert.equal(normalizeLayoutKey("executive"), "executive");
+  });
+
+  it("persists dark when the stored key is dark", () => {
+    assert.equal(normalizeLayoutKey("dark"), "dark");
   });
 
   it("does not coerce unknown keys to elegant", () => {

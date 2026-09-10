@@ -1,0 +1,182 @@
+Handoff: implementar theme Dark — editorial midnight en real_state_site_template
+==============================================================================
+
+Reglas permanentes del repo: real_state_site_template/AGENTS.md (playbook "Nueva plantilla").
+Este archivo es el brief concreto de la plantilla Dark.
+
+
+Variables
+---------
+
+  slug              dark
+  THEME_NAME        dark
+  ThemeName         Dark
+  THEME_LABEL       Dark — editorial midnight / rust / gold
+  REFERENCE_HTML    2 deo_real_estate_dark.html
+                    Ruta de origen: /Users/deliaescobar/Downloads/2 deo_real_estate_dark.html
+  REFERENCE_THEME   default (secciones de marketing al estilo catálogo: hero, resultados,
+                    ubicaciones, about, proceso, testimonios si hay datos, contacto, CTA, ficha)
+  STYLED_LAYOUT     true
+
+  Paleta (HTML):
+    Midnight #0D131F, midnightLight #162032, cream #F9F6F0, creamDark #EFECE6,
+    rust #8B2615, rustDark #6A1C10, gold #D4AF37, goldLight #E6CA65,
+    charcoal #222222, muted #7A828E, WhatsApp #25D366.
+    Playfair Display (títulos) + Plus Jakarta Sans (cuerpo) + Space Grotesk (mono / labels).
+    CSS encapsulado en [data-site-theme="dark"] con variables --dark-*.
+    Glass: rgba(13, 19, 31, 0.75) blur 16px, borde rgba(212, 175, 55, 0.15).
+    Hero overlay: linear-gradient(to top, midnight, midnight/70, midnight/40) + rust/10 mix-blend.
+
+  Tipografías:
+    Headings 400–700 Playfair; hero clamp 2.5rem–5rem, line-height 1.1, tracking tight.
+    Accent italic gold en las últimas dos palabras del título del hero.
+    Labels 10px uppercase tracking-widest Space Grotesk gold.
+    Cuerpo 300–500 Jakarta, cream/80.
+
+  Hero:
+    Full-bleed min-height 100vh, imagen object-cover object-center, Ken Burns lento
+    (scale 1.05, 10s) tomado del HTML (no pulse de opacidad). Scrim local, no global.
+    Badge, h1, subtítulo, buscador glass rounded-2xl / md:rounded-full.
+    Prioridad de imagen: SiteConfig hero.imageUrl → heroPhotoUrls → foto de listing
+    de la página → composición CSS midnight/rust. Nunca vacío.
+
+  Secciones (HTML + DiseñoBase1):
+    Header, hero + buscador (+ Limpiar filtros), propiedades, ubicaciones
+    (solo SiteConfig; sin conteos ni fotos inventadas), nosotros, proceso,
+    opiniones o principios, contacto con canales reales, CTA final si hay
+    WhatsApp/agenda, footer.
+    Ficha: DiseñoBase2 + skin Dark — galería/inquiry minmax(0,7fr)/minmax(20rem,5fr).
+    Tarjeta: overlay vertical; título clamp(1.25rem, 1.7vw, 1.65rem), max 3 líneas.
+
+  Buscador:
+    DarkSearch (skin glass) en lugar de PublicCatalogSearch: el contrato del
+    catálogo incluye recámaras además de operación/ubicación/tipo del HTML.
+    Soft nav + catalogSearchParams; no Document reload.
+
+  Cards:
+    Un solo Link. CTA flecha con pointer-events: none. publicListingCardModel.
+    Hover foto scale(1.1) 700ms solo (hover:hover) and (pointer:fine).
+    Radio 1.5rem, borde gold/15, hover borde gold.
+
+  Ficha:
+    Composición de la captura (galería + inquiry sticky, identity, specs, copy,
+    lugar) con skin Dark. Widgets compartidos. Sin modal del HTML (hay ruta real).
+
+  Motion (HTML):
+    Reveal: opacity 0 + translateY(30px), 1000ms cubic-bezier(0.16, 1, 0.3, 1),
+    threshold 0.15, stagger 150ms (cards) / 100–250–400ms (proceso).
+    Wrappers presentes en SSR; visible sin JS y con reduced motion.
+    Keyframes prefijo dark-.
+
+  Responsive:
+    390 / 768 / 1024 / 1440. Header h-24, targets ≥44px, sin overflow horizontal.
+
+  API y Ops:
+    layout_key "dark". Sin override permanente de SiteConfig.
+
+
+Pre-requisitos API + Ops (estado al implementar)
+------------------------------------------------
+
+  [ ] real_state_api: SiteConfig::LAYOUT_KEYS incluye "dark"
+      Ubicación esperada: real_state_api/app/models/site_config.rb
+      Estado: el repositorio API no está disponible junto a este template
+      (`../real_state_api` no existe en el workspace). BUSINESS_RULES.md §6b
+      y §SiteConfig no pudieron verificarse aquí.
+
+  [ ] real_state_api: specs + BUSINESS_RULES.md §SiteConfig
+      Ubicación esperada: real_state_api/spec y BUSINESS_RULES.md §SiteConfig.
+
+  [ ] real_state_frontend: Ops permite seleccionar Dark
+      Ubicación esperada: OpsSiteConfigLayout / LAYOUT_OPTIONS.
+      Estado: `../real_state_frontend` no está disponible en el workspace.
+
+Sin esos cambios, Ops no puede guardar `layout_key: "dark"`. El template
+resuelve `dark` cuando el API ya envía esa clave; claves desconocidas
+siguen cayendo a `default`. No simular que el flujo Ops→sitio ya funciona.
+
+
+Contexto
+--------
+
+Monorepo Real State. Trabaja SOLO en:
+
+  real_state_site_template/  (Next.js App Router, puerto dev 3002)
+
+1 deploy = 1 inmobiliaria (ACCOUNT_ID + API_URL). Marca, layout, idiomas y dominio
+vienen de SiteConfig via GET /api/public/site_config?account_id=.
+
+Objetivo: cuando Ops guarde layout_key: "dark", el template renderiza el theme
+dark en / y /inmueble/[slug].
+
+
+Arquitectura (no romper)
+------------------------
+
+  src/app/page.tsx -> resolveSiteThemeFromConfig() -> theme.Catalog
+  src/app/inmueble/[slug]/page.tsx -> theme.ListingDetail
+
+Contrato: src/themes/theme-types.ts (CatalogThemeProps, ListingDetailThemeProps).
+
+Reglas:
+  - Server Components; sin fetch de listings dentro del theme.
+  - i18n: getSiteUi(lang) / getDarkUi(lang) + site-i18n.ts.
+  - Marca: getResolvedSiteConfig / getPublicSiteContent.
+  - Theme = skin: Inquiry, WhatsApp, specs y href salen de ListingInquiryForm,
+    ListingWhatsAppButton, publicListingCardModel, listingPublicSpecsLocalized.
+    NO copiar esos flujos en src/themes/dark/.
+
+
+Alcance v1 — theme Dark
+-----------------------
+
+Referencia visual: HTML midnight/rust/gold (no portar su JS, Unsplash, DEO/Tijuana
+ni inquiry simulada). Tarjeta según imagen overlay. Secciones según capturas.
+
+Catálogo: header, hero cinematográfico, buscador con “Limpiar filtros”,
+resultados (`total` del API), filtros Link, paginación, ubicaciones configuradas
+(sin recuentos), about (#nosotros), proceso, opiniones o principios, contacto,
+CTA final si hay canal, footer.
+
+Ficha: paridad funcional con default (galería, specs, inquiry, WhatsApp, maps,
+share, descripción completa).
+
+Datos:
+  listings representa: la página actual del catálogo (limit/offset).
+  total representa: meta.total del API (inventario filtrado, no de la página).
+  locations representa: solo SiteConfig / content.locations (nunca el lote
+    paginado). Sin locationCounts.
+  locationCounts: no aplica.
+
+styledLayout en componentes compartidos: true
+
+
+Cableado obligatorio (template)
+-------------------------------
+
+  1. theme-definitions.ts    — { name: "dark", layoutKeys: ["dark"] }
+  2. theme-registry.ts       — Catalog, ListingDetail, LegalPage, ListingLoadError
+     catalog: { pageSize: 12, heroGallery: true }
+
+NO modificar app/page.tsx, app/inmueble/[slug]/page.tsx ni rutas legales.
+NO usar site-config.ts legacy. NO fetch al Rails desde el browser.
+NO remapea default / luxury / deo / beige / elegant / orange / ultra.
+
+
+i18n (desde Ops)
+----------------
+
+getDarkUi(lang); selector ES|EN si show_locale_switcher; localizedHref().
+
+
+Admin / login
+-------------
+
+isStyledSiteLayout(): layout_key !== "default" -> acentos de marca en admin/login.
+
+
+Fuera de alcance
+----------------
+
+Nuevos campos SiteConfig, cambios en API/Ops, deploy Vercel.
+Modal y toast del HTML (sustituidos por ficha real e inquiry real).
