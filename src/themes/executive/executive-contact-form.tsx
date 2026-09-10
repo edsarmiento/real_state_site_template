@@ -1,6 +1,3 @@
-"use client";
-
-import type { FormEvent } from "react";
 import type {
   ContactContent,
   ContactFormCopy,
@@ -29,7 +26,7 @@ type Props = {
  * Catalog contact panel. Site content currently types formEnabled as false and
  * formMode as hidden|preview only — ListingInquiryForm needs a listing slug and
  * lives on the listing detail. Preview mode shows a non-submitting shell using
- * shared contactForm copy.
+ * shared contactForm copy and LegalContent.privacyConsentLabel.
  */
 export function ExecutiveContactForm({
   contact,
@@ -67,14 +64,9 @@ export function ExecutiveContactForm({
     );
   }
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-  }
-
   return (
     <form
       className="executive-consult executive-consult--preview"
-      onSubmit={onSubmit}
       noValidate
       aria-label={dict.contact.previewAria}
     >
@@ -134,7 +126,7 @@ export function ExecutiveContactForm({
       <label className="executive-consult__consent">
         <input type="checkbox" name="privacyAccepted" disabled />
         <span>
-          {dict.contact.privacyConsent}{" "}
+          {legal.privacyConsentLabel}{" "}
           <a href={privacyHref} className="executive-inline-link">
             {dict.contact.privacyLink}
           </a>
@@ -172,12 +164,13 @@ function WhatsAppBlock({
   attentionNote: string | null;
   prompt?: string;
 }) {
-  if (whatsappHref) {
+  const href = whatsappHref?.trim() || null;
+  if (href) {
     return (
       <div className="executive-consult__wa">
         <p>{prompt || copy.immediatePrompt}</p>
         <a
-          href={whatsappHref}
+          href={href}
           className="executive-whatsapp-cta executive-whatsapp-cta--block"
           target="_blank"
           rel="noopener noreferrer"

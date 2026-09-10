@@ -26,6 +26,7 @@ import {
   ExecutiveIconPhone,
   ExecutiveIconWhatsApp,
 } from "@/themes/executive/executive-icons";
+import { normalizeExecutiveFooterContact } from "@/themes/executive/executive-footer-contact";
 import { representativeListingPhoto } from "@/themes/executive/executive-location-photo";
 import { ExecutiveSocialLinks } from "@/themes/executive/executive-social-links";
 
@@ -267,51 +268,59 @@ function collectChannels(
   dict: SiteDictionary,
 ): Channel[] {
   const contact = content.contact;
-  const whatsappHref = executiveContactChannels(content).whatsappHref;
+  const resolved = normalizeExecutiveFooterContact({
+    whatsappHref: executiveContactChannels(content).whatsappHref,
+    phone: contact.phone,
+    phoneHref: contact.phoneHref,
+    email: contact.email,
+    emailHref: contact.emailHref,
+  });
+  const scheduleCallUrl = contact.scheduleCallUrl?.trim() || null;
+  const location = contact.location?.trim() || null;
   const channels: Channel[] = [];
-  if (whatsappHref) {
+  if (resolved.whatsappHref) {
     channels.push({
       key: "whatsapp",
       eyebrow: dict.contact.writeUs,
       value: dict.whatsapp.label,
-      href: whatsappHref,
+      href: resolved.whatsappHref,
       external: true,
       icon: "whatsapp",
     });
   }
-  if (contact.phoneHref) {
+  if (resolved.phone && resolved.phoneHref) {
     channels.push({
       key: "phone",
       eyebrow: dict.contact.callUs,
-      value: contact.phone || dict.contact.callUs,
-      href: contact.phoneHref,
+      value: resolved.phone,
+      href: resolved.phoneHref,
       icon: "phone",
     });
   }
-  if (contact.emailHref && contact.email) {
+  if (resolved.email && resolved.emailHref) {
     channels.push({
       key: "email",
       eyebrow: dict.contact.email,
-      value: contact.email,
-      href: contact.emailHref,
+      value: resolved.email,
+      href: resolved.emailHref,
       icon: "email",
     });
   }
-  if (contact.scheduleCallUrl) {
+  if (scheduleCallUrl) {
     channels.push({
       key: "schedule",
       eyebrow: dict.contact.schedule,
       value: dict.contact.scheduleValue,
-      href: contact.scheduleCallUrl,
+      href: scheduleCallUrl,
       external: true,
       icon: "schedule",
     });
   }
-  if (contact.location) {
+  if (location) {
     channels.push({
       key: "location",
       eyebrow: dict.contact.location,
-      value: contact.location,
+      value: location,
       href: null,
       icon: "location",
     });

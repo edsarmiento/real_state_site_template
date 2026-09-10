@@ -2,7 +2,10 @@ import Link from "next/link";
 import { fillTemplate, localizeSiteHref } from "@/lib/site-i18n";
 import { executiveContactChannels } from "@/themes/executive/executive-contact-channels";
 import { executiveBrandInitial } from "@/themes/executive/executive-brand";
-import { executiveHasVisibleContact } from "@/themes/executive/executive-footer-contact";
+import {
+  executiveFooterContactChannels,
+  normalizeExecutiveFooterContact,
+} from "@/themes/executive/executive-footer-contact";
 import { ExecutiveLogo } from "@/themes/executive/executive-logo";
 import { ExecutiveSocialLinks } from "@/themes/executive/executive-social-links";
 import { executiveNavLinks, getExecutiveUi } from "@/themes/executive/executive-ui";
@@ -15,14 +18,16 @@ export async function ExecutiveFooter({ lang }: Props) {
   const { content, dict, locale, defaultLocale } = await getExecutiveUi(lang);
   const { brand, footer, legal, social, contact } = content;
   const links = executiveNavLinks(dict, locale, defaultLocale);
-  const whatsappHref = executiveContactChannels(content).whatsappHref;
-  const hasContact = executiveHasVisibleContact({
-    whatsappHref,
-    phone: contact.phone,
-    phoneHref: contact.phoneHref,
-    email: contact.email,
-    emailHref: contact.emailHref,
-  });
+  const contactChannels = executiveFooterContactChannels(
+    normalizeExecutiveFooterContact({
+      whatsappHref: executiveContactChannels(content).whatsappHref,
+      phone: contact.phone,
+      phoneHref: contact.phoneHref,
+      email: contact.email,
+      emailHref: contact.emailHref,
+    }),
+    { whatsapp: dict.whatsapp.footer },
+  );
   const year = new Date().getFullYear();
   const initial = executiveBrandInitial(brand.name);
 
@@ -64,37 +69,36 @@ export async function ExecutiveFooter({ lang }: Props) {
           </ul>
         </nav>
 
-        {hasContact ? (
+        {contactChannels.length > 0 ? (
           <div>
             <p className="executive-footer__heading">{dict.footer.contact}</p>
             <ul className="executive-footer__list">
-              {whatsappHref ? (
-                <li>
-                  <a
-                    href={whatsappHref}
-                    className="executive-footer__link"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${dict.whatsapp.footer}. ${dict.a11y.opensInNewTab}`}
-                  >
-                    {dict.whatsapp.footer}
-                  </a>
+              {contactChannels.map((channel) => (
+                <li key={`${channel.kind}:${channel.href}`}>
+                  {channel.kind === "whatsapp" ? (
+                    <a
+                      href={channel.href}
+                      className="executive-footer__link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${channel.label}. ${dict.a11y.opensInNewTab}`}
+                    >
+                      {channel.label}
+                    </a>
+                  ) : (
+                    <a
+                      href={channel.href}
+                      className={
+                        channel.kind === "email"
+                          ? "executive-footer__link executive-footer__link--sand"
+                          : "executive-footer__link"
+                      }
+                    >
+                      {channel.label}
+                    </a>
+                  )}
                 </li>
-              ) : null}
-              {contact.emailHref && contact.email ? (
-                <li>
-                  <a href={contact.emailHref} className="executive-footer__link executive-footer__link--sand">
-                    {contact.email}
-                  </a>
-                </li>
-              ) : null}
-              {contact.phoneHref && contact.phone ? (
-                <li>
-                  <a href={contact.phoneHref} className="executive-footer__link">
-                    {contact.phone}
-                  </a>
-                </li>
-              ) : null}
+              ))}
             </ul>
           </div>
         ) : null}
