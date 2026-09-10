@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import "./luxury-theme.css";
 import { luxuryThemeCssVars, type LuxuryThemeCssVars } from "@/lib/public-site-content";
 import {
   LUXURY_BODY_FONT_CLASS,

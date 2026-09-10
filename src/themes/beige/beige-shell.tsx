@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "./beige-theme.css";
 import { BEIGE_FONT_CLASS } from "@/themes/beige/beige-fonts";
 import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
 import { BeigeMotionRoot } from "@/themes/beige/beige-motion-root";

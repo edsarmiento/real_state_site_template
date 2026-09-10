@@ -257,7 +257,7 @@ Reglas en template:
 
 - `src/themes/luxury/` — catálogo con secciones, ficha, header/footer propios. Inquiry / WhatsApp / specs: mismos widgets y helpers que default (`classNames` luxury).
 - i18n: mismo `site-i18n.ts` que default; `getLuxuryUi(lang)` para copy + locale.
-- CSS: `[data-site-theme="luxury"]`, variables `--luxury-*` (`luxuryThemeCssVars()` en `globals.css`).
+- CSS: `[data-site-theme="luxury"]` en `luxury-theme.css` (importado desde `luxury-shell.tsx`); variables runtime `--luxury-*` vía `luxuryThemeCssVars()`.
 - Legales: `theme.LegalPage` (registrado como `LuxuryLegalPage`).
 - Gaps API: [`docs/api/luxury-endpoint-gap-analysis.md`](docs/api/luxury-endpoint-gap-analysis.md).
 
@@ -265,7 +265,7 @@ Reglas en template:
 
 - `src/themes/beige/` — catálogo (hero collage, buscador, residencial, ubicaciones, comercial, FAQ) y ficha con galería, inquiry y WhatsApp.
 - i18n: mismo `site-i18n.ts`; `getBeigeUi(lang)`.
-- CSS encapsulado en `[data-site-theme="beige"]` (`globals.css`): marfil/beige/oliva; Playfair Display + Plus Jakarta Sans vía `next/font`.
+- CSS encapsulado en `[data-site-theme="beige"]` (`beige-theme.css`, importado desde `beige-shell.tsx`): marfil/beige/oliva; Playfair Display + Plus Jakarta Sans vía `next/font`.
 - Catálogo: `theme.catalog.pageSize` / `heroGallery` (sin `if (theme.name)` en `app/`).
 - Legales: `theme.LegalPage` (registrado como `BeigeLegalPage`).
 - Widgets compartidos: `ListingInquiryForm`, `ListingWhatsAppButton`, `ListingShareButton`, `ListingPhotoGallery`, `publicListingCardModel`.
@@ -348,7 +348,7 @@ Usa este flujo cuando pidan **una plantilla nueva** (visual distinta de default/
 1. `src/themes/<nombre>/` — Catalog, ListingDetail, LegalPage (o reusar `DefaultLegalPage`).
 2. `theme-definitions.ts` — fila `{ name, layoutKeys: ["<slug>"] }` (fuente de `SiteLayoutKey` / mapeo).
 3. `theme-registry.ts` — entrada con Catalog, ListingDetail, LegalPage.
-4. CSS → `[data-site-theme="<nombre>"]` (bloque o archivo del theme); no clonar CSS luxury.
+4. CSS → `src/themes/<nombre>/<nombre>-theme.css` scoped con `[data-site-theme="<nombre>"]`, importado desde `<nombre>-shell.tsx` (como Elegant); no clonar CSS luxury ni meter el bloque en `globals.css`.
 5. Marketing → extender `getPublicSiteContent()` o content del theme leyendo **primero** `getResolvedSiteConfig()`.
 6. `npm run build` + `npm run lint`.
 7. Smoke: Ops `layout_key` → `/`, ficha, legales, login.
@@ -362,6 +362,8 @@ src/themes/<nombre>/
   <nombre>-catalog.tsx
   <nombre>-listing-detail.tsx
   <nombre>-legal-page.tsx   # o reusar DefaultLegalPage en el registry
+  <nombre>-shell.tsx
+  <nombre>-theme.css        # scoped [data-site-theme="<nombre>"]; import desde el shell
   …
 ```
 
@@ -442,8 +444,8 @@ Clonar **default**, no Luxury, como scaffold de un theme fino.
 
 ### Estilos y UI
 
-- **Tailwind CSS v4** (`globals.css` + clases en JSX). Sin CSS modules salvo necesidad excepcional.
-- Paleta base en `:root` (`globals.css`). Luxury usa `--luxury-*`.
+- **Tailwind CSS v4** (`globals.css` base + clases en JSX). Sin CSS modules salvo necesidad excepcional.
+- Paleta base en `:root` (`globals.css`). Cada theme: `<nombre>-theme.css` importado desde su shell (`[data-site-theme="…"]`). Luxury además usa `--luxury-*` runtime vía `luxuryThemeCssVars()`.
 - Reutilizar `components/ui/*` (Button, TextField, Card, ErrorBanner) antes de inventar estilos nuevos.
 - Diseño responsive: mobile-first (`sm:`, `md:`). Mantener contraste legible en heroes oscuros.
 - **Accesibilidad básica:** `alt` en imágenes de contenido, `aria-hidden` en decorativos, labels en campos de formulario.

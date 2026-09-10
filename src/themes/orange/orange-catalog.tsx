@@ -39,7 +39,7 @@ export async function OrangeCatalog({
   listings,
   total,
   page = 1,
-  pageSize,
+  pageSize = 12,
   catalogOk,
   catalogStatus,
   lang,
