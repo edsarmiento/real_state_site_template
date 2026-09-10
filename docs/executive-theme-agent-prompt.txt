@@ -1,0 +1,170 @@
+Handoff: theme Executive en real_state_site_template
+===================================================
+
+Reglas permanentes del repo: AGENTS.md (playbook "Nueva plantilla").
+Este archivo es el brief concreto de la plantilla Executive.
+
+
+Variables (reemplazar)
+----------------------
+
+  executive              layout_key en API/Ops, minusculas
+  executive              nombre en codigo / SiteThemeName
+  Executive              PascalCase para componentes
+  Executive              etiqueta humana
+  default                theme a copiar estructura: default | luxury
+  true                   usar styledLayout en search/cards/forms compartidos
+  Navy #0a1128 / sand #c5a880, Playfair Display + Plus Jakarta Sans, hero collage 3 marcos, glass cards
+
+
+Pre-requisitos API + Ops (completar antes del handoff)
+------------------------------------------------------
+
+  [ ] real_state_api: SiteConfig::LAYOUT_KEYS incluye "executive"
+  [ ] real_state_api: specs + BUSINESS_RULES.md §SiteConfig
+  [ ] real_state_frontend: OpsSiteConfigLayout + opcion en LAYOUT_OPTIONS
+
+Estado al implementar el template (2026-09-09): los repos `real_state_api` y
+`real_state_frontend` no estan en este worktree. No se pudo auditar LAYOUT_KEYS
+ni el select de Ops. El template registra `layout_key: executive`. Hasta que API
+y Ops acepten la clave, Ops no podra activar el theme. No hay override permanente
+de SiteConfig en el codigo.
+
+Si algo falta, hacerlo primero o incluirlo en el alcance del agente.
+
+
+Contexto
+--------
+
+Monorepo Real State. Trabaja SOLO en:
+
+  real_state_site_template/  (Next.js App Router, puerto dev 3002)
+
+1 deploy = 1 inmobiliaria (ACCOUNT_ID + API_URL). Marca, layout, idiomas y dominio
+vienen de SiteConfig via GET /api/public/site_config?account_id=.
+
+Objetivo: cuando Ops guarde layout_key: "executive", el template renderiza el theme
+executive en / y /inmueble/[slug].
+
+Lee:
+  - real_state_site_template/AGENTS.md
+  - real_state_api/BUSINESS_RULES.md — SiteConfig
+
+
+Arquitectura (no romper)
+------------------------
+
+  src/app/page.tsx -> resolveSiteThemeFromConfig() -> theme.Catalog
+  src/app/inmueble/[slug]/page.tsx -> theme.ListingDetail
+
+Contrato: src/themes/theme-types.ts (CatalogThemeProps, ListingDetailThemeProps).
+
+Reglas:
+  - Server Components; sin fetch de listings dentro del theme.
+  - i18n: getSiteUi(lang) + site-i18n.ts.
+  - Marca: getSiteUi().config (SiteConfig via getResolvedSiteConfig).
+  - Theme = skin: recibe valores y pinta. Inquiry, WhatsApp, specs y href
+    salen de ListingInquiryForm, ListingWhatsAppButton, publicListingCardModel,
+    listingPublicSpecsLocalized. NO copiar esos flujos en src/themes/executive/.
+
+
+Alcance v1 — theme Executive
+------------------------------
+
+Referencia de estructura: src/themes/default/ (paridad de ficha) + composicion
+del HTML Executive.html (catálogo marketing). No clonar Luxury.
+
+Identidad visual:
+  Paleta navy/sand del HTML: navy-950 #060a17, navy-900 #0a1128, navy-800 #101c38,
+  navy-700 #1a294f, navy-600 #263b6b, sand-500 #c5a880, sand-600 #b09167,
+  sand-400 #dfc29e, sand-100 #f9f6f0, emerald-600 #059669. Glass cards:
+  rgba(26,41,79,0.4) + blur 16px + borde sand 20%. Tipografias Playfair Display
+  (serif, titulos) y Plus Jakarta Sans (cuerpo). Hero: badge + titulo con ultima
+  palabra italic sand + 3 marcos 4/3. Buscador glass 5 columnas. Grid 1/2/3.
+  Hover lift translateY(-4px) 300ms cubic-bezier(0.16,1,0.3,1). Imagenes
+  scale(1.05) 500ms. Sin topbar, metricas, testimonios, manifiesto ni FAQs
+  (no estan en el HTML). Sin copy de tenant: marca, ciudades y contacto salen
+  de SiteConfig / listings.
+
+styledLayout en componentes compartidos: true
+  (admin/login via isStyledSiteLayout; widgets publicos se skinean con CSS del
+  theme y styledLayout={false} para no filtrar azul default)
+
+
+Minimo obligatorio en src/themes/executive/
+----------------------------------------
+
+  executive-catalog.tsx           OBLIGATORIO — pagina /
+  executive-listing-detail.tsx    OBLIGATORIO — pagina /inmueble/[slug]
+  executive-legal-page.tsx        OBLIGATORIO (o registrar DefaultLegalPage)
+
+Recomendado:
+  executive-catalog-hero.tsx      solo si el hero no va inline en catalog
+
+Catalog debe incluir:
+  - SiteHeader / SiteFooter (prop lang) — chrome propio del theme
+  - Hero con siteName, siteTagline (getSiteUi)
+  - PublicCatalogSearch + PublicListingCard (styledLayout segun true)
+    Adaptador local de search/cards si el markup HTML es distinto; helpers
+    compartidos de filtros, publicListingCardModel y specs.
+  - Empty state / error catalogo (ui.dict.results.*)
+  - Barra admin -> /login (el HTML no la trae; no se añade en el chrome
+    publico para no romper la composicion. Acceso via /login)
+  - Wrapper: data-site-theme="executive"
+
+Listing detail debe incluir:
+  - Paridad funcional con default-listing-detail (galeria, specs, inquiry, WhatsApp, maps)
+  - listingUrl con listingPublicUrl(slug, ui.config.siteOrigin, localizedHref(...))
+  - ListingInquiryForm + ListingWhatsAppButton (classNames del theme; sin form propio)
+  - listingPublicSpecsLocalized / publicListingCardModel; sin *-specs.ts del theme
+
+
+Cableado obligatorio (template)
+-------------------------------
+
+  1. theme-definitions.ts    — { name: "executive", layoutKeys: ["executive"] }
+  2. theme-registry.ts       — entrada con Catalog, ListingDetail, LegalPage
+     (LegalPage propio o DefaultLegalPage)
+
+NO modificar app/page.tsx, app/inmueble/[slug]/page.tsx ni rutas legales
+(terminos/cookies/aviso) — delegan al registry.
+NO usar site-config.ts legacy. NO fetch al Rails desde el browser.
+
+
+i18n (desde Ops)
+----------------
+
+  getSiteUi(lang); selector ES|EN si show_locale_switcher; localizedHref().
+
+
+Admin / login
+-------------
+
+  isStyledSiteLayout(): layout_key !== "default" -> acentos de marca en admin/login.
+
+
+Verificacion
+------------
+
+  npm run build && npm run lint
+
+Smoke:
+  1. Ops: layout "Executive" -> guardar
+  2. /, /inmueble/:slug, legales, /login
+
+
+Fuera de alcance (salvo pedido explicito)
+-----------------------------------------
+
+  Nuevos campos SiteConfig, marketing env tipo Luxury, deploy Vercel.
+
+
+Entregable
+----------
+
+  - src/themes/executive/ completo
+  - Registry + mapeo
+  - build verde
+  - Nota: paleta navy/sand + composicion del HTML; estructura de ficha desde
+    default; search/cards/locations/about/process/contact como beige (helpers),
+    no markup de Luxury.
