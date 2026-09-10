@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "./orange-theme.css";
 import { ORANGE_FONT_CLASS } from "@/themes/orange/orange-fonts";
 import { OrangeMotionRoot } from "@/themes/orange/orange-motion-root";
 import { getOrangeUi } from "@/themes/orange/orange-ui";

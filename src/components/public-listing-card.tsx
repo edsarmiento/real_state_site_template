@@ -69,7 +69,7 @@ export function PublicListingCard({
         <ListingOfferBadge
           offerType={offerType}
           styledLayout={styledLayout}
-          className="absolute left-3 top-3"
+          className="listing-offer-badge--overlay absolute left-3 top-3"
           saleLabel={dict?.listing.sale}
           rentLabel={dict?.listing.rent}
         />

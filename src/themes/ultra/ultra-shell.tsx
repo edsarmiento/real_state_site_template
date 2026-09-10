@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "./ultra-theme.css";
 import { ULTRA_FONT_CLASS } from "@/themes/ultra/ultra-fonts";
 import { ultraContactChannels } from "@/themes/ultra/ultra-contact-channels";
 import { UltraMotionRoot } from "@/themes/ultra/ultra-motion-root";
