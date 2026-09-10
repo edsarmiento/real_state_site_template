@@ -4,7 +4,7 @@ import { localizedHref } from "@/lib/site-i18n";
 import { LuxuryLocaleSwitcher } from "@/themes/luxury/luxury-locale-switcher";
 import { LuxuryLogo } from "@/themes/luxury/luxury-logo";
 import { LuxuryMobileNav } from "@/themes/luxury/luxury-mobile-nav";
-import { getLuxuryUi, luxuryNavLinks } from "@/themes/luxury/luxury-ui";
+import { loadLuxuryUi, luxuryNavLinks } from "@/themes/luxury/luxury-ui";
 import { LuxuryWhatsAppLink } from "@/themes/luxury/luxury-whatsapp-link";
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
 };
 
 export async function LuxuryHeader({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getLuxuryUi(lang);
+  const { content, dict, locale, defaultLocale } = await loadLuxuryUi(lang);
   const { brand, contact, social } = content;
   const links = luxuryNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);

@@ -1,24 +1,30 @@
-import { getPublicSiteContent } from "@/lib/public-site-content";
+import type { PublicSiteContent } from "@/lib/public-site-content";
 import {
   getDictionary,
   localizedHref,
-  resolveRequestLocale,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
+import { resolveThemeProps } from "@/themes/resolve-theme-props";
+import type { ThemeResolvedProps } from "@/themes/theme-types";
 import { getOrangeCopy, type OrangeCopy } from "@/themes/orange/orange-copy";
 
 export type OrangeUi = {
-  content: Awaited<ReturnType<typeof getPublicSiteContent>>;
+  content: PublicSiteContent;
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   dict: SiteDictionary;
   copy: OrangeCopy;
 };
 
-export async function getOrangeUi(lang?: string): Promise<OrangeUi> {
-  const content = await getPublicSiteContent();
-  const locale = resolveRequestLocale(lang, content.locale);
+/**
+ * Pure derivation of Orange UI values from already-resolved integration props.
+ * Does not fetch SiteConfig or public content.
+ */
+export function getOrangeUi({
+  content,
+  locale,
+}: ThemeResolvedProps): OrangeUi {
   return {
     content,
     locale,
@@ -26,6 +32,11 @@ export async function getOrangeUi(lang?: string): Promise<OrangeUi> {
     dict: getDictionary(locale),
     copy: getOrangeCopy(locale),
   };
+}
+
+/** Async loader for chrome (shell/header/footer) that still takes `lang`. */
+export async function loadOrangeUi(lang?: string): Promise<OrangeUi> {
+  return getOrangeUi(await resolveThemeProps(lang));
 }
 
 export function orangeNavLinks(input: {

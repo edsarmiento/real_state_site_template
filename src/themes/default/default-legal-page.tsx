@@ -1,17 +1,20 @@
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getPublicSiteContent } from "@/lib/public-site-content";
-import type { LegalPageThemeRouteProps } from "@/themes/theme-types";
+import type { LegalPageThemeProps } from "@/themes/theme-types";
 
-const TITLES: Record<LegalPageThemeRouteProps["kind"], string> = {
+const TITLES: Record<LegalPageThemeProps["kind"], string> = {
   privacy: "Aviso de privacidad",
   terms: "Términos de uso",
   cookies: "Política de cookies",
 };
 
-export async function DefaultLegalPage({ kind, lang }: LegalPageThemeRouteProps) {
-  const { legal } = await getPublicSiteContent();
+export function DefaultLegalPage({
+  kind,
+  lang,
+  content,
+}: LegalPageThemeProps) {
+  const { legal } = content;
 
   return (
     <div className="min-h-screen bg-zinc-50">

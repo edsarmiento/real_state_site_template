@@ -3,7 +3,7 @@ import "./elegant-theme.css";
 import { ELEGANT_FONT_CLASS } from "@/themes/elegant/elegant-fonts";
 import { elegantContactChannels } from "@/themes/elegant/elegant-contact-channels";
 import { ElegantMotionRoot } from "@/themes/elegant/elegant-motion-root";
-import { getElegantUi } from "@/themes/elegant/elegant-ui";
+import { loadElegantUi } from "@/themes/elegant/elegant-ui";
 import { ElegantWhatsAppFloat } from "@/themes/elegant/elegant-whatsapp-float";
 
 type Props = {
@@ -17,7 +17,7 @@ export async function ElegantShell({
   floatRaised = false,
   lang,
 }: Props) {
-  const { content, dict, locale } = await getElegantUi(lang);
+  const { content, dict, locale } = await loadElegantUi(lang);
   const href = elegantContactChannels(content).whatsappHref;
 
   return (

@@ -11,7 +11,7 @@ import {
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref } from "@/lib/site-i18n";
-import type { ListingDetailThemeRouteProps } from "@/themes/theme-types";
+import type { ListingDetailThemeProps } from "@/themes/theme-types";
 import {
   LuxuryButton,
   luxuryButtonClassName,
@@ -53,12 +53,18 @@ function SpecValue({ value }: { value: string }) {
   );
 }
 
-export async function LuxuryListingDetail({
+export function LuxuryListingDetail({
   listing,
   lang,
-}: ListingDetailThemeRouteProps) {
-  const { content, dict, locale, defaultLocale, showShareButton, siteOrigin } =
-    await getLuxuryUi(lang);
+  content,
+  config,
+  locale,
+}: ListingDetailThemeProps) {
+  const { dict, defaultLocale, showShareButton, siteOrigin } = getLuxuryUi({
+    content,
+    config,
+    locale,
+  });
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const priceSuffix = offerType === "rent" ? dict.listing.perMonth : null;

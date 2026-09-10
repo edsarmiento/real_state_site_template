@@ -11,25 +11,25 @@ import {
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref, localizeSiteHref } from "@/lib/site-i18n";
-import type { ListingDetailThemeRouteProps } from "@/themes/theme-types";
+import type { ListingDetailThemeProps } from "@/themes/theme-types";
 import { ElegantFooter } from "@/themes/elegant/elegant-footer";
 import { ElegantHeader } from "@/themes/elegant/elegant-header";
 import { ElegantIconArrowLeft, ElegantIconWhatsApp } from "@/themes/elegant/elegant-icons";
 import { ElegantShell } from "@/themes/elegant/elegant-shell";
 import { formatElegantPriceParts, getElegantUi } from "@/themes/elegant/elegant-ui";
 
-export async function ElegantListingDetail({
+export function ElegantListingDetail({
   listing,
   lang,
-}: ListingDetailThemeRouteProps) {
-  const {
+  content,
+  config,
+  locale,
+}: ListingDetailThemeProps) {
+  const { dict, defaultLocale, showShareButton, siteOrigin } = getElegantUi({
     content,
-    dict,
+    config,
     locale,
-    defaultLocale,
-    showShareButton,
-    siteOrigin,
-  } = await getElegantUi(lang);
+  });
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const specs = listingPublicSpecsLocalized(listing, dict);

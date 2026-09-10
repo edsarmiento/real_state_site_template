@@ -2,10 +2,16 @@ import { getLuxuryUi } from "@/themes/luxury/luxury-ui";
 import { LuxuryFooter } from "@/themes/luxury/luxury-footer";
 import { LuxuryHeader } from "@/themes/luxury/luxury-header";
 import { LuxuryShell } from "@/themes/luxury/luxury-shell";
-import type { LegalPageThemeRouteProps } from "@/themes/theme-types";
+import type { LegalPageThemeProps } from "@/themes/theme-types";
 
-export async function LuxuryLegalPage({ kind, lang }: LegalPageThemeRouteProps) {
-  const { dict } = await getLuxuryUi(lang);
+export function LuxuryLegalPage({
+  kind,
+  lang,
+  content,
+  config,
+  locale,
+}: LegalPageThemeProps) {
+  const { dict } = getLuxuryUi({ content, config, locale });
   const title =
     kind === "privacy"
       ? dict.legal.privacyTitle

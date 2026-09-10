@@ -5,10 +5,10 @@ import { PublicListingCard } from "@/components/public-listing-card";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { fillTemplate, localizedHref } from "@/lib/site-i18n";
-import { getSiteUi } from "@/lib/site-ui";
-import type { CatalogThemeRouteProps } from "@/themes/theme-types";
+import { getSiteUiFromResolved } from "@/lib/site-ui";
+import type { CatalogThemeProps } from "@/themes/theme-types";
 
-export async function DefaultCatalog({
+export function DefaultCatalog({
   oferta,
   city,
   propertyType,
@@ -19,8 +19,11 @@ export async function DefaultCatalog({
   catalogOk,
   catalogStatus,
   lang,
-}: CatalogThemeRouteProps) {
-  const ui = await getSiteUi(lang);
+  content,
+  config,
+  locale,
+}: CatalogThemeProps) {
+  const ui = getSiteUiFromResolved({ content, config, locale });
   const emptyKind =
     oferta === "sale"
       ? ui.dict.results.emptySale

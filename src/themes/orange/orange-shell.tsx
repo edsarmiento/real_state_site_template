@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import "./orange-theme.css";
 import { ORANGE_FONT_CLASS } from "@/themes/orange/orange-fonts";
 import { OrangeMotionRoot } from "@/themes/orange/orange-motion-root";
-import { getOrangeUi } from "@/themes/orange/orange-ui";
+import { loadOrangeUi } from "@/themes/orange/orange-ui";
 import { OrangeWhatsAppFloat } from "@/themes/orange/orange-whatsapp-float";
 
 type Props = {
@@ -16,7 +16,7 @@ export async function OrangeShell({
   floatRaised = false,
   lang,
 }: Props) {
-  const { content, dict, locale } = await getOrangeUi(lang);
+  const { content, dict, locale } = await loadOrangeUi(lang);
   const href = content.whatsapp.href ?? content.contact.whatsappHref;
 
   return (

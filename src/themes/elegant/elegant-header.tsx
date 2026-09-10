@@ -11,7 +11,7 @@ import { ElegantMobileNav } from "@/themes/elegant/elegant-mobile-nav";
 import {
   elegantBrandInitials,
   elegantNavLinks,
-  getElegantUi,
+  loadElegantUi,
 } from "@/themes/elegant/elegant-ui";
 
 type Props = {
@@ -19,7 +19,7 @@ type Props = {
 };
 
 export async function ElegantHeader({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getElegantUi(lang);
+  const { content, dict, locale, defaultLocale } = await loadElegantUi(lang);
   const { brand } = content;
   const links = elegantNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);

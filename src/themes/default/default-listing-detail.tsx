@@ -15,8 +15,8 @@ import {
 import type { PropertyType } from "@/lib/property-types";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref } from "@/lib/site-i18n";
-import { getSiteUi } from "@/lib/site-ui";
-import type { ListingDetailThemeRouteProps } from "@/themes/theme-types";
+import { getSiteUiFromResolved } from "@/lib/site-ui";
+import type { ListingDetailThemeProps } from "@/themes/theme-types";
 
 function Spec({ label, value }: { label: string; value: string }) {
   return (
@@ -42,11 +42,14 @@ function InfoCard({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-export async function DefaultListingDetail({
+export function DefaultListingDetail({
   listing,
   lang,
-}: ListingDetailThemeRouteProps) {
-  const ui = await getSiteUi(lang);
+  content,
+  config,
+  locale,
+}: ListingDetailThemeProps) {
+  const ui = getSiteUiFromResolved({ content, config, locale });
   const listingUrl = listingPublicUrl(
     listing.slug,
     ui.config.siteOrigin,

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { fillTemplate, localizedHref } from "@/lib/site-i18n";
-import type { CatalogThemeRouteProps } from "@/themes/theme-types";
+import type { CatalogThemeProps } from "@/themes/theme-types";
 import { OrangeFooter } from "@/themes/orange/orange-footer";
 import { OrangeHeader } from "@/themes/orange/orange-header";
 import { OrangeListingCard } from "@/themes/orange/orange-listing-card";
@@ -31,7 +31,7 @@ type OrangeHeroMetric = {
   icon?: (props: { className?: string }) => ReactNode;
 };
 
-export async function OrangeCatalog({
+export function OrangeCatalog({
   oferta,
   city,
   propertyType,
@@ -43,8 +43,11 @@ export async function OrangeCatalog({
   catalogOk,
   catalogStatus,
   lang,
-}: CatalogThemeRouteProps) {
-  const { content, dict, copy, locale, defaultLocale } = await getOrangeUi(lang);
+  content,
+  config,
+  locale,
+}: CatalogThemeProps) {
+  const { dict, copy, defaultLocale } = getOrangeUi({ content, config, locale });
   const homeHref = localizedHref("/", locale, null, defaultLocale);
   const propertiesHref = localizedHref("/#propiedades", locale, null, defaultLocale);
   const heroImage = content.hero.imageUrl?.trim() || listings[0]?.photo_url || null;

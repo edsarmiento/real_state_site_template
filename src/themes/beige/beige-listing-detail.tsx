@@ -12,7 +12,7 @@ import { googleMapsSearchUrl } from "@/lib/maps-links";
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref } from "@/lib/site-i18n";
-import type { ListingDetailThemeRouteProps } from "@/themes/theme-types";
+import type { ListingDetailThemeProps } from "@/themes/theme-types";
 import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
@@ -32,12 +32,18 @@ import { formatBeigePriceParts, getBeigeUi } from "@/themes/beige/beige-ui";
 
 const SPEC_STAGGER_MS = [0, 80, 160, 240] as const;
 
-export async function BeigeListingDetail({
+export function BeigeListingDetail({
   listing,
   lang,
-}: ListingDetailThemeRouteProps) {
-  const { content, dict, locale, defaultLocale, showShareButton, siteOrigin } =
-    await getBeigeUi(lang);
+  content,
+  config,
+  locale,
+}: ListingDetailThemeProps) {
+  const { dict, defaultLocale, showShareButton, siteOrigin } = getBeigeUi({
+    content,
+    config,
+    locale,
+  });
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const specs = listingPublicSpecsLocalized(listing, dict);

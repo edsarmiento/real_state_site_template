@@ -1,13 +1,16 @@
 import { fillTemplate } from "@/lib/site-i18n";
 import { LuxuryShell } from "@/themes/luxury/luxury-shell";
 import { getLuxuryUi } from "@/themes/luxury/luxury-ui";
-import type { ListingLoadErrorThemeRouteProps } from "@/themes/theme-types";
+import type { ListingLoadErrorThemeProps } from "@/themes/theme-types";
 
-export async function LuxuryListingLoadError({
+export function LuxuryListingLoadError({
   status,
   lang,
-}: ListingLoadErrorThemeRouteProps) {
-  const { dict } = await getLuxuryUi(lang);
+  content,
+  config,
+  locale,
+}: ListingLoadErrorThemeProps) {
+  const { dict } = getLuxuryUi({ content, config, locale });
   const message = fillTemplate(dict.results.listingError, { status });
 
   return (

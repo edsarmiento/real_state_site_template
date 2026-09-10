@@ -1,11 +1,17 @@
-import type { LegalPageThemeRouteProps } from "@/themes/theme-types";
+import type { LegalPageThemeProps } from "@/themes/theme-types";
 import { getElegantUi } from "@/themes/elegant/elegant-ui";
 import { ElegantFooter } from "@/themes/elegant/elegant-footer";
 import { ElegantHeader } from "@/themes/elegant/elegant-header";
 import { ElegantShell } from "@/themes/elegant/elegant-shell";
 
-export async function ElegantLegalPage({ kind, lang }: LegalPageThemeRouteProps) {
-  const { dict } = await getElegantUi(lang);
+export function ElegantLegalPage({
+  kind,
+  lang,
+  content,
+  config,
+  locale,
+}: LegalPageThemeProps) {
+  const { dict } = getElegantUi({ content, config, locale });
   const title =
     kind === "privacy"
       ? dict.legal.privacyTitle

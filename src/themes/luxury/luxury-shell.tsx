@@ -6,7 +6,7 @@ import {
   LUXURY_HEADING_FONT_CLASS,
 } from "@/themes/luxury/luxury-fonts";
 import { LuxuryMotionRoot } from "@/themes/luxury/luxury-motion-root";
-import { getLuxuryUi } from "@/themes/luxury/luxury-ui";
+import { loadLuxuryUi } from "@/themes/luxury/luxury-ui";
 import { LuxuryWhatsAppFloat } from "@/themes/luxury/luxury-whatsapp-float";
 
 type Props = {
@@ -20,7 +20,7 @@ export async function LuxuryShell({
   floatRaised = false,
   lang,
 }: Props) {
-  const { content, dict, locale } = await getLuxuryUi(lang);
+  const { content, dict, locale } = await loadLuxuryUi(lang);
   const headingClass =
     LUXURY_HEADING_FONT_CLASS[content.typography.headingFont];
   const bodyClass = LUXURY_BODY_FONT_CLASS[content.typography.bodyFont];

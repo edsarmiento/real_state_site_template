@@ -3,13 +3,16 @@ import { ElegantFooter } from "@/themes/elegant/elegant-footer";
 import { ElegantHeader } from "@/themes/elegant/elegant-header";
 import { ElegantShell } from "@/themes/elegant/elegant-shell";
 import { getElegantUi } from "@/themes/elegant/elegant-ui";
-import type { ListingLoadErrorThemeRouteProps } from "@/themes/theme-types";
+import type { ListingLoadErrorThemeProps } from "@/themes/theme-types";
 
-export async function ElegantListingLoadError({
+export function ElegantListingLoadError({
   status,
   lang,
-}: ListingLoadErrorThemeRouteProps) {
-  const { dict } = await getElegantUi(lang);
+  content,
+  config,
+  locale,
+}: ListingLoadErrorThemeProps) {
+  const { dict } = getElegantUi({ content, config, locale });
   const message = fillTemplate(dict.results.listingError, { status });
 
   return (

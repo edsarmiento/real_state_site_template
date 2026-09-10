@@ -1,15 +1,15 @@
-import { getPublicSiteContent } from "@/lib/public-site-content";
-import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
+import type { PublicSiteContent } from "@/lib/public-site-content";
 import {
   getDictionary,
   localizedHref,
-  resolveRequestLocale,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
+import { resolveThemeProps } from "@/themes/resolve-theme-props";
+import type { ThemeResolvedProps } from "@/themes/theme-types";
 
 export type BeigeUi = {
-  content: Awaited<ReturnType<typeof getPublicSiteContent>>;
+  content: PublicSiteContent;
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   dict: SiteDictionary;
@@ -17,12 +17,15 @@ export type BeigeUi = {
   siteOrigin: string;
 };
 
-export async function getBeigeUi(lang?: string): Promise<BeigeUi> {
-  const [content, config] = await Promise.all([
-    getPublicSiteContent(),
-    getResolvedSiteConfig(),
-  ]);
-  const locale = resolveRequestLocale(lang, content.locale);
+/**
+ * Pure derivation of Beige UI values from already-resolved integration props.
+ * Does not fetch SiteConfig or public content.
+ */
+export function getBeigeUi({
+  content,
+  config,
+  locale,
+}: ThemeResolvedProps): BeigeUi {
   return {
     content,
     locale,
@@ -31,6 +34,11 @@ export async function getBeigeUi(lang?: string): Promise<BeigeUi> {
     showShareButton: config.showShareButton,
     siteOrigin: config.siteOrigin,
   };
+}
+
+/** Async loader for chrome (shell/header/footer) that still takes `lang`. */
+export async function loadBeigeUi(lang?: string): Promise<BeigeUi> {
+  return getBeigeUi(await resolveThemeProps(lang));
 }
 
 export function beigeNavLinks(

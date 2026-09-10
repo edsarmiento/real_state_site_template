@@ -1,11 +1,17 @@
-import type { LegalPageThemeRouteProps } from "@/themes/theme-types";
+import type { LegalPageThemeProps } from "@/themes/theme-types";
 import { UltraFooter } from "@/themes/ultra/ultra-footer";
 import { UltraHeader } from "@/themes/ultra/ultra-header";
 import { UltraShell } from "@/themes/ultra/ultra-shell";
 import { getUltraUi } from "@/themes/ultra/ultra-ui";
 
-export async function UltraLegalPage({ kind, lang }: LegalPageThemeRouteProps) {
-  const { dict } = await getUltraUi(lang);
+export function UltraLegalPage({
+  kind,
+  lang,
+  content,
+  config,
+  locale,
+}: LegalPageThemeProps) {
+  const { dict } = getUltraUi({ content, config, locale });
   const title =
     kind === "privacy"
       ? dict.legal.privacyTitle

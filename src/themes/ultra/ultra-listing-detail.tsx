@@ -13,7 +13,7 @@ import {
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref } from "@/lib/site-i18n";
-import type { ListingDetailThemeRouteProps } from "@/themes/theme-types";
+import type { ListingDetailThemeProps } from "@/themes/theme-types";
 import { UltraFooter } from "@/themes/ultra/ultra-footer";
 import { UltraHeader } from "@/themes/ultra/ultra-header";
 import { UltraIconArrowLeft, UltraIconWhatsApp } from "@/themes/ultra/ultra-icons";
@@ -22,12 +22,14 @@ import { UltraReveal } from "@/themes/ultra/ultra-reveal";
 import { UltraShell } from "@/themes/ultra/ultra-shell";
 import { getUltraUi } from "@/themes/ultra/ultra-ui";
 
-export async function UltraListingDetail({
+export function UltraListingDetail({
   listing,
   lang,
-}: ListingDetailThemeRouteProps) {
-  const { content, dict, locale, defaultLocale, config } =
-    await getUltraUi(lang);
+  content,
+  config,
+  locale,
+}: ListingDetailThemeProps) {
+  const { dict, defaultLocale } = getUltraUi({ content, config, locale });
   const copy = getUltraCopy(locale);
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);

@@ -7,7 +7,7 @@ import {
   localizeSiteHref,
   localizedHref,
 } from "@/lib/site-i18n";
-import type { CatalogThemeRouteProps } from "@/themes/theme-types";
+import type { CatalogThemeProps } from "@/themes/theme-types";
 import { ElegantFooter } from "@/themes/elegant/elegant-footer";
 import { ElegantHeader } from "@/themes/elegant/elegant-header";
 import { elegantHeroTitleParts } from "@/themes/elegant/elegant-hero-title";
@@ -24,7 +24,7 @@ import {
 import { ElegantShell } from "@/themes/elegant/elegant-shell";
 import { elegantContentHref, getElegantUi } from "@/themes/elegant/elegant-ui";
 
-export async function ElegantCatalog({
+export function ElegantCatalog({
   oferta,
   city,
   propertyType,
@@ -39,8 +39,11 @@ export async function ElegantCatalog({
   catalogStatus,
   lang,
   heroPhotoUrls,
-}: CatalogThemeRouteProps) {
-  const { content, dict, locale, defaultLocale } = await getElegantUi(lang);
+  content,
+  config,
+  locale,
+}: CatalogThemeProps) {
+  const { dict, defaultLocale } = getElegantUi({ content, config, locale });
   const locations =
     content.locations.length > 0
       ? content.locations

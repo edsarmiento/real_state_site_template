@@ -6,7 +6,7 @@ type WithLang = { lang?: string };
 
 /**
  * Registry-only wrapper: resolve SiteConfig/content/locale once, then paint.
- * Used for themes that must not resolve data internally (Yellow).
+ * App routes stay fetch/delegate-only; paint components receive resolved props.
  * Renders the inner component via JSX (not as a plain function call).
  */
 export function withResolvedThemeProps<P extends WithLang>(

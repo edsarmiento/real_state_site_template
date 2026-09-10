@@ -5,14 +5,14 @@ import { OrangeHeaderChrome } from "@/themes/orange/orange-header-chrome";
 import { OrangeLocaleSwitcher } from "@/themes/orange/orange-locale-switcher";
 import { OrangeLogo } from "@/themes/orange/orange-logo";
 import { OrangeMobileNav } from "@/themes/orange/orange-mobile-nav";
-import { getOrangeUi, orangeNavLinks } from "@/themes/orange/orange-ui";
+import { loadOrangeUi, orangeNavLinks } from "@/themes/orange/orange-ui";
 
 type Props = {
   lang?: string;
 };
 
 export async function OrangeHeader({ lang }: Props) {
-  const { content, dict, copy, locale, defaultLocale } = await getOrangeUi(lang);
+  const { content, dict, copy, locale, defaultLocale } = await loadOrangeUi(lang);
   const showTestimonials = content.testimonials.length > 0;
   const showAbout = Boolean(content.about.title.trim());
   const links = orangeNavLinks({

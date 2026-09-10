@@ -7,7 +7,7 @@ import {
   localizeSiteHref,
   localizedHref,
 } from "@/lib/site-i18n";
-import type { CatalogThemeRouteProps } from "@/themes/theme-types";
+import type { CatalogThemeProps } from "@/themes/theme-types";
 import { LuxuryButton } from "@/themes/luxury/luxury-button";
 import { LuxuryFooter } from "@/themes/luxury/luxury-footer";
 import { LuxuryHeader } from "@/themes/luxury/luxury-header";
@@ -24,11 +24,11 @@ import {
 import { LuxuryTestimonials } from "@/themes/luxury/luxury-testimonials";
 import { LuxuryReveal } from "@/themes/luxury/luxury-reveal";
 import { LuxuryShell } from "@/themes/luxury/luxury-shell";
-import { getLuxuryUi } from "@/themes/luxury/luxury-ui";
+import { getLuxuryUi, type LuxuryUi } from "@/themes/luxury/luxury-ui";
 
 function catalogHeading(
-  dict: Awaited<ReturnType<typeof getLuxuryUi>>["dict"],
-  oferta: CatalogThemeRouteProps["oferta"],
+  dict: LuxuryUi["dict"],
+  oferta: CatalogThemeProps["oferta"],
   city: string,
   total: number,
 ): string {
@@ -46,7 +46,7 @@ function catalogHeading(
   return `${count} ${kind}${place}`;
 }
 
-export async function LuxuryCatalog({
+export function LuxuryCatalog({
   oferta,
   city,
   propertyType,
@@ -57,8 +57,11 @@ export async function LuxuryCatalog({
   catalogOk,
   catalogStatus,
   lang,
-}: CatalogThemeRouteProps) {
-  const { content, dict, locale, defaultLocale } = await getLuxuryUi(lang);
+  content,
+  config,
+  locale,
+}: CatalogThemeProps) {
+  const { dict, defaultLocale } = getLuxuryUi({ content, config, locale });
   const heroImage = content.hero.imageUrl;
   const locations =
     content.locations.length > 0

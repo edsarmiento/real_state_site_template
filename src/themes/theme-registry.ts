@@ -46,61 +46,61 @@ const YELLOW_CATALOG = { pageSize: 12, heroGallery: true } as const;
  * Public themes. Add a theme: folder under src/themes/<name>/ + entry here
  * + matching row in theme-definitions.ts (layoutKeys).
  *
- * Yellow entries are wrapped with `withResolvedThemeProps` so App routes stay
- * fetch/delegate-only while Yellow paint components receive resolved props.
+ * All theme paint entries are wrapped with `withResolvedThemeProps` so App
+ * routes stay fetch/delegate-only while paint components receive resolved props.
  */
 export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
   default: {
     name: "default",
     layoutKeys: LAYOUT_KEYS_BY_THEME.default,
     catalog: DEFAULT_CATALOG,
-    Catalog: DefaultCatalog,
-    ListingDetail: DefaultListingDetail,
-    LegalPage: DefaultLegalPage,
+    Catalog: withResolvedThemeProps(DefaultCatalog),
+    ListingDetail: withResolvedThemeProps(DefaultListingDetail),
+    LegalPage: withResolvedThemeProps(DefaultLegalPage),
   },
   luxury: {
     name: "luxury",
     layoutKeys: LAYOUT_KEYS_BY_THEME.luxury,
     catalog: DEFAULT_CATALOG,
-    Catalog: LuxuryCatalog,
-    ListingDetail: LuxuryListingDetail,
-    ListingLoadError: LuxuryListingLoadError,
-    LegalPage: LuxuryLegalPage,
+    Catalog: withResolvedThemeProps(LuxuryCatalog),
+    ListingDetail: withResolvedThemeProps(LuxuryListingDetail),
+    ListingLoadError: withResolvedThemeProps(LuxuryListingLoadError),
+    LegalPage: withResolvedThemeProps(LuxuryLegalPage),
   },
   beige: {
     name: "beige",
     layoutKeys: LAYOUT_KEYS_BY_THEME.beige,
     catalog: BEIGE_CATALOG,
-    Catalog: BeigeCatalog,
-    ListingDetail: BeigeListingDetail,
-    ListingLoadError: BeigeListingLoadError,
-    LegalPage: BeigeLegalPage,
+    Catalog: withResolvedThemeProps(BeigeCatalog),
+    ListingDetail: withResolvedThemeProps(BeigeListingDetail),
+    ListingLoadError: withResolvedThemeProps(BeigeListingLoadError),
+    LegalPage: withResolvedThemeProps(BeigeLegalPage),
   },
   elegant: {
     name: "elegant",
     layoutKeys: LAYOUT_KEYS_BY_THEME.elegant,
     catalog: ELEGANT_CATALOG,
-    Catalog: ElegantCatalog,
-    ListingDetail: ElegantListingDetail,
-    ListingLoadError: ElegantListingLoadError,
-    LegalPage: ElegantLegalPage,
+    Catalog: withResolvedThemeProps(ElegantCatalog),
+    ListingDetail: withResolvedThemeProps(ElegantListingDetail),
+    ListingLoadError: withResolvedThemeProps(ElegantListingLoadError),
+    LegalPage: withResolvedThemeProps(ElegantLegalPage),
   },
   orange: {
     name: "orange",
     layoutKeys: LAYOUT_KEYS_BY_THEME.orange,
     catalog: ORANGE_CATALOG,
-    Catalog: OrangeCatalog,
-    ListingDetail: OrangeListingDetail,
-    LegalPage: OrangeLegalPage,
+    Catalog: withResolvedThemeProps(OrangeCatalog),
+    ListingDetail: withResolvedThemeProps(OrangeListingDetail),
+    LegalPage: withResolvedThemeProps(OrangeLegalPage),
   },
   ultra: {
     name: "ultra",
     layoutKeys: LAYOUT_KEYS_BY_THEME.ultra,
     catalog: ULTRA_CATALOG,
-    Catalog: UltraCatalog,
-    ListingDetail: UltraListingDetail,
-    ListingLoadError: UltraListingLoadError,
-    LegalPage: UltraLegalPage,
+    Catalog: withResolvedThemeProps(UltraCatalog),
+    ListingDetail: withResolvedThemeProps(UltraListingDetail),
+    ListingLoadError: withResolvedThemeProps(UltraListingLoadError),
+    LegalPage: withResolvedThemeProps(UltraLegalPage),
   },
   yellow: {
     name: "yellow",
