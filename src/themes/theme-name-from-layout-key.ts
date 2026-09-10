@@ -1,8 +1,2 @@
-export function themeNameFromLayoutKey(
-  layoutKey: string,
-): "default" | "luxury" | "orange" {
-  const value = layoutKey.trim().toLowerCase();
-  if (value === "deo" || value === "luxury") return "luxury";
-  if (value === "orange") return "orange";
-  return "default";
-}
+/** Re-export — single source of truth is theme-definitions.ts. */
+export { themeNameFromLayoutKey } from "@/themes/theme-definitions";

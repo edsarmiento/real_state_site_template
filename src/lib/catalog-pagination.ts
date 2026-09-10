@@ -58,6 +58,7 @@ export function resolveCatalogPage(
 export function catalogPageItems(
   current: number,
   total: number,
+  _siblingCount = 1,
 ): Array<number | "ellipsis"> {
   if (total <= 1) return [1];
   if (total <= 7) {
