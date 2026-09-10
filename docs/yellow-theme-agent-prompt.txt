@@ -1,0 +1,176 @@
+Handoff: implementar theme Yellow en real_state_site_template
+=====================================================================
+
+Antes de usar este archivo:
+  1. Este archivo es el brief operativo de Yellow; leelo directamente.
+  2. Reemplaza todos los marcadores <...> abajo.
+  3. Completa la seccion "Pre-requisitos API + Ops" segun el estado real del monorepo.
+  4. Pegale el .txt al agente o desarrollador.
+
+Reglas permanentes del repo: real_state_site_template/AGENTS.md (playbook "Nueva plantilla").
+Este archivo es solo el brief concreto de ESTA plantilla.
+
+
+Variables (reemplazar)
+----------------------
+
+  yellow              layout_key en API/Ops, minusculas (ej. beige)
+  yellow              nombre en codigo / SiteThemeName (ej. beige; puede diferir del layout_key)
+  Yellow              PascalCase para componentes (ej. Beige)
+  Yellow              etiqueta humana (ej. Beige — catalogo calido)
+  default             theme a copiar estructura: default | luxury
+  true                true | false — usar styledLayout en search/cards/forms compartidos
+  Blue & Yellow: fondo #F8F9FA, texto #1E2D38, muted #64748B, sky #2A6F97 / #EAF2F8 / #D6E6F2, cream #FEF9E7 / #FCEEA7 / #E2CE84 / #D4B859. Playfair Display + Plus Jakarta Sans. Hero editorial 7/5 con collage 4/3, buscador 5 columnas, cards glass, destinos h-80, about + proceso 01-03, contacto glass. Hover translateY(-4px) 300ms cubic-bezier(0.16, 1, 0.3, 1).
+
+
+Pre-requisitos API + Ops (completar antes del handoff)
+------------------------------------------------------
+
+  [ ] real_state_api: SiteConfig::LAYOUT_KEYS incluye "yellow"
+  [ ] real_state_api: specs + BUSINESS_RULES.md §SiteConfig
+  [ ] real_state_frontend: OpsSiteConfigLayout + opcion en LAYOUT_OPTIONS
+
+Estado al implementar el template (2026-09-09): los repos requeridos de
+API y Ops no estan en este worktree. El theme se registra en el template;
+no se podra activar desde Ops hasta coordinar LAYOUT_KEYS + selector.
+Sin override permanente de SiteConfig.
+
+Si algo falta, hacerlo primero o incluirlo en el alcance del agente.
+
+
+Contexto
+--------
+
+Monorepo Real State. Trabaja SOLO en:
+
+  real_state_site_template/  (Next.js App Router, puerto dev 3002)
+
+1 deploy = 1 inmobiliaria (ACCOUNT_ID + API_URL). Marca, layout, idiomas y dominio
+vienen de SiteConfig via GET /api/public/site_config?account_id=.
+
+Objetivo: cuando Ops guarde layout_key: "yellow", el template renderiza el theme
+yellow en / y /inmueble/[slug].
+
+Lee:
+  - real_state_site_template/AGENTS.md
+  - real_state_api/BUSINESS_RULES.md — SiteConfig
+
+
+Arquitectura (no romper)
+------------------------
+
+  src/app/page.tsx -> resolveSiteThemeFromConfig() -> theme.Catalog
+  src/app/inmueble/[slug]/page.tsx -> theme.ListingDetail
+
+Contrato: src/themes/theme-types.ts (CatalogThemeProps, ListingDetailThemeProps).
+
+Reglas:
+  - Server Components; sin fetch de listings dentro del theme.
+  - i18n: getSiteUi(lang) + site-i18n.ts.
+  - Marca: getSiteUi().config (SiteConfig via getResolvedSiteConfig).
+  - Theme = skin: recibe valores y pinta. Inquiry, WhatsApp, specs y href
+    salen de ListingInquiryForm, ListingWhatsAppButton, publicListingCardModel,
+    listingPublicSpecsLocalized. NO copiar esos flujos en src/themes/yellow/.
+
+
+Alcance v1 — theme Yellow
+------------------------------
+
+Referencia de estructura: src/themes/default/
+
+Identidad visual:
+  Blue & Yellow edition (HTML yellow.html). Paleta navy/sky/cream.
+  Tipografias: Playfair Display (titulos, italic accent) + Plus Jakarta Sans
+  (cuerpo 300-700). Hero: badge, titulo 4/5/6xl, CTAs pill navy + ghost sky,
+  collage 1+2 fotos aspect 4/3. Buscador glass 5 columnas. Catalogo 1/2/3
+  cols, card h-72 + CTA decorativo. Destinos overlay. About con checks +
+  caja CTA. Proceso 01-03. Contacto canales reales + form preview/hidden.
+  Footer navy. Motion: hover 4px / scale 1.05 / 300-500ms; reveals opcionales
+  visibles sin JS. Responsive 390 / 768 / 1024 / 1440.
+
+  HTML de referencia: yellow.html (Blue & Yellow Edition).
+  styledLayout: true (layout_key !== default activa acentos admin/login).
+  Widgets compartidos: classNames + CSS del theme; gallery styledLayout false.
+
+styledLayout en componentes compartidos: true
+
+
+Minimo obligatorio en src/themes/yellow/
+----------------------------------------
+
+  yellow-catalog.tsx           OBLIGATORIO — pagina /
+  yellow-listing-detail.tsx    OBLIGATORIO — pagina /inmueble/[slug]
+  yellow-legal-page.tsx        OBLIGATORIO (o registrar DefaultLegalPage)
+
+Recomendado:
+  yellow-catalog-hero.tsx      solo si el hero no va inline en catalog
+
+Catalog debe incluir:
+  - SiteHeader / SiteFooter (prop lang) — chrome propio YellowHeader / YellowFooter
+  - Hero con siteName, siteTagline (getSiteUi)
+  - PublicCatalogSearch + PublicListingCard (styledLayout segun true)
+    Adaptador local YellowSearch / YellowListingCard: markup del HTML;
+    helpers de filtros, publicListingCardModel, limit/offset del page.tsx.
+  - Empty state / error catalogo (ui.dict.results.*)
+  - Barra admin -> /login
+  - Wrapper: data-site-theme="yellow"
+
+Listing detail debe incluir:
+  - Paridad funcional con default-listing-detail (galeria, specs, inquiry, WhatsApp, maps)
+  - listingUrl con listingPublicUrl(slug, ui.config.siteOrigin, localizedHref(...))
+  - ListingInquiryForm + ListingWhatsAppButton (classNames del theme; sin form propio)
+  - listingPublicSpecsLocalized / publicListingCardModel; sin *-specs.ts del theme
+
+
+Cableado obligatorio (template)
+-------------------------------
+
+  1. theme-definitions.ts    — { name: "yellow", layoutKeys: ["yellow"] }
+  2. theme-registry.ts       — entrada con Catalog, ListingDetail, LegalPage
+     (LegalPage propio o DefaultLegalPage)
+
+NO modificar app/page.tsx, app/inmueble/[slug]/page.tsx ni rutas legales
+(terminos/cookies/aviso) — delegan al registry.
+NO usar site-config.ts legacy. NO fetch al Rails desde el browser.
+
+
+i18n (desde Ops)
+----------------
+
+  getSiteUi(lang); selector ES|EN si show_locale_switcher; localizedHref().
+
+
+Admin / login
+-------------
+
+  isStyledSiteLayout(): layout_key !== "default" -> acentos de marca en admin/login.
+
+
+Verificacion
+------------
+
+  npm run build && npm run lint
+
+Smoke:
+  1. Ops: layout "Yellow" -> guardar
+  2. /, /inmueble/:slug, legales, /login
+
+
+Fuera de alcance (salvo pedido explicito)
+-----------------------------------------
+
+  Nuevos campos SiteConfig, marketing env tipo Luxury, deploy Vercel.
+
+
+Entregable
+----------
+
+  - src/themes/yellow/ completo
+  - Registry + mapeo
+  - build verde
+  - Nota: paleta Blue & Yellow; contratos de default; composicion tipo beige
+    (hero collage, secciones) porque el HTML lo exige. Sin copy de tenant
+    (DEO, Tijuana, telefonos de demo). Sort del HTML omitido (API sin sort).
+    Formulario de contacto general: preview/hidden (sin endpoint). Mapa:
+    enlace Google Maps real, no modal decorativo. LinkedIn omitido (no hay
+    contrato social).

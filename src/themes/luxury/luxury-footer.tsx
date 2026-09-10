@@ -2,14 +2,14 @@ import Link from "next/link";
 import { fillTemplate, localizeSiteHref } from "@/lib/site-i18n";
 import { LuxuryLogo } from "@/themes/luxury/luxury-logo";
 import { LuxurySocialLinks } from "@/themes/luxury/luxury-social-links";
-import { getLuxuryUi, luxuryNavLinks } from "@/themes/luxury/luxury-ui";
+import { loadLuxuryUi, luxuryNavLinks } from "@/themes/luxury/luxury-ui";
 
 type Props = {
   lang?: string;
 };
 
 export async function LuxuryFooter({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getLuxuryUi(lang);
+  const { content, dict, locale, defaultLocale } = await loadLuxuryUi(lang);
   const { brand, contact, footer, legal, social } = content;
   const links = luxuryNavLinks(dict, locale, defaultLocale);
   const whatsappHref = content.whatsapp.href ?? contact.whatsappHref;

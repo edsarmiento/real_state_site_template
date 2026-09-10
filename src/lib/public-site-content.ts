@@ -717,7 +717,7 @@ function resolveMotionPreset(raw: string | undefined): MotionPreset {
   return "subtle";
 }
 
-function buildPublicSiteContent(config: ResolvedSiteConfig): PublicSiteContent {
+export function buildPublicSiteContent(config: ResolvedSiteConfig): PublicSiteContent {
   const name = config.siteName;
   const tagline = config.siteTagline;
   const typography = resolveSiteTypography();

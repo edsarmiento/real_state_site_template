@@ -6,7 +6,7 @@ import { ElegantSocialLinks } from "@/themes/elegant/elegant-social-links";
 import {
   elegantBrandInitials,
   elegantNavLinks,
-  getElegantUi,
+  loadElegantUi,
 } from "@/themes/elegant/elegant-ui";
 
 type Props = {
@@ -14,7 +14,7 @@ type Props = {
 };
 
 export async function ElegantFooter({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getElegantUi(lang);
+  const { content, dict, locale, defaultLocale } = await loadElegantUi(lang);
   const { brand, footer, legal, social, contact } = content;
   const links = elegantNavLinks(dict, locale, defaultLocale);
   const whatsappHref = elegantContactChannels(content).whatsappHref;

@@ -7,7 +7,7 @@ import { UltraIconWhatsApp } from "@/themes/ultra/ultra-icons";
 import { UltraHeaderChrome } from "@/themes/ultra/ultra-header-chrome";
 import { UltraLocaleSwitcher } from "@/themes/ultra/ultra-locale-switcher";
 import { UltraMobileNav } from "@/themes/ultra/ultra-mobile-nav";
-import { getUltraUi, ultraNavLinks } from "@/themes/ultra/ultra-ui";
+import { loadUltraUi, ultraNavLinks } from "@/themes/ultra/ultra-ui";
 
 type Props = {
   lang?: string;
@@ -15,7 +15,7 @@ type Props = {
 
 export async function UltraHeader({ lang }: Props) {
   const [ui, session] = await Promise.all([
-    getUltraUi(lang),
+    loadUltraUi(lang),
     getSessionContext(),
   ]);
   const { content, dict, locale, defaultLocale } = ui;

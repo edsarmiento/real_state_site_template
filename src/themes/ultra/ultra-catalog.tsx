@@ -42,8 +42,11 @@ export async function UltraCatalog({
   catalogStatus,
   lang,
   heroPhotoUrls,
+  content,
+  config,
+  locale,
 }: CatalogThemeProps) {
-  const { content, dict, locale, defaultLocale } = await getUltraUi(lang);
+  const { dict, defaultLocale } = getUltraUi({ content, config, locale });
   const copy = getUltraCopy(locale);
   const locations =
     content.locations.length > 0

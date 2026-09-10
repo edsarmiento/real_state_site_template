@@ -5,11 +5,14 @@ import { ElegantShell } from "@/themes/elegant/elegant-shell";
 import { getElegantUi } from "@/themes/elegant/elegant-ui";
 import type { ListingLoadErrorThemeProps } from "@/themes/theme-types";
 
-export async function ElegantListingLoadError({
+export function ElegantListingLoadError({
   status,
   lang,
+  content,
+  config,
+  locale,
 }: ListingLoadErrorThemeProps) {
-  const { dict } = await getElegantUi(lang);
+  const { dict } = getElegantUi({ content, config, locale });
   const message = fillTemplate(dict.results.listingError, { status });
 
   return (

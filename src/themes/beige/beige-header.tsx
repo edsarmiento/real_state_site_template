@@ -9,14 +9,14 @@ import { BeigeIconWhatsApp } from "@/themes/beige/beige-icons";
 import { BeigeLocaleSwitcher } from "@/themes/beige/beige-locale-switcher";
 import { BeigeLogo } from "@/themes/beige/beige-logo";
 import { BeigeMobileNav } from "@/themes/beige/beige-mobile-nav";
-import { beigeNavLinks, getBeigeUi } from "@/themes/beige/beige-ui";
+import { beigeNavLinks, loadBeigeUi } from "@/themes/beige/beige-ui";
 
 type Props = {
   lang?: string;
 };
 
 export async function BeigeHeader({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
+  const { content, dict, locale, defaultLocale } = await loadBeigeUi(lang);
   const { brand } = content;
   const links = beigeNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);

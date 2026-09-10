@@ -5,14 +5,14 @@ import {
   OrangeIconInstagram,
 } from "@/themes/orange/orange-icons";
 import { OrangeLogo } from "@/themes/orange/orange-logo";
-import { getOrangeUi, orangeNavLinks } from "@/themes/orange/orange-ui";
+import { loadOrangeUi, orangeNavLinks } from "@/themes/orange/orange-ui";
 
 type Props = {
   lang?: string;
 };
 
 export async function OrangeFooter({ lang }: Props) {
-  const { content, dict, copy, locale, defaultLocale } = await getOrangeUi(lang);
+  const { content, dict, copy, locale, defaultLocale } = await loadOrangeUi(lang);
   const { brand, contact, footer, legal, about, social } = content;
   const showTestimonials = content.testimonials.length > 0;
   const showAbout = Boolean(about.title.trim());

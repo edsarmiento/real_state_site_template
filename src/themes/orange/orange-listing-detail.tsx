@@ -32,11 +32,14 @@ function specIcon(key: string) {
   return <OrangeIconHome />;
 }
 
-export async function OrangeListingDetail({
+export function OrangeListingDetail({
   listing,
   lang,
+  content,
+  config,
+  locale,
 }: ListingDetailThemeProps) {
-  const { content, dict, copy, locale, defaultLocale } = await getOrangeUi(lang);
+  const { dict, copy, defaultLocale } = getOrangeUi({ content, config, locale });
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const specs = orangeVisibleSpecs(listing);

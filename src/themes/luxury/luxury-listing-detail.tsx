@@ -53,12 +53,18 @@ function SpecValue({ value }: { value: string }) {
   );
 }
 
-export async function LuxuryListingDetail({
+export function LuxuryListingDetail({
   listing,
   lang,
+  content,
+  config,
+  locale,
 }: ListingDetailThemeProps) {
-  const { content, dict, locale, defaultLocale, showShareButton, siteOrigin } =
-    await getLuxuryUi(lang);
+  const { dict, defaultLocale, showShareButton, siteOrigin } = getLuxuryUi({
+    content,
+    config,
+    locale,
+  });
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const priceSuffix = offerType === "rent" ? dict.listing.perMonth : null;

@@ -24,7 +24,7 @@ import {
 import { ElegantShell } from "@/themes/elegant/elegant-shell";
 import { elegantContentHref, getElegantUi } from "@/themes/elegant/elegant-ui";
 
-export async function ElegantCatalog({
+export function ElegantCatalog({
   oferta,
   city,
   propertyType,
@@ -39,8 +39,11 @@ export async function ElegantCatalog({
   catalogStatus,
   lang,
   heroPhotoUrls,
+  content,
+  config,
+  locale,
 }: CatalogThemeProps) {
-  const { content, dict, locale, defaultLocale } = await getElegantUi(lang);
+  const { dict, defaultLocale } = getElegantUi({ content, config, locale });
   const locations =
     content.locations.length > 0
       ? content.locations

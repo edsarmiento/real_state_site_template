@@ -1,17 +1,35 @@
-import { getPublicSiteContent } from "@/lib/public-site-content";
-import { localizedHref, type SiteDictionary, type SiteLocale } from "@/lib/site-i18n";
-import { getSiteUi, type SiteUi } from "@/lib/site-ui";
+import type { PublicSiteContent } from "@/lib/public-site-content";
+import { getDictionary, localizedHref, type SiteDictionary, type SiteLocale } from "@/lib/site-i18n";
+import type { SiteUi } from "@/lib/site-ui";
+import { resolveThemeProps } from "@/themes/resolve-theme-props";
+import type { ThemeResolvedProps } from "@/themes/theme-types";
 
 export type UltraUi = SiteUi & {
-  content: Awaited<ReturnType<typeof getPublicSiteContent>>;
+  content: PublicSiteContent;
 };
 
-export async function getUltraUi(lang?: string): Promise<UltraUi> {
-  const [ui, content] = await Promise.all([
-    getSiteUi(lang),
-    getPublicSiteContent(),
-  ]);
-  return { ...ui, content };
+/**
+ * Pure derivation of Ultra UI values from already-resolved integration props.
+ * Does not fetch SiteConfig or public content.
+ */
+export function getUltraUi({
+  content,
+  config,
+  locale,
+}: ThemeResolvedProps): UltraUi {
+  return {
+    content,
+    config,
+    locale,
+    defaultLocale: config.locale.defaultLocale,
+    localeConfig: config.locale,
+    dict: getDictionary(locale),
+  };
+}
+
+/** Async loader for chrome (shell/header/footer) that still takes `lang`. */
+export async function loadUltraUi(lang?: string): Promise<UltraUi> {
+  return getUltraUi(await resolveThemeProps(lang));
 }
 
 export function ultraNavLinks(

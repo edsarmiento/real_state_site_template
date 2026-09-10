@@ -4,7 +4,7 @@ import { ULTRA_FONT_CLASS } from "@/themes/ultra/ultra-fonts";
 import { ultraContactChannels } from "@/themes/ultra/ultra-contact-channels";
 import { UltraMotionRoot } from "@/themes/ultra/ultra-motion-root";
 import { UltraParticles } from "@/themes/ultra/ultra-particles";
-import { getUltraUi } from "@/themes/ultra/ultra-ui";
+import { loadUltraUi } from "@/themes/ultra/ultra-ui";
 import { UltraWhatsAppFloat } from "@/themes/ultra/ultra-whatsapp-float";
 
 type Props = {
@@ -20,7 +20,7 @@ export async function UltraShell({
   lang,
   particles = "ambient",
 }: Props) {
-  const { content, dict, locale } = await getUltraUi(lang);
+  const { content, dict, locale } = await loadUltraUi(lang);
   const href = ultraContactChannels(content).whatsappHref;
   const motionOn = content.motion.preset !== "none";
 

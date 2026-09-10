@@ -18,18 +18,18 @@ import { ElegantIconArrowLeft, ElegantIconWhatsApp } from "@/themes/elegant/eleg
 import { ElegantShell } from "@/themes/elegant/elegant-shell";
 import { formatElegantPriceParts, getElegantUi } from "@/themes/elegant/elegant-ui";
 
-export async function ElegantListingDetail({
+export function ElegantListingDetail({
   listing,
   lang,
+  content,
+  config,
+  locale,
 }: ListingDetailThemeProps) {
-  const {
+  const { dict, defaultLocale, showShareButton, siteOrigin } = getElegantUi({
     content,
-    dict,
+    config,
     locale,
-    defaultLocale,
-    showShareButton,
-    siteOrigin,
-  } = await getElegantUi(lang);
+  });
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const specs = listingPublicSpecsLocalized(listing, dict);

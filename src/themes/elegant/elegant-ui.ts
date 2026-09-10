@@ -1,12 +1,12 @@
-import { getPublicSiteContent } from "@/lib/public-site-content";
-import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
+import type { PublicSiteContent } from "@/lib/public-site-content";
 import {
   getDictionary,
   localizedHref,
-  resolveRequestLocale,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
+import { resolveThemeProps } from "@/themes/resolve-theme-props";
+import type { ThemeResolvedProps } from "@/themes/theme-types";
 
 export {
   elegantBrandInitials,
@@ -16,7 +16,7 @@ export {
 export { elegantContentHref } from "@/themes/elegant/elegant-format";
 
 export type ElegantUi = {
-  content: Awaited<ReturnType<typeof getPublicSiteContent>>;
+  content: PublicSiteContent;
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   dict: SiteDictionary;
@@ -24,12 +24,15 @@ export type ElegantUi = {
   siteOrigin: string;
 };
 
-export async function getElegantUi(lang?: string): Promise<ElegantUi> {
-  const [content, config] = await Promise.all([
-    getPublicSiteContent(),
-    getResolvedSiteConfig(),
-  ]);
-  const locale = resolveRequestLocale(lang, content.locale);
+/**
+ * Pure derivation of Elegant UI values from already-resolved integration props.
+ * Does not fetch SiteConfig or public content.
+ */
+export function getElegantUi({
+  content,
+  config,
+  locale,
+}: ThemeResolvedProps): ElegantUi {
   return {
     content,
     locale,
@@ -38,6 +41,11 @@ export async function getElegantUi(lang?: string): Promise<ElegantUi> {
     showShareButton: config.showShareButton,
     siteOrigin: config.siteOrigin,
   };
+}
+
+/** Async loader for chrome (shell/header/footer) that still takes `lang`. */
+export async function loadElegantUi(lang?: string): Promise<ElegantUi> {
+  return getElegantUi(await resolveThemeProps(lang));
 }
 
 export function elegantNavLinks(

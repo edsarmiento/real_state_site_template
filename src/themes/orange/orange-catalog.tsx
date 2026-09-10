@@ -31,7 +31,7 @@ type OrangeHeroMetric = {
   icon?: (props: { className?: string }) => ReactNode;
 };
 
-export async function OrangeCatalog({
+export function OrangeCatalog({
   oferta,
   city,
   propertyType,
@@ -43,8 +43,11 @@ export async function OrangeCatalog({
   catalogOk,
   catalogStatus,
   lang,
+  content,
+  config,
+  locale,
 }: CatalogThemeProps) {
-  const { content, dict, copy, locale, defaultLocale } = await getOrangeUi(lang);
+  const { dict, copy, defaultLocale } = getOrangeUi({ content, config, locale });
   const homeHref = localizedHref("/", locale, null, defaultLocale);
   const propertiesHref = localizedHref("/#propiedades", locale, null, defaultLocale);
   const heroImage = content.hero.imageUrl?.trim() || listings[0]?.photo_url || null;

@@ -32,12 +32,18 @@ import { formatBeigePriceParts, getBeigeUi } from "@/themes/beige/beige-ui";
 
 const SPEC_STAGGER_MS = [0, 80, 160, 240] as const;
 
-export async function BeigeListingDetail({
+export function BeigeListingDetail({
   listing,
   lang,
+  content,
+  config,
+  locale,
 }: ListingDetailThemeProps) {
-  const { content, dict, locale, defaultLocale, showShareButton, siteOrigin } =
-    await getBeigeUi(lang);
+  const { dict, defaultLocale, showShareButton, siteOrigin } = getBeigeUi({
+    content,
+    config,
+    locale,
+  });
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const specs = listingPublicSpecsLocalized(listing, dict);

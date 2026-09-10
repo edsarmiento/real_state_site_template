@@ -1,12 +1,12 @@
-import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import {
   getDictionary,
-  resolveRequestLocale,
   type SiteDictionary,
   type SiteLocale,
   type SiteLocaleConfig,
 } from "@/lib/site-i18n";
 import type { ResolvedSiteConfig } from "@/lib/site-config-types";
+import { resolveThemeProps } from "@/themes/resolve-theme-props";
+import type { ThemeResolvedProps } from "@/themes/theme-types";
 
 export type SiteUi = {
   config: ResolvedSiteConfig;
@@ -16,10 +16,14 @@ export type SiteUi = {
   dict: SiteDictionary;
 };
 
-export async function getSiteUi(lang?: string): Promise<SiteUi> {
-  const config = await getResolvedSiteConfig();
-  const locale = resolveRequestLocale(lang, config.locale);
-
+/**
+ * Pure derivation of default-theme UI values from already-resolved props.
+ * Does not fetch SiteConfig.
+ */
+export function getSiteUiFromResolved({
+  config,
+  locale,
+}: ThemeResolvedProps): SiteUi {
   return {
     config,
     locale,
@@ -27,4 +31,9 @@ export async function getSiteUi(lang?: string): Promise<SiteUi> {
     localeConfig: config.locale,
     dict: getDictionary(locale),
   };
+}
+
+/** Async loader for chrome (SiteHeader/SiteFooter) that still takes `lang`. */
+export async function getSiteUi(lang?: string): Promise<SiteUi> {
+  return getSiteUiFromResolved(await resolveThemeProps(lang));
 }

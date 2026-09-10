@@ -3,11 +3,14 @@ import { LuxuryShell } from "@/themes/luxury/luxury-shell";
 import { getLuxuryUi } from "@/themes/luxury/luxury-ui";
 import type { ListingLoadErrorThemeProps } from "@/themes/theme-types";
 
-export async function LuxuryListingLoadError({
+export function LuxuryListingLoadError({
   status,
   lang,
+  content,
+  config,
+  locale,
 }: ListingLoadErrorThemeProps) {
-  const { dict } = await getLuxuryUi(lang);
+  const { dict } = getLuxuryUi({ content, config, locale });
   const message = fillTemplate(dict.results.listingError, { status });
 
   return (

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getPublicSiteContent } from "@/lib/public-site-content";
 import type { LegalPageThemeProps } from "@/themes/theme-types";
 
 const TITLES: Record<LegalPageThemeProps["kind"], string> = {
@@ -10,8 +9,12 @@ const TITLES: Record<LegalPageThemeProps["kind"], string> = {
   cookies: "Política de cookies",
 };
 
-export async function DefaultLegalPage({ kind, lang }: LegalPageThemeProps) {
-  const { legal } = await getPublicSiteContent();
+export function DefaultLegalPage({
+  kind,
+  lang,
+  content,
+}: LegalPageThemeProps) {
+  const { legal } = content;
 
   return (
     <div className="min-h-screen bg-zinc-50">

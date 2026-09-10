@@ -4,8 +4,14 @@ import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
 import { BeigeShell } from "@/themes/beige/beige-shell";
 
-export async function BeigeLegalPage({ kind, lang }: LegalPageThemeProps) {
-  const { dict } = await getBeigeUi(lang);
+export function BeigeLegalPage({
+  kind,
+  lang,
+  content,
+  config,
+  locale,
+}: LegalPageThemeProps) {
+  const { dict } = getBeigeUi({ content, config, locale });
   const title =
     kind === "privacy"
       ? dict.legal.privacyTitle

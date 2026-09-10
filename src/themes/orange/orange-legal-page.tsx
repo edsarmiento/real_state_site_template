@@ -1,18 +1,17 @@
+import type { LegalPageThemeProps } from "@/themes/theme-types";
 import { getOrangeUi } from "@/themes/orange/orange-ui";
 import { OrangeFooter } from "@/themes/orange/orange-footer";
 import { OrangeHeader } from "@/themes/orange/orange-header";
 import { OrangeShell } from "@/themes/orange/orange-shell";
 
-type Kind = "privacy" | "terms" | "cookies";
-
-export async function OrangeLegalPage({
+export function OrangeLegalPage({
   kind,
   lang,
-}: {
-  kind: Kind;
-  lang?: string;
-}) {
-  const { dict } = await getOrangeUi(lang);
+  content,
+  config,
+  locale,
+}: LegalPageThemeProps) {
+  const { dict } = getOrangeUi({ content, config, locale });
   const title =
     kind === "privacy"
       ? dict.legal.privacyTitle

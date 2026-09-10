@@ -22,12 +22,14 @@ import { UltraReveal } from "@/themes/ultra/ultra-reveal";
 import { UltraShell } from "@/themes/ultra/ultra-shell";
 import { getUltraUi } from "@/themes/ultra/ultra-ui";
 
-export async function UltraListingDetail({
+export function UltraListingDetail({
   listing,
   lang,
+  content,
+  config,
+  locale,
 }: ListingDetailThemeProps) {
-  const { content, dict, locale, defaultLocale, config } =
-    await getUltraUi(lang);
+  const { dict, defaultLocale } = getUltraUi({ content, config, locale });
   const copy = getUltraCopy(locale);
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);

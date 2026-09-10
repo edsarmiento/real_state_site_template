@@ -5,11 +5,14 @@ import { UltraShell } from "@/themes/ultra/ultra-shell";
 import { getUltraUi } from "@/themes/ultra/ultra-ui";
 import type { ListingLoadErrorThemeProps } from "@/themes/theme-types";
 
-export async function UltraListingLoadError({
+export function UltraListingLoadError({
   status,
   lang,
+  content,
+  config,
+  locale,
 }: ListingLoadErrorThemeProps) {
-  const { dict } = await getUltraUi(lang);
+  const { dict } = getUltraUi({ content, config, locale });
   const message = fillTemplate(dict.results.listingError, { status });
 
   return (

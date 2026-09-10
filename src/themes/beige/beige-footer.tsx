@@ -5,14 +5,14 @@ import { BEIGE_LOGO_FOOTER_CLASS } from "@/themes/beige/beige-display";
 import { BeigeLogo } from "@/themes/beige/beige-logo";
 import { BeigeReveal } from "@/themes/beige/beige-reveal";
 import { BeigeSocialLinks } from "@/themes/beige/beige-social-links";
-import { beigeNavLinks, getBeigeUi } from "@/themes/beige/beige-ui";
+import { beigeNavLinks, loadBeigeUi } from "@/themes/beige/beige-ui";
 
 type Props = {
   lang?: string;
 };
 
 export async function BeigeFooter({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
+  const { content, dict, locale, defaultLocale } = await loadBeigeUi(lang);
   const { brand, footer, legal, social, contact } = content;
   const links = beigeNavLinks(dict, locale, defaultLocale);
   const whatsappHref = beigeContactChannels(content).whatsappHref;

@@ -26,7 +26,7 @@ import {
 import { BeigeShell } from "@/themes/beige/beige-shell";
 import { getBeigeUi } from "@/themes/beige/beige-ui";
 
-export async function BeigeCatalog({
+export function BeigeCatalog({
   oferta,
   city,
   propertyType,
@@ -41,8 +41,11 @@ export async function BeigeCatalog({
   catalogStatus,
   lang,
   heroPhotoUrls,
+  content,
+  config,
+  locale,
 }: CatalogThemeProps) {
-  const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
+  const { dict, defaultLocale } = getBeigeUi({ content, config, locale });
   const collage = (heroPhotoUrls ?? []).slice(0, 3);
   const locations =
     content.locations.length > 0
