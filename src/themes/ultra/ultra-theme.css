@@ -1893,6 +1893,11 @@ html:has([data-site-theme="ultra"])::-webkit-scrollbar-thumb {
   transform: scale(1.08);
 }
 
+[data-site-theme="ultra"] .ultra-social-icon:focus-visible {
+  outline: 2px solid var(--ultra-gold);
+  outline-offset: 3px;
+}
+
 [data-site-theme="ultra"] .ultra-footer__bottom {
   margin-top: 2rem;
   padding: 1.1rem 1.5rem;
@@ -1932,6 +1937,11 @@ html:has([data-site-theme="ultra"])::-webkit-scrollbar-thumb {
 [data-site-theme="ultra"] .ultra-whatsapp-float:hover,
 [data-site-theme="ultra"] .ultra-whatsapp-float:focus-visible {
   transform: translateY(-2px) scale(1.04);
+}
+
+[data-site-theme="ultra"] .ultra-whatsapp-float:focus-visible {
+  outline: 2px solid var(--ultra-gold);
+  outline-offset: 3px;
 }
 
 [data-site-theme="ultra"] .ultra-whatsapp-float--raised {
