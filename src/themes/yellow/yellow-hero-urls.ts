@@ -1,5 +1,12 @@
+function isYellowListingCard(value: unknown): boolean {
+  if (value == null || typeof value !== "object") return false;
+  const photo = (value as { photo_url?: unknown }).photo_url;
+  return photo == null || typeof photo === "string";
+}
+
 export function yellowSafeListingArray<T>(value: unknown): T[] {
-  return Array.isArray(value) ? (value as T[]) : [];
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is T => isYellowListingCard(item));
 }
 
 /**

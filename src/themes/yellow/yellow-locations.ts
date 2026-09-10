@@ -80,13 +80,3 @@ export function yellowLocationGridClass(total: number): string {
 export function yellowEditorialIndex(index: number): string {
   return String(Math.max(0, index) + 1).padStart(2, "0");
 }
-
-export function yellowCityListingCount(
-  city: string,
-  listings: YellowListingPlace[] | null | undefined,
-): number {
-  if (!city || !Array.isArray(listings)) return 0;
-  return listings.filter((listing) =>
-    yellowCitiesMatch(listing.city || "", city),
-  ).length;
-}

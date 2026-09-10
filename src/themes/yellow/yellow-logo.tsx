@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { brandInitial } from "@/themes/yellow/yellow-display";
 
 type Props = {
   src: string;
@@ -25,7 +26,11 @@ export function YellowLogo({ src, alt, className, fallbackClassName }: Props) {
 function YellowLogoInner({ src, alt, className, fallbackClassName }: Props) {
   const [failed, setFailed] = useState(false);
   if (!src || failed) {
-    return <span className={fallbackClassName}>{alt}</span>;
+    return (
+      <span className={fallbackClassName} aria-hidden>
+        {brandInitial(alt) || "·"}
+      </span>
+    );
   }
   return (
     // eslint-disable-next-line @next/next/no-img-element

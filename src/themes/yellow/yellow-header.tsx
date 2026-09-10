@@ -51,7 +51,7 @@ export async function YellowHeader({ lang }: Props) {
               src={brand.logoUrl}
               alt={brand.name}
               className={YELLOW_LOGO_NAV_CLASS}
-              fallbackClassName="yellow-logo-fallback"
+              fallbackClassName="yellow-logo-mark"
             />
           ) : (
             <span className="yellow-logo-mark" aria-hidden={Boolean(brand.name)}>

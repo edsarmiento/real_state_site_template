@@ -24,7 +24,6 @@ import {
   YellowIconWhatsApp,
 } from "@/themes/yellow/yellow-icons";
 import {
-  yellowCityListingCount,
   yellowEditorialIndex,
   yellowLocationGridClass,
   yellowLocationSlot,
@@ -106,17 +105,6 @@ export function YellowLocations({
                   name: location.name,
                 });
             const slot = yellowLocationSlot(index, items.length);
-            const listingCount = yellowCityListingCount(
-              location.filter.city ?? location.name,
-              listings,
-            );
-            let countLabel: string | null = null;
-            if (listingCount === 1) countLabel = dict.results.one;
-            else if (listingCount > 1) {
-              countLabel = fillTemplate(dict.results.many, {
-                count: listingCount,
-              });
-            }
 
             return (
               <li
@@ -151,11 +139,6 @@ export function YellowLocations({
                       <h3 className="yellow-location-card__name">
                         {location.name}
                       </h3>
-                      {countLabel ? (
-                        <p className="yellow-location-card__count">
-                          {countLabel}
-                        </p>
-                      ) : null}
                       <span className="yellow-location-card__line" aria-hidden />
                       <span className="yellow-location-cta">
                         {dict.locations.cta}
@@ -212,19 +195,13 @@ export function YellowAbout({
         </YellowReveal>
         <YellowReveal variant="right">
           <div className="yellow-about__cta">
-            {content.about.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={content.about.imageUrl}
-                alt=""
-                className="yellow-about__image"
-                loading="lazy"
-              />
-            ) : (
-              <span className="yellow-about__icon" aria-hidden>
-                <YellowIconHome className="h-10 w-10" />
-              </span>
-            )}
+            <YellowCoverImage
+              src={content.about.imageUrl}
+              alt=""
+              className="yellow-about__image"
+              placeholderClassName="yellow-about__icon"
+              placeholder={<YellowIconHome className="h-10 w-10" />}
+            />
             <h3 className="yellow-about__cta-title">{dict.finalCta.title}</h3>
             <p className="yellow-lead">
               {fillTemplate(dict.finalCta.description, {

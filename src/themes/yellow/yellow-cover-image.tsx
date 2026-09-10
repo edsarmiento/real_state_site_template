@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 type Props = {
   src: string | null | undefined;
   alt: string;
   className: string;
   placeholderClassName: string;
-  placeholder: string;
+  placeholder: ReactNode;
 };
 
 export function YellowCoverImage({
@@ -40,8 +40,10 @@ function YellowCoverImageInner({
   const [failed, setFailed] = useState(false);
 
   if (!src || failed) {
+    const announce =
+      typeof placeholder === "string" && placeholder.trim() !== "";
     return (
-      <div className={placeholderClassName} aria-hidden={!placeholder}>
+      <div className={placeholderClassName} aria-hidden={!announce}>
         {placeholder}
       </div>
     );

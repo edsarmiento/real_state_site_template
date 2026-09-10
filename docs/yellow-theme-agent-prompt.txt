@@ -30,12 +30,10 @@ Pre-requisitos API + Ops (completar antes del handoff)
   [ ] real_state_api: specs + BUSINESS_RULES.md §SiteConfig
   [ ] real_state_frontend: OpsSiteConfigLayout + opcion en LAYOUT_OPTIONS
 
-Estado al implementar el template (2026-09-09): los repos
-`real_state_api` y `real_state_frontend` no estan en este worktree
-(`/Users/deliaescobar/projects/RentaFacil/real_state_api` y
-`/Users/deliaescobar/projects/RentaFacil/real_state_frontend` no existen).
-El theme se registra en el template; no se podra activar desde Ops hasta
-coordinar LAYOUT_KEYS + selector. Sin override permanente de SiteConfig.
+Estado al implementar el template (2026-09-09): los repos requeridos de
+API y Ops no estan en este worktree. El theme se registra en el template;
+no se podra activar desde Ops hasta coordinar LAYOUT_KEYS + selector.
+Sin override permanente de SiteConfig.
 
 Si algo falta, hacerlo primero o incluirlo en el alcance del agente.
 

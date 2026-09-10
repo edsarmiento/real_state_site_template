@@ -2,8 +2,8 @@
 
 import { useId, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { catalogSearchParams } from "@/lib/catalog-pagination";
 import {
-  catalogOfferQueryValue,
   parseCatalogOfferFilter,
   type CatalogOfferFilter,
 } from "@/lib/listing-types";
@@ -36,14 +36,20 @@ function catalogHref(
   defaultLocale: SiteLocale,
   langFromForm?: string,
 ): string {
-  const params: Record<string, string> = {};
-  if (oferta !== "all") params.oferta = catalogOfferQueryValue(oferta);
-  if (city.trim()) params.city = city.trim();
-  if (propertyType) params.tipo = propertyType;
-  if (bedrooms) params.recamaras = bedrooms;
+  const params = catalogSearchParams({
+    oferta,
+    city,
+    propertyType,
+    bedrooms,
+  });
   const resolved =
     langFromForm === "en" || langFromForm === "es" ? langFromForm : locale;
   return `${localizedHref("/", resolved, params, defaultLocale)}#catalogo`;
+}
+
+function formField(data: FormData, name: string): string {
+  const value = data.get(name);
+  return typeof value === "string" ? value : "";
 }
 
 export function YellowSearch({
@@ -66,9 +72,18 @@ export function YellowSearch({
     { id: "all", label: dict.search.all },
   ];
 
-  function goOffer(next: CatalogOfferFilter) {
+  function goOffer(next: CatalogOfferFilter, form: HTMLFormElement | null) {
+    const data = form ? new FormData(form) : null;
     router.push(
-      catalogHref(next, city, propertyType, bedrooms, locale, defaultLocale),
+      catalogHref(
+        next,
+        data ? formField(data, "city") : city,
+        data ? formField(data, "tipo") : propertyType,
+        data ? formField(data, "recamaras") : bedrooms,
+        locale,
+        defaultLocale,
+        data ? formField(data, "lang") : undefined,
+      ),
       { scroll: false },
     );
   }
@@ -78,13 +93,13 @@ export function YellowSearch({
     const data = new FormData(event.currentTarget);
     router.push(
       catalogHref(
-        parseCatalogOfferFilter(String(data.get("oferta") || "")),
-        String(data.get("city") || ""),
-        String(data.get("tipo") || ""),
-        String(data.get("recamaras") || ""),
+        parseCatalogOfferFilter(formField(data, "oferta")),
+        formField(data, "city"),
+        formField(data, "tipo"),
+        formField(data, "recamaras"),
         locale,
         defaultLocale,
-        String(data.get("lang") || ""),
+        formField(data, "lang"),
       ),
       { scroll: false },
     );
@@ -108,7 +123,7 @@ export function YellowSearch({
               type="button"
               className="yellow-search__pill"
               aria-pressed={oferta === pill.id}
-              onClick={() => goOffer(pill.id)}
+              onClick={(event) => goOffer(pill.id, event.currentTarget.form)}
             >
               {pill.label}
             </button>

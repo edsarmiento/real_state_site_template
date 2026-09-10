@@ -70,6 +70,19 @@ describe("yellowSafeListingArray", () => {
 
   it("keeps a real listings array", () => {
     const listings = [{ photo_url: "https://cdn.example/a.jpg" }];
-    assert.equal(yellowSafeListingArray(listings), listings);
+    assert.deepEqual(yellowSafeListingArray(listings), listings);
+  });
+
+  it("drops null entries and malformed objects", () => {
+    assert.deepEqual(
+      yellowSafeListingArray([
+        null,
+        undefined,
+        "listing",
+        { photo_url: 12 },
+        { photo_url: "https://cdn.example/a.jpg" },
+      ]),
+      [{ photo_url: "https://cdn.example/a.jpg" }],
+    );
   });
 });

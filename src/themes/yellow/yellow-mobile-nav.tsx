@@ -52,11 +52,17 @@ export function YellowMobileNav({
     first?.focus();
 
     function focusables(): HTMLElement[] {
+      const nodes: HTMLElement[] = [];
+      const toggle = toggleRef.current;
+      if (toggle) nodes.push(toggle);
       const root = panelRef.current;
-      if (!root) return [];
-      return [...root.querySelectorAll<HTMLElement>(
+      if (!root) return nodes;
+      for (const node of root.querySelectorAll<HTMLElement>(
         "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])",
-      )];
+      )) {
+        if (node !== toggle) nodes.push(node);
+      }
+      return nodes;
     }
 
     function onKey(event: KeyboardEvent) {

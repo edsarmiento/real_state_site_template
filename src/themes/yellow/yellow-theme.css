@@ -256,8 +256,7 @@ html:has([data-site-theme="yellow"])::-webkit-scrollbar-thumb {
   min-width: 0;
 }
 
-[data-site-theme="yellow"] .yellow-logo--nav,
-[data-site-theme="yellow"] .yellow-logo-fallback {
+[data-site-theme="yellow"] .yellow-logo--nav {
   width: 2.5rem;
   height: 2.5rem;
   object-fit: contain;
@@ -1229,12 +1228,6 @@ html:has([data-site-theme="yellow"])::-webkit-scrollbar-thumb {
   font-weight: 700;
   color: #fff;
   line-height: 1.05;
-}
-
-[data-site-theme="yellow"] .yellow-location-card__count {
-  color: rgb(252 238 167 / 0.92);
-  font-size: 0.8rem;
-  font-weight: 600;
 }
 
 [data-site-theme="yellow"] .yellow-location-card__line {

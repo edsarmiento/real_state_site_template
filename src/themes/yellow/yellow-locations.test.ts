@@ -3,7 +3,6 @@ import { describe, it } from "node:test";
 import {
   yellowCitiesMatch,
   yellowCityKey,
-  yellowCityListingCount,
   yellowEditorialIndex,
   yellowLocationGridClass,
   yellowLocationSlot,
@@ -110,18 +109,5 @@ describe("yellowLocation layout", () => {
     assert.ok(yellowLocationGridClass(5).includes("--bento"));
     assert.equal(yellowEditorialIndex(0), "01");
     assert.equal(yellowEditorialIndex(2), "03");
-  });
-});
-
-describe("yellowCityListingCount", () => {
-  it("counts only exact city matches from real listings", () => {
-    const listings = [
-      { city: "Tijuana, BC" },
-      { city: "Tijuana" },
-      { city: "New York" },
-    ];
-    assert.equal(yellowCityListingCount("Tijuana", listings), 2);
-    assert.equal(yellowCityListingCount("York", listings), 0);
-    assert.equal(yellowCityListingCount("Tijuana", null), 0);
   });
 });
