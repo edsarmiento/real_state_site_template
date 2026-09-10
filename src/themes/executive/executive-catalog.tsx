@@ -26,7 +26,7 @@ import {
   getExecutiveUi,
 } from "@/themes/executive/executive-ui";
 
-export async function ExecutiveCatalog({
+export function ExecutiveCatalog({
   oferta,
   city,
   propertyType,
@@ -39,8 +39,15 @@ export async function ExecutiveCatalog({
   catalogStatus,
   lang,
   heroPhotoUrls,
+  content,
+  config,
+  locale,
 }: CatalogThemeProps) {
-  const { content, dict, copy, locale, defaultLocale } = await getExecutiveUi(lang);
+  const { dict, copy, defaultLocale } = getExecutiveUi({
+    content,
+    config,
+    locale,
+  });
   const locations =
     content.locations.length > 0
       ? content.locations

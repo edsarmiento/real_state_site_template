@@ -34,12 +34,15 @@ function SpecIcon({ specKey }: { specKey: string }) {
   return <ExecutiveIconHome className="h-4 w-4" />;
 }
 
-export async function ExecutiveListingDetail({
+export function ExecutiveListingDetail({
   listing,
   lang,
+  content,
+  config,
+  locale,
 }: ListingDetailThemeProps) {
-  const { content, dict, copy, locale, defaultLocale, showShareButton, siteOrigin } =
-    await getExecutiveUi(lang);
+  const { dict, copy, defaultLocale, showShareButton, siteOrigin } =
+    getExecutiveUi({ content, config, locale });
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const specs = listingPublicSpecsLocalized(listing, dict);

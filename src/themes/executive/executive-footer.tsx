@@ -8,14 +8,14 @@ import {
 } from "@/themes/executive/executive-footer-contact";
 import { ExecutiveLogo } from "@/themes/executive/executive-logo";
 import { ExecutiveSocialLinks } from "@/themes/executive/executive-social-links";
-import { executiveNavLinks, getExecutiveUi } from "@/themes/executive/executive-ui";
+import { executiveNavLinks, loadExecutiveUi } from "@/themes/executive/executive-ui";
 
 type Props = {
   lang?: string;
 };
 
 export async function ExecutiveFooter({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getExecutiveUi(lang);
+  const { content, dict, locale, defaultLocale } = await loadExecutiveUi(lang);
   const { brand, footer, legal, social, contact } = content;
   const links = executiveNavLinks(dict, locale, defaultLocale);
   const contactChannels = executiveFooterContactChannels(

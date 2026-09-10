@@ -120,10 +120,10 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     name: "executive",
     layoutKeys: LAYOUT_KEYS_BY_THEME.executive,
     catalog: EXECUTIVE_CATALOG,
-    Catalog: ExecutiveCatalog,
-    ListingDetail: ExecutiveListingDetail,
-    ListingLoadError: ExecutiveListingLoadError,
-    LegalPage: ExecutiveLegalPage,
+    Catalog: withResolvedThemeProps(ExecutiveCatalog),
+    ListingDetail: withResolvedThemeProps(ExecutiveListingDetail),
+    ListingLoadError: withResolvedThemeProps(ExecutiveListingLoadError),
+    LegalPage: withResolvedThemeProps(ExecutiveLegalPage),
   },
 };
 

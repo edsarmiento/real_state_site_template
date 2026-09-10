@@ -9,7 +9,7 @@ import { ExecutiveMobileNav } from "@/themes/executive/executive-mobile-nav";
 import {
   executiveBrandInitial,
   executiveNavLinks,
-  getExecutiveUi,
+  loadExecutiveUi,
 } from "@/themes/executive/executive-ui";
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
 };
 
 export async function ExecutiveHeader({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getExecutiveUi(lang);
+  const { content, dict, locale, defaultLocale } = await loadExecutiveUi(lang);
   const { brand } = content;
   const links = executiveNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);

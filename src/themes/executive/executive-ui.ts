@@ -1,16 +1,16 @@
-import { getPublicSiteContent } from "@/lib/public-site-content";
-import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
+import type { PublicSiteContent } from "@/lib/public-site-content";
 import {
   getDictionary,
   localizedHref,
-  resolveRequestLocale,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
+import { resolveThemeProps } from "@/themes/resolve-theme-props";
+import type { ThemeResolvedProps } from "@/themes/theme-types";
 import { getExecutiveCopy, type ExecutiveCopy } from "@/themes/executive/executive-copy";
 
 export type ExecutiveUi = {
-  content: Awaited<ReturnType<typeof getPublicSiteContent>>;
+  content: PublicSiteContent;
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   dict: SiteDictionary;
@@ -19,12 +19,15 @@ export type ExecutiveUi = {
   siteOrigin: string;
 };
 
-export async function getExecutiveUi(lang?: string): Promise<ExecutiveUi> {
-  const [content, config] = await Promise.all([
-    getPublicSiteContent(),
-    getResolvedSiteConfig(),
-  ]);
-  const locale = resolveRequestLocale(lang, content.locale);
+/**
+ * Pure derivation of Executive UI values from already-resolved integration props.
+ * Does not fetch SiteConfig or public content.
+ */
+export function getExecutiveUi({
+  content,
+  config,
+  locale,
+}: ThemeResolvedProps): ExecutiveUi {
   return {
     content,
     locale,
@@ -34,6 +37,11 @@ export async function getExecutiveUi(lang?: string): Promise<ExecutiveUi> {
     showShareButton: config.showShareButton,
     siteOrigin: config.siteOrigin,
   };
+}
+
+/** Async loader for chrome (shell/header/footer) that still takes `lang`. */
+export async function loadExecutiveUi(lang?: string): Promise<ExecutiveUi> {
+  return getExecutiveUi(await resolveThemeProps(lang));
 }
 
 export function executiveNavLinks(

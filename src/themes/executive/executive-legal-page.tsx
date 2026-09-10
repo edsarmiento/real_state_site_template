@@ -4,8 +4,14 @@ import { ExecutiveHeader } from "@/themes/executive/executive-header";
 import { ExecutiveShell } from "@/themes/executive/executive-shell";
 import { getExecutiveUi } from "@/themes/executive/executive-ui";
 
-export async function ExecutiveLegalPage({ kind, lang }: LegalPageThemeProps) {
-  const { dict } = await getExecutiveUi(lang);
+export function ExecutiveLegalPage({
+  kind,
+  lang,
+  content,
+  config,
+  locale,
+}: LegalPageThemeProps) {
+  const { dict } = getExecutiveUi({ content, config, locale });
   const title =
     kind === "privacy"
       ? dict.legal.privacyTitle

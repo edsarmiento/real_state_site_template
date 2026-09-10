@@ -5,11 +5,14 @@ import { ExecutiveShell } from "@/themes/executive/executive-shell";
 import { getExecutiveUi } from "@/themes/executive/executive-ui";
 import type { ListingLoadErrorThemeProps } from "@/themes/theme-types";
 
-export async function ExecutiveListingLoadError({
+export function ExecutiveListingLoadError({
   status,
   lang,
+  content,
+  config,
+  locale,
 }: ListingLoadErrorThemeProps) {
-  const { dict } = await getExecutiveUi(lang);
+  const { dict } = getExecutiveUi({ content, config, locale });
   const message = fillTemplate(dict.results.listingError, { status });
 
   return (

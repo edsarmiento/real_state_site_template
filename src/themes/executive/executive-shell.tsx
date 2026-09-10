@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import "./executive-theme.css";
 import { EXECUTIVE_FONT_CLASS } from "@/themes/executive/executive-fonts";
-import { getExecutiveUi } from "@/themes/executive/executive-ui";
+import { loadExecutiveUi } from "@/themes/executive/executive-ui";
 
 type Props = {
   children: ReactNode;
@@ -9,7 +9,7 @@ type Props = {
 };
 
 export async function ExecutiveShell({ children, lang }: Props) {
-  const { locale } = await getExecutiveUi(lang);
+  const { locale } = await loadExecutiveUi(lang);
 
   return (
     <div
