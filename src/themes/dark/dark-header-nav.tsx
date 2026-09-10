@@ -27,7 +27,11 @@ export function DarkHeaderNav({ links, label }: Props) {
     }
     sync();
     window.addEventListener("hashchange", sync);
-    return () => window.removeEventListener("hashchange", sync);
+    window.addEventListener("popstate", sync);
+    return () => {
+      window.removeEventListener("hashchange", sync);
+      window.removeEventListener("popstate", sync);
+    };
   }, []);
 
   return (
@@ -39,6 +43,7 @@ export function DarkHeaderNav({ links, label }: Props) {
           <Link
             key={link.href}
             href={link.href}
+            onNavigate={() => setHash(target)}
             className={active ? "dark-nav-link is-active" : "dark-nav-link"}
             aria-current={active ? "page" : undefined}
           >

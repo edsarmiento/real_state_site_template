@@ -112,8 +112,6 @@ export function DarkMobileNav({
           id={panelId}
           className="dark-mobile-nav__panel"
           aria-label={menuLabel}
-          role="dialog"
-          aria-modal="true"
         >
           {links.map((link) => (
             <Link

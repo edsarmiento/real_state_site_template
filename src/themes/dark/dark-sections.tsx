@@ -683,6 +683,7 @@ export function DarkFinalCta({
               {schedule ? (
                 <a
                   href={schedule}
+                  aria-label={`${dict.contact.scheduleCall}. ${dict.a11y.opensInNewTab}`}
                   className="dark-btn dark-btn--ghost"
                   target="_blank"
                   rel="noopener noreferrer"

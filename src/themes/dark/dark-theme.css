@@ -967,12 +967,12 @@ html:has([data-site-theme="dark"])::-webkit-scrollbar-thumb {
 }
 
 [data-site-theme="dark"] .dark-location-card.is-active {
-  outline: 1px solid color-mix(in srgb, var(--dark-accent) 55%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--dark-gold) 55%, transparent);
   outline-offset: 2px;
 }
 
 [data-site-theme="dark"] .dark-location-card.is-active .dark-location-card__name {
-  color: var(--dark-accent);
+  color: var(--dark-gold);
 }
 
 [data-site-theme="dark"] .dark-location-card {

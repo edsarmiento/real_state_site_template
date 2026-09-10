@@ -1,11 +1,13 @@
 "use client";
 
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   darkCatalogHashTarget,
   focusDarkCatalogSection,
 } from "@/themes/dark/dark-catalog-hash";
+
+const useBeforePaintEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -20,16 +22,14 @@ export function DarkCatalogHashScroll() {
   const searchParams = useSearchParams();
   const query = searchParams.toString();
 
-  useLayoutEffect(() => {
-    const target = darkCatalogHashTarget(window.location.hash);
-    if (!target) return;
+  useBeforePaintEffect(() => {
 
     let cancelled = false;
     let raf = 0;
     let frames = 0;
 
     const run = () => {
-      if (cancelled) return;
+      if (cancelled || !darkCatalogHashTarget(window.location.hash)) return;
       const ok = focusDarkCatalogSection(document, {
         prefersReducedMotion: prefersReducedMotion(),
       });
@@ -40,6 +40,7 @@ export function DarkCatalogHashScroll() {
     run();
 
     function onHashChange() {
+      window.cancelAnimationFrame(raf);
       frames = 0;
       run();
     }

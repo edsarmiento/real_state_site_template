@@ -1,5 +1,7 @@
 "use client";
 
+import type { SiteThemeName } from "@/themes/theme-definitions";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ListingPhotoGalleryStrip } from "@/components/listing-photo-gallery-strip";
 import {
@@ -32,7 +34,7 @@ type Props = {
   stripChrome?: ListingGalleryStripChrome;
   locale?: SiteLocale;
   /** Theme attribute on the strip lightbox portal for scoped CSS. */
-  portalSiteTheme?: string;
+  portalSiteTheme?: SiteThemeName;
 };
 
 function ChevronLeft({ className }: { className?: string }) {

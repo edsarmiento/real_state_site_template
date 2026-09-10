@@ -1,19 +1,14 @@
+import { specIcon } from "@/themes/dark/dark-spec-icon";
 import Link from "next/link";
 import {
   listingPublicSpecsLocalized,
   publicListingCardModel,
   type PublicListingCard,
 } from "@/lib/listing-types";
-import { fillTemplate, type SiteDictionary, type SiteLocale } from "@/lib/site-i18n";
+import type { SiteDictionary, SiteLocale } from "@/lib/site-i18n";
 import { DarkCoverImage } from "@/themes/dark/dark-cover-image";
 import { displayListingTitle } from "@/themes/dark/dark-copy";
-import {
-  DarkIconArrowUpRight,
-  DarkIconBath,
-  DarkIconBed,
-  DarkIconHome,
-  DarkIconMaximize,
-} from "@/themes/dark/dark-icons";
+import { DarkIconArrowUpRight } from "@/themes/dark/dark-icons";
 import { DarkReveal } from "@/themes/dark/dark-reveal";
 import { formatDarkPriceParts } from "@/themes/dark/dark-ui";
 
@@ -24,13 +19,6 @@ type Props = {
   dict: SiteDictionary;
   index?: number;
 };
-
-function specIcon(key: string) {
-  if (key === "bedrooms") return DarkIconBed;
-  if (key === "bathrooms") return DarkIconBath;
-  if (key === "land" || key === "built") return DarkIconMaximize;
-  return DarkIconHome;
-}
 
 export function DarkListingCard({
   listing,
@@ -56,13 +44,7 @@ export function DarkListingCard({
 
   return (
     <DarkReveal variant="up" delayMs={(index % 3) * 150}>
-      <Link
-        href={href}
-        className="dark-card"
-        aria-label={fillTemplate(dict.listing.viewPropertyAria, {
-          title: listing.title,
-        })}
-      >
+      <Link href={href} className="dark-card">
         <DarkCoverImage
           src={listing.photo_url}
           alt={listing.title}
@@ -72,7 +54,7 @@ export function DarkListingCard({
         />
         <span className="dark-card__badge">{offerLabel}</span>
         {specs.length > 0 ? (
-          <ul className="dark-card__specs" aria-hidden>
+          <ul className="dark-card__specs">
             {specs.map((spec) => {
               const Icon = specIcon(spec.key);
               return (

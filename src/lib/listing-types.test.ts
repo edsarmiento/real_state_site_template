@@ -12,7 +12,7 @@ describe("listingGalleryUrls", () => {
     assert.deepEqual(
       listingGalleryUrls({
         photo_url: null,
-        photos: [{ id: 1, url: null, position: 0 }],
+        photos: [{ url: null, position: 0 }],
       }),
       [],
     );
@@ -23,9 +23,9 @@ describe("listingGalleryUrls", () => {
       listingGalleryUrls({
         photo_url: signed("cover.jpg", "a"),
         photos: [
-          { id: 2, url: signed("two.jpg", "b"), position: 1 },
-          { id: 1, url: signed("cover.jpg", "a"), position: 0 },
-          { id: 3, url: signed("three.jpg", "c"), position: 2 },
+          { url: signed("two.jpg", "b"), position: 1 },
+          { url: signed("cover.jpg", "a"), position: 0 },
+          { url: signed("three.jpg", "c"), position: 2 },
         ],
       }),
       [
@@ -47,7 +47,7 @@ describe("listingGalleryUrls", () => {
     assert.equal(
       listingGalleryUrls({
         photo_url: cover,
-        photos: [{ id: 1, url: cover, position: 0 }],
+        photos: [{ url: cover, position: 0 }],
       }).length,
       1,
     );
@@ -55,8 +55,8 @@ describe("listingGalleryUrls", () => {
       listingGalleryUrls({
         photo_url: cover,
         photos: [
-          { id: 1, url: cover, position: 0 },
-          { id: 2, url: signed("two.jpg", "b"), position: 1 },
+          { url: cover, position: 0 },
+          { url: signed("two.jpg", "b"), position: 1 },
         ],
       }).length,
       2,
@@ -65,9 +65,9 @@ describe("listingGalleryUrls", () => {
       listingGalleryUrls({
         photo_url: cover,
         photos: [
-          { id: 1, url: cover, position: 0 },
-          { id: 2, url: signed("two.jpg", "b"), position: 1 },
-          { id: 3, url: signed("three.jpg", "c"), position: 2 },
+          { url: cover, position: 0 },
+          { url: signed("two.jpg", "b"), position: 1 },
+          { url: signed("three.jpg", "c"), position: 2 },
         ],
       }).length,
       3,
@@ -79,10 +79,10 @@ describe("listingGalleryUrls", () => {
       listingGalleryUrls({
         photo_url: signed("cover.jpg", "old"),
         photos: [
-          { id: 1, url: signed("cover.jpg", "new"), position: 0 },
-          { id: 2, url: "  ", position: 1 },
-          { id: 3, url: null, position: 2 },
-          { id: 4, url: signed("two.jpg", "x"), position: 3 },
+          { url: signed("cover.jpg", "new"), position: 0 },
+          { url: "  ", position: 1 },
+          { url: null, position: 2 },
+          { url: signed("two.jpg", "x"), position: 3 },
         ],
       }),
       [signed("cover.jpg", "old"), signed("two.jpg", "x")],

@@ -41,6 +41,17 @@ describe("keepValidPublicListings", () => {
     );
   });
 
+  it("rejects incomplete cards and invalid rendering fields", () => {
+    for (const field of ["city", "currency", "location_label", "photo_url", "agency_name"]) {
+      const card: Record<string, unknown> = { ...validListing };
+      delete card[field];
+      assert.deepEqual(keepValidPublicListings([card]), [], field);
+      card[field] = 42;
+      assert.deepEqual(keepValidPublicListings([card]), [], field);
+    }
+    assert.deepEqual(keepValidPublicListings([{ ...validListing, photo_url: null }]), [{ ...validListing, photo_url: null }]);
+  });
+
   it("returns an empty list when listings is missing or not an array", () => {
     assert.deepEqual(keepValidPublicListings(null), []);
     assert.deepEqual(keepValidPublicListings(undefined), []);

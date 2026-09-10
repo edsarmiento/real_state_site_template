@@ -13,7 +13,6 @@ Variables
   ThemeName         Dark
   THEME_LABEL       Dark — editorial midnight / rust / gold
   REFERENCE_HTML    2 deo_real_estate_dark.html
-                    Ruta de origen: /Users/deliaescobar/Downloads/2 deo_real_estate_dark.html
   REFERENCE_THEME   default (secciones de marketing al estilo catálogo: hero, resultados,
                     ubicaciones, about, proceso, testimonios si hay datos, contacto, CTA, ficha)
   STYLED_LAYOUT     true

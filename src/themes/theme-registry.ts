@@ -1,3 +1,6 @@
+import { createElement } from "react";
+import { fetchDarkLocationListings } from "@/themes/dark/dark-location-listings";
+import { getDarkUi } from "@/themes/dark/dark-ui";
 import { BeigeCatalog } from "@/themes/beige/beige-catalog";
 import { BeigeListingDetail } from "@/themes/beige/beige-listing-detail";
 import { BeigeListingLoadError } from "@/themes/beige/beige-listing-load-error";
@@ -134,7 +137,13 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     name: "dark",
     layoutKeys: LAYOUT_KEYS_BY_THEME.dark,
     catalog: DARK_CATALOG,
-    Catalog: DarkCatalog,
+    Catalog: async (props) => {
+      const { content } = await getDarkUi(props.lang);
+      const locationListings = content.locations.length > 0
+        ? props.listings
+        : await fetchDarkLocationListings();
+      return createElement(DarkCatalog, { ...props, locationListings });
+    },
     ListingDetail: DarkListingDetail,
     ListingLoadError: DarkListingLoadError,
     LegalPage: DarkLegalPage,

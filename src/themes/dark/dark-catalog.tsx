@@ -14,7 +14,6 @@ import { resolveDarkHeroImage } from "@/themes/dark/dark-hero-media";
 import { DarkHeroImage } from "@/themes/dark/dark-hero-image";
 import { darkHeroTitleParts } from "@/themes/dark/dark-hero-title";
 import { keepValidPublicListings } from "@/themes/dark/dark-listings";
-import { fetchDarkLocationListings } from "@/themes/dark/dark-location-listings";
 import { resolveDarkLocations } from "@/themes/dark/dark-locations";
 import { DarkListingCard } from "@/themes/dark/dark-listing-card";
 import { DarkPagination } from "@/themes/dark/dark-pagination";
@@ -60,6 +59,7 @@ export async function DarkCatalog({
   propertyType,
   bedrooms,
   listings,
+  locationListings = [],
   total,
   page = 1,
   pageSize = 12,
@@ -72,17 +72,7 @@ export async function DarkCatalog({
 }: CatalogThemeProps) {
   const { content, dict, locale, defaultLocale } = await getDarkUi(lang);
   const validListings = keepValidPublicListings(listings);
-  const hasCatalogFilters =
-    oferta !== "all" ||
-    Boolean(city.trim()) ||
-    Boolean(propertyType.trim()) ||
-    Boolean(bedrooms.trim());
-  const locationSourceListings =
-    content.locations.length > 0
-      ? validListings
-      : hasCatalogFilters
-        ? keepValidPublicListings(await fetchDarkLocationListings())
-        : validListings;
+  const locationSourceListings = keepValidPublicListings(locationListings);
   const { locations, inconsistencies } = resolveDarkLocations(
     content.locations,
     locationSourceListings,
@@ -205,14 +195,12 @@ export async function DarkCatalog({
                   {dict.results.emptyTitle}
                 </h2>
                 <p className="dark-lead">
-                  {dict.results.emptyCopy}
-                  {emptyKind ? ` ${emptyKind}` : ""}
-                  {city ? ` ${fillTemplate(dict.results.inPlace, { city })}` : ""}
-                  {localizedType ? ` · ${localizedType}` : ""}
-                  {bedrooms
-                    ? ` · ${fillTemplate(dict.results.bedroomsFilter, { count: bedrooms })}`
-                    : ""}
-                  .
+                  {fillTemplate(dict.results.emptyFiltered, {
+                    emptyKind: emptyKind ? ` ${emptyKind}` : "",
+                    city: city ? ` ${fillTemplate(dict.results.inPlace, { city })}` : "",
+                    localizedType: localizedType ? ` · ${localizedType}` : "",
+                    bedrooms: bedrooms ? ` · ${fillTemplate(dict.results.bedroomsFilter, { count: bedrooms })}` : "",
+                  })}
                 </p>
                 <Link href={clearCatalogHref} className="dark-btn" scroll={false}>
                   {dict.results.clearFilters}

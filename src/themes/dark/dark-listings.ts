@@ -17,7 +17,12 @@ export function isPublicListingCard(value: unknown): value is PublicListingCard 
     typeof item.rent_cents === "number" &&
     Number.isFinite(item.rent_cents) &&
     (item.offer_type === "rent" || item.offer_type === "sale") &&
-    typeof item.property_type === "string"
+    typeof item.property_type === "string" &&
+    typeof item.city === "string" &&
+    typeof item.currency === "string" &&
+    typeof item.location_label === "string" &&
+    (item.photo_url === null || typeof item.photo_url === "string") &&
+    typeof item.agency_name === "string"
   );
 }
 

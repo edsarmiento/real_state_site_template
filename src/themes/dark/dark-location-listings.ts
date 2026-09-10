@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { publicApiFetch } from "@/lib/public-api-fetch";
+import { classifyPublicApiFetchError, publicApiFetch } from "@/lib/public-api-fetch";
 import type { PublicListingCard } from "@/lib/listing-types";
 
 /**
@@ -9,12 +9,17 @@ import type { PublicListingCard } from "@/lib/listing-types";
  */
 export const fetchDarkLocationListings = cache(
   async (): Promise<PublicListingCard[]> => {
-    const result = await publicApiFetch<{
-      listings: PublicListingCard[];
-    }>("/api/public/listings?limit=48&offset=0", {
-      signal: AbortSignal.timeout(3000),
-    });
-    if (!result.ok || !Array.isArray(result.data.listings)) return [];
-    return result.data.listings;
+    try {
+      const result = await publicApiFetch<{
+        listings: PublicListingCard[];
+      }>("/api/public/listings?limit=48&offset=0", {
+        signal: AbortSignal.timeout(3000),
+      });
+      if (!result.ok || !Array.isArray(result.data?.listings)) return [];
+      return result.data.listings;
+    } catch (error) {
+      if (classifyPublicApiFetchError(error) === "aborted") return [];
+      throw error;
+    }
   },
 );

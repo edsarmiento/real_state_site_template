@@ -1,5 +1,5 @@
 /**
- * One-off Dark theme visual smoke (not a committed test suite).
+ * Dark theme visual smoke.
  * Usage: node scripts/smoke-dark-visual.mjs
  */
 import fs from "node:fs";
@@ -82,9 +82,6 @@ async function main() {
       waitUntil: "networkidle2",
     });
     const emptyText = await page.evaluate(() => document.body.innerText);
-    const emptyOk =
-      /0 |sin resultados|no hay|no se encontr|empty|ningun/i.test(emptyText) ||
-      !document.querySelector?.(".dark-card");
     // re-check cards
     const emptyCards = await page.$$(".dark-card");
     note(
@@ -426,27 +423,29 @@ async function main() {
       JSON.stringify(focusTag),
     );
     await shot(page, "listing-focus-1440");
+  } catch (error) {
+    note("smoke-error", "FAIL", String(error));
+    throw error;
   } finally {
+    const report = {
+      base: BASE,
+      generatedAt: new Date().toISOString(),
+      findings,
+      summary: {
+        pass: findings.filter((f) => f.status === "PASS").length,
+        fail: findings.filter((f) => f.status === "FAIL").length,
+        warn: findings.filter((f) => f.status === "WARN").length,
+        skip: findings.filter((f) => f.status === "SKIP").length,
+      },
+    };
+    fs.writeFileSync(
+      path.join(OUT, "results.json"),
+      JSON.stringify(report, null, 2),
+    );
+    console.log("\nSUMMARY", report.summary);
+    if (report.summary.fail > 0) process.exitCode = 1;
     await browser.close();
   }
-
-  const report = {
-    base: BASE,
-    generatedAt: new Date().toISOString(),
-    findings,
-    summary: {
-      pass: findings.filter((f) => f.status === "PASS").length,
-      fail: findings.filter((f) => f.status === "FAIL").length,
-      warn: findings.filter((f) => f.status === "WARN").length,
-      skip: findings.filter((f) => f.status === "SKIP").length,
-    },
-  };
-  fs.writeFileSync(
-    path.join(OUT, "results.json"),
-    JSON.stringify(report, null, 2),
-  );
-  console.log("\nSUMMARY", report.summary);
-  if (report.summary.fail > 0) process.exitCode = 1;
 }
 
 main().catch((err) => {

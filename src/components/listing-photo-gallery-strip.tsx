@@ -1,5 +1,7 @@
 "use client";
 
+import type { SiteThemeName } from "@/themes/theme-definitions";
+
 import {
   useCallback,
   useEffect,
@@ -28,7 +30,7 @@ type Props = {
   chrome: ListingGalleryStripChrome;
   className?: string;
   /** Set on the lightbox portal root for theme-scoped CSS (e.g. "dark"). */
-  portalSiteTheme?: string;
+  portalSiteTheme?: SiteThemeName;
 };
 
 function Chevron({
@@ -139,18 +141,24 @@ export function ListingPhotoGalleryStrip({
       const node = slideRefs.current[index];
       const strip = stripRef.current;
       if (!node || !strip) return;
-      const targetLeft = node.offsetLeft;
+      const targetLeft = Math.max(
+        0,
+        Math.min(node.offsetLeft, strip.scrollWidth - strip.clientWidth),
+      );
       ignoreScrollSyncRef.current = true;
       if (scrollSyncTimerRef.current) clearTimeout(scrollSyncTimerRef.current);
       strip.scrollTo({ left: targetLeft, behavior });
 
+      let attempts = 0;
       const settle = () => {
-        if (Math.abs(strip.scrollLeft - targetLeft) > 2) {
+        if (Math.abs(strip.scrollLeft - targetLeft) > 2 && attempts++ < 25) {
           scrollSyncTimerRef.current = setTimeout(settle, 40);
           return;
         }
         ignoreScrollSyncRef.current = false;
-        setActiveIndex(index);
+        scrollSyncTimerRef.current = null;
+        if (Math.abs(strip.scrollLeft - targetLeft) <= 2) setActiveIndex(index);
+        else strip.dispatchEvent(new Event("scroll"));
       };
       scrollSyncTimerRef.current = setTimeout(settle, behavior === "auto" ? 16 : 120);
     },
@@ -264,9 +272,16 @@ export function ListingPhotoGalleryStrip({
     return () => strip.removeEventListener("scroll", syncActiveFromScroll);
   }, [lightboxOpen, count]);
 
+  const activeRatio = ratios[activeIndex];
+  const previousLayoutRef = useRef<{ index: number; ratio: number | undefined } | null>(null);
   useLayoutEffect(() => {
-    scrollToIndex(activeIndexRef.current, "auto");
-  }, [ratios, scrollToIndex]);
+    const previous = previousLayoutRef.current;
+    previousLayoutRef.current = { index: activeIndex, ratio: activeRatio };
+    // A new active index can come from manual scrolling: do not snap it back.
+    if (previous?.index === activeIndex && previous.ratio !== activeRatio) {
+      scrollToIndex(activeIndex, "auto");
+    }
+  }, [activeIndex, activeRatio, scrollToIndex]);
 
   const rootClass = ["listing-gallery", "listing-gallery--strip", className]
     .filter(Boolean)

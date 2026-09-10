@@ -1,4 +1,4 @@
-import type { SiteLocale } from "@/lib/site-i18n";
+import { getDictionary, type SiteLocale } from "@/lib/site-i18n";
 
 export type ListingGalleryStripChrome = {
   viewAll: string;
@@ -9,18 +9,8 @@ export type ListingGalleryStripChrome = {
 export function listingGalleryStripChrome(
   locale: SiteLocale,
 ): ListingGalleryStripChrome {
-  if (locale === "en") {
-    return {
-      viewAll: "View all photos",
-      close: "Close",
-      lightbox: "Photo viewer",
-    };
-  }
-  return {
-    viewAll: "Ver todas las fotos",
-    close: "Cerrar",
-    lightbox: "Visor de fotos",
-  };
+  const { viewAll, close, lightbox } = getDictionary(locale).listing.gallery;
+  return { viewAll, close, lightbox };
 }
 
 /** Fallback ratio before natural dimensions load (landscape bias). */

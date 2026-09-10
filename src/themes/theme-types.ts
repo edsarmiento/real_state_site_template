@@ -29,6 +29,8 @@ export type CatalogThemeRouteProps = {
   propertyType: string;
   bedrooms: string;
   listings: PublicListingCard[];
+  /** Unfiltered cards resolved before the theme renders location links. */
+  locationListings?: PublicListingCard[];
   total: number;
   page?: number;
   pageSize?: number;

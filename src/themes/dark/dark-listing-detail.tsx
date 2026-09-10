@@ -1,3 +1,4 @@
+import { specIcon } from "@/themes/dark/dark-spec-icon";
 import Link from "next/link";
 import { ListingInquiryForm } from "@/components/listing-inquiry-form";
 import { ListingShareButton } from "@/components/listing-share-button";
@@ -18,12 +19,8 @@ import { ListingPhotoGallery } from "@/components/listing-photo-gallery";
 import { DarkReveal } from "@/themes/dark/dark-reveal";
 import {
   DarkIconArrowLeft,
-  DarkIconBath,
-  DarkIconBed,
   DarkIconExternal,
-  DarkIconHome,
   DarkIconMapPin,
-  DarkIconMaximize,
   DarkIconWhatsApp,
 } from "@/themes/dark/dark-icons";
 import { DarkShell } from "@/themes/dark/dark-shell";
@@ -112,6 +109,7 @@ export async function DarkListingDetail({
                     fallbackUrl={listing.photo_url}
                     labels={dict.listing.gallery}
                     locale={locale}
+                    stripChrome={dict.listing.gallery}
                     portalSiteTheme="dark"
                   />
                   <span className="dark-gallery__badge">{offerLabel}</span>
@@ -120,23 +118,18 @@ export async function DarkListingDetail({
 
               {specs.length > 0 ? (
                 <dl className="dark-detail__specs">
-                  {specs.map((spec) => (
-                    <div key={spec.key} className="dark-detail__spec">
-                      <dt>
-                        {spec.key === "bedrooms" ? (
-                          <DarkIconBed className="dark-detail__spec-icon" />
-                        ) : spec.key === "bathrooms" ? (
-                          <DarkIconBath className="dark-detail__spec-icon" />
-                        ) : spec.key === "land" || spec.key === "built" ? (
-                          <DarkIconMaximize className="dark-detail__spec-icon" />
-                        ) : (
-                          <DarkIconHome className="dark-detail__spec-icon" />
-                        )}
-                        {dict.listing.specs[spec.key]}
-                      </dt>
-                      <dd>{spec.value}</dd>
-                    </div>
-                  ))}
+                  {specs.map((spec) => {
+                    const Icon = specIcon(spec.key);
+                    return (
+                      <div key={spec.key} className="dark-detail__spec">
+                        <dt>
+                          <Icon className="dark-detail__spec-icon" />
+                          {dict.listing.specs[spec.key]}
+                        </dt>
+                        <dd>{spec.value}</dd>
+                      </div>
+                    );
+                  })}
                 </dl>
               ) : null}
 
@@ -224,6 +217,7 @@ export async function DarkListingDetail({
                             listing.latitude,
                             listing.longitude,
                           )}
+                          aria-label={`${dict.listing.viewMap}. ${dict.a11y.opensInNewTab}`}
                           className="dark-soft-btn"
                           target="_blank"
                           rel="noopener noreferrer"
