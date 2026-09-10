@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ORANGE_CATALOG_PAGE_SIZE } from "@/lib/catalog-pagination";
 import { fillTemplate, localizedHref } from "@/lib/site-i18n";
 import type { CatalogThemeProps } from "@/themes/theme-types";
 import { OrangeFooter } from "@/themes/orange/orange-footer";
@@ -40,7 +39,7 @@ export async function OrangeCatalog({
   listings,
   total,
   page = 1,
-  pageSize = ORANGE_CATALOG_PAGE_SIZE,
+  pageSize,
   catalogOk,
   catalogStatus,
   lang,

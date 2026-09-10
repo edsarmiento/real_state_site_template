@@ -113,9 +113,6 @@ export function catalogSearchParams(input: {
   return params;
 }
 
-/** @deprecated Prefer theme.catalog.pageSize; kept for orange theme modules. */
-export const ORANGE_CATALOG_PAGE_SIZE = 12;
-
 export function catalogPageOffset(page: number, pageSize: number): number {
   if (
     !Number.isSafeInteger(page) ||
