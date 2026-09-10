@@ -47,7 +47,10 @@ export async function ExecutiveListingDetail({
   const isSale = offerType === "sale";
   const agency = listing.agency_name || content.brand.name;
   const hasMap = listing.latitude != null && listing.longitude != null;
-  const hasPlace = Boolean(listing.address_label) || hasMap;
+  const hasPlace =
+    Boolean(listing.address_label?.trim()) ||
+    Boolean(listing.location_label?.trim()) ||
+    hasMap;
   const backHref = localizedHref("/#propiedades", locale, null, defaultLocale);
   const listingUrl = listingPublicUrl(
     listing.slug,

@@ -11,7 +11,7 @@ type Props = {
 
 function LogoBody({ src, alt, className, fallback }: Props) {
   const [failed, setFailed] = useState(false);
-  if (failed) {
+  if (!src || failed) {
     return <span className="executive-logo-fallback">{fallback}</span>;
   }
   return (

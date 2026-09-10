@@ -46,9 +46,23 @@ export function ExecutiveMobileNav({
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    const first = panelRef.current?.querySelector<HTMLElement>(
-      "a, button, [tabindex]:not([tabindex='-1'])",
-    );
+    const focusableSelector =
+      "a[href], button:not([disabled]), select:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
+
+    function visibleFocusables(panel: HTMLElement) {
+      return Array.from(
+        panel.querySelectorAll<HTMLElement>(focusableSelector),
+      ).filter(
+        (node) =>
+          !node.hidden &&
+          node.getAttribute("aria-hidden") !== "true" &&
+          node.closest("[hidden], [aria-hidden='true']") == null,
+      );
+    }
+
+    const first = panelRef.current
+      ? visibleFocusables(panelRef.current)[0]
+      : undefined;
     first?.focus();
 
     function onKey(event: KeyboardEvent) {
@@ -60,11 +74,7 @@ export function ExecutiveMobileNav({
       if (event.key !== "Tab") return;
       const panel = panelRef.current;
       if (!panel) return;
-      const focusables = Array.from(
-        panel.querySelectorAll<HTMLElement>(
-          "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])",
-        ),
-      );
+      const focusables = visibleFocusables(panel);
       if (focusables.length === 0) return;
       const firstEl = focusables[0];
       const lastEl = focusables[focusables.length - 1];

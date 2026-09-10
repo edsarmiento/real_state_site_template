@@ -30,7 +30,24 @@ describe("ExecutiveContactForm contract (source)", () => {
   it("keeps preview controls disabled", () => {
     assert.match(source, /formMode === "hidden"/);
     assert.match(source, /executive-consult--preview/);
-    const disabledControls = source.match(/\bdisabled\b/g) ?? [];
-    assert.equal(disabledControls.length, 6);
+    for (const control of [
+      'name="name"',
+      'name="phone"',
+      'name="email"',
+      'name="message"',
+      'name="privacyAccepted"',
+      'type="submit"',
+    ]) {
+      const start = source.indexOf(control);
+      assert.ok(start >= 0, `missing control ${control}`);
+      const block = source.slice(start);
+      const end = block.indexOf(">");
+      assert.ok(end >= 0, `unclosed control ${control}`);
+      assert.match(
+        block.slice(0, end + 1),
+        /\bdisabled\b/,
+        `falta disabled en ${control}`,
+      );
+    }
   });
 });
