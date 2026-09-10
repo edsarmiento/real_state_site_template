@@ -10,14 +10,13 @@ type Props = {
   placeholder: string;
 };
 
-export function ExecutiveCoverImage({
-  src,
+function CoverImageBody({
+  imageSrc,
   alt,
   className,
   placeholderClassName,
   placeholder,
-}: Props) {
-  const imageSrc = src?.trim() || null;
+}: Props & { imageSrc: string | null }) {
   const [failed, setFailed] = useState(false);
 
   if (!imageSrc || failed) {
@@ -32,6 +31,17 @@ export function ExecutiveCoverImage({
       className={className}
       loading="lazy"
       onError={() => setFailed(true)}
+    />
+  );
+}
+
+export function ExecutiveCoverImage(props: Props) {
+  const imageSrc = props.src?.trim() || null;
+  return (
+    <CoverImageBody
+      key={imageSrc ?? "empty"}
+      {...props}
+      imageSrc={imageSrc}
     />
   );
 }

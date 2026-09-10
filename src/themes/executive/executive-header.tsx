@@ -48,6 +48,7 @@ export async function ExecutiveHeader({ lang }: Props) {
         <Link href={homeHref} className="executive-brand">
           {brand.logoUrl ? (
             <ExecutiveLogo
+              key={brand.logoUrl}
               src={brand.logoUrl}
               alt={brand.name}
               className="executive-logo--nav"

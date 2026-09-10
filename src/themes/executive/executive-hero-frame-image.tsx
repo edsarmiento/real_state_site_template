@@ -12,7 +12,7 @@ type Props = {
   preload?: boolean;
 };
 
-export function ExecutiveHeroFrameImage({
+function FrameImageBody({
   src,
   alt,
   sizes,
@@ -38,4 +38,9 @@ export function ExecutiveHeroFrameImage({
       onError={() => setFailed(true)}
     />
   );
+}
+
+export function ExecutiveHeroFrameImage(props: Props) {
+  const src = props.src.trim();
+  return <FrameImageBody key={src || "empty"} {...props} src={src} />;
 }

@@ -9,7 +9,7 @@ type Props = {
   fallback: string;
 };
 
-export function ExecutiveLogo({ src, alt, className, fallback }: Props) {
+function LogoBody({ src, alt, className, fallback }: Props) {
   const [failed, setFailed] = useState(false);
   if (failed) {
     return <span className="executive-logo-fallback">{fallback}</span>;
@@ -24,4 +24,9 @@ export function ExecutiveLogo({ src, alt, className, fallback }: Props) {
       onError={() => setFailed(true)}
     />
   );
+}
+
+export function ExecutiveLogo(props: Props) {
+  const src = props.src.trim();
+  return <LogoBody key={src || "empty"} {...props} src={src} />;
 }

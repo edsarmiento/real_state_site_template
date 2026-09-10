@@ -56,9 +56,17 @@ export function ExecutiveHero({
   dict,
   copy,
 }: Props) {
-  const [snapshot] = useState({ urls: photoUrls, title: photoTitle });
-  const urls = snapshot.urls.length > 0 ? snapshot.urls : photoUrls;
-  const title = snapshot.urls.length > 0 ? snapshot.title : photoTitle;
+  const [cached, setCached] = useState({ urls: photoUrls, title: photoTitle });
+  const urls = photoUrls.length > 0 ? photoUrls : cached.urls;
+  const title = photoUrls.length > 0 ? photoTitle : cached.title;
+  if (
+    photoUrls.length > 0 &&
+    (cached.title !== photoTitle ||
+      cached.urls.length !== photoUrls.length ||
+      cached.urls.some((url, index) => url !== photoUrls[index]))
+  ) {
+    setCached({ urls: photoUrls, title: photoTitle });
+  }
 
   return (
     <section className="executive-hero">

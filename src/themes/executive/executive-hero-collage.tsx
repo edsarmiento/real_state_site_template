@@ -44,6 +44,7 @@ function FrameBody({
   if (slot.kind === "photo") {
     return (
       <ExecutiveHeroFrameImage
+        key={slot.src}
         src={slot.src}
         alt={alt}
         sizes={sizes}

@@ -64,6 +64,7 @@ export function ExecutiveListingCard({
     >
       <div className="executive-card__media">
         <ExecutiveCoverImage
+          key={listing.photo_url?.trim() || "empty"}
           src={listing.photo_url}
           alt=""
           className="executive-card__photo"

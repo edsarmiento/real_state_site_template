@@ -28,6 +28,7 @@ export async function ExecutiveFooter({ lang }: Props) {
           <div className="executive-footer__brand">
             {brand.logoUrl ? (
               <ExecutiveLogo
+                key={brand.logoUrl}
                 src={brand.logoUrl}
                 alt={brand.name}
                 className="executive-logo--footer"

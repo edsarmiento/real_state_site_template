@@ -1937,7 +1937,7 @@ html:has([data-site-theme="executive"])::-webkit-scrollbar-thumb {
 }
 
 [data-site-theme="executive"] .executive-gallery .listing-gallery__thumb--active {
-  ring-color: var(--executive-sand-500);
+  --tw-ring-color: var(--executive-sand-500);
   transform: scale(0.95);
 }
 

@@ -108,6 +108,7 @@ export function ExecutiveLocations({
                   <div className="executive-location-card__media">
                     {imageSrc ? (
                       <ExecutiveCoverImage
+                        key={imageSrc}
                         src={imageSrc}
                         alt={alt}
                         className="executive-location-card__photo"
