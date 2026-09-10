@@ -4,12 +4,12 @@ import {
   yellowCitiesMatch,
   yellowCityKey,
   yellowEditorialIndex,
+  yellowLocationCatalogHref,
   yellowLocationGridClass,
   yellowLocationSlot,
   yellowRepresentativeListingPhoto,
   yellowUniqueCities,
-} from "./yellow-locations";
-import { localizedHref } from "../../lib/site-i18n";
+} from "./yellow-locations.ts";
 
 describe("yellowCityKey", () => {
   it("normalizes case, accents and the first comma segment", () => {
@@ -115,12 +115,12 @@ describe("yellowLocation layout", () => {
 
 describe("Yellow location catalog URLs", () => {
   it("keeps the city filter and ends at the catalog hash", () => {
-    const href = localizedHref("/#catalogo", "es", { city: "Tijuana" }, "es");
+    const href = yellowLocationCatalogHref("Tijuana", "es", "es");
     assert.equal(href, "/?city=Tijuana#catalogo");
   });
 
   it("keeps lang when it differs from the default locale", () => {
-    const href = localizedHref("/#catalogo", "en", { city: "Tijuana" }, "es");
+    const href = yellowLocationCatalogHref("Tijuana", "en", "es");
     assert.equal(href.startsWith("/?"), true);
     assert.equal(href.endsWith("#catalogo"), true);
     assert.equal(href.includes("city=Tijuana"), true);
@@ -129,7 +129,7 @@ describe("Yellow location catalog URLs", () => {
   });
 
   it("encodes city characters and does not put the hash before the query", () => {
-    const href = localizedHref("/#catalogo", "es", { city: "Santa Fe" }, "es");
+    const href = yellowLocationCatalogHref("Santa Fe", "es", "es");
     assert.equal(href, "/?city=Santa+Fe#catalogo");
   });
 });

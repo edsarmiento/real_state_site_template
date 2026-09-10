@@ -1,6 +1,3 @@
-"use client";
-
-import type { FormEvent } from "react";
 import type { ContactContent, LegalContent } from "@/lib/public-site-content";
 import {
   localizeSiteHref,
@@ -17,6 +14,7 @@ type Props = {
   defaultLocale: SiteLocale;
 };
 
+/** Disabled preview surface (no active submit flow). Server Component. */
 export function YellowContactForm({
   contact,
   legal,
@@ -51,14 +49,9 @@ export function YellowContactForm({
     );
   }
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-  }
-
   return (
     <form
       className="yellow-form-panel yellow-form-panel--preview"
-      onSubmit={onSubmit}
       noValidate
       aria-label={dict.contact.previewAria}
     >

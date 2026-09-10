@@ -1,10 +1,10 @@
-import type { LegalPageThemeProps } from "@/themes/theme-types";
+import type { LegalPageThemeRouteProps } from "@/themes/theme-types";
 import { getBeigeUi } from "@/themes/beige/beige-ui";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
 import { BeigeShell } from "@/themes/beige/beige-shell";
 
-export async function BeigeLegalPage({ kind, lang }: LegalPageThemeProps) {
+export async function BeigeLegalPage({ kind, lang }: LegalPageThemeRouteProps) {
   const { dict } = await getBeigeUi(lang);
   const title =
     kind === "privacy"

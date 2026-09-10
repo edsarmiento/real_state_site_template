@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { fillTemplate, localizedHref } from "@/lib/site-i18n";
-import type { CatalogThemeProps } from "@/themes/theme-types";
+import type { CatalogThemeRouteProps } from "@/themes/theme-types";
 import { OrangeFooter } from "@/themes/orange/orange-footer";
 import { OrangeHeader } from "@/themes/orange/orange-header";
 import { OrangeListingCard } from "@/themes/orange/orange-listing-card";
@@ -43,7 +43,7 @@ export async function OrangeCatalog({
   catalogOk,
   catalogStatus,
   lang,
-}: CatalogThemeProps) {
+}: CatalogThemeRouteProps) {
   const { content, dict, copy, locale, defaultLocale } = await getOrangeUi(lang);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
   const propertiesHref = localizedHref("/#propiedades", locale, null, defaultLocale);

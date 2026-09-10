@@ -25,6 +25,7 @@ import {
 } from "@/themes/yellow/yellow-icons";
 import {
   yellowEditorialIndex,
+  yellowLocationCatalogHref,
   yellowLocationGridClass,
   yellowLocationSlot,
   yellowRepresentativeListingPhoto,
@@ -56,7 +57,7 @@ export function YellowLocations({
     .map((location) => {
       const city = location.filter.city?.trim();
       if (!city) return null;
-      const href = localizedHref("/#catalogo", locale, { city }, defaultLocale);
+      const href = yellowLocationCatalogHref(city, locale, defaultLocale);
       const configured = location.imageUrl?.trim() || null;
       const listingPhoto = configured
         ? null

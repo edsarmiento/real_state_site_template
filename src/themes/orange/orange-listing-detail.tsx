@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { parseOfferType } from "@/lib/listing-types";
 import { localizedHref } from "@/lib/site-i18n";
-import type { ListingDetailThemeProps } from "@/themes/theme-types";
+import type { ListingDetailThemeRouteProps } from "@/themes/theme-types";
 import { orangeVisibleSpecs } from "@/themes/orange/orange-listing-specs";
 import { OrangeFooter } from "@/themes/orange/orange-footer";
 import { OrangeGallery } from "@/themes/orange/orange-gallery";
@@ -35,7 +35,7 @@ function specIcon(key: string) {
 export async function OrangeListingDetail({
   listing,
   lang,
-}: ListingDetailThemeProps) {
+}: ListingDetailThemeRouteProps) {
   const { content, dict, copy, locale, defaultLocale } = await getOrangeUi(lang);
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);

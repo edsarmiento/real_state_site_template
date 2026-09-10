@@ -7,7 +7,7 @@ import {
   localizeSiteHref,
   localizedHref,
 } from "@/lib/site-i18n";
-import type { CatalogThemeProps } from "@/themes/theme-types";
+import type { CatalogThemeRouteProps } from "@/themes/theme-types";
 import { ElegantFooter } from "@/themes/elegant/elegant-footer";
 import { ElegantHeader } from "@/themes/elegant/elegant-header";
 import { elegantHeroTitleParts } from "@/themes/elegant/elegant-hero-title";
@@ -39,7 +39,7 @@ export async function ElegantCatalog({
   catalogStatus,
   lang,
   heroPhotoUrls,
-}: CatalogThemeProps) {
+}: CatalogThemeRouteProps) {
   const { content, dict, locale, defaultLocale } = await getElegantUi(lang);
   const locations =
     content.locations.length > 0

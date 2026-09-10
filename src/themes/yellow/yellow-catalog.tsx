@@ -22,6 +22,7 @@ import { yellowUniqueCities } from "@/themes/yellow/yellow-locations";
 import { YellowPagination } from "@/themes/yellow/yellow-pagination";
 import { YellowReveal } from "@/themes/yellow/yellow-reveal";
 import { YellowSearch } from "@/themes/yellow/yellow-search";
+import { yellowSearchRemountKey } from "@/themes/yellow/yellow-search-key";
 import {
   YellowAbout,
   YellowContact,
@@ -144,6 +145,11 @@ export function YellowCatalog({
           <YellowReveal variant="up" delayMs={120}>
             <div className="yellow-search-shell">
               <YellowSearch
+                key={yellowSearchRemountKey({
+                  city,
+                  propertyType,
+                  bedrooms,
+                })}
                 oferta={oferta}
                 city={city}
                 propertyType={propertyType}

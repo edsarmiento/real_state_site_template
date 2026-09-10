@@ -29,6 +29,7 @@ import {
   type SiteThemeName,
 } from "@/themes/theme-definitions";
 import type { SiteTheme } from "@/themes/theme-types";
+import { withResolvedThemeProps } from "@/themes/with-resolved-theme-props";
 
 const LAYOUT_KEYS_BY_THEME = Object.fromEntries(
   THEME_DEFINITIONS.map((d) => [d.name, d.layoutKeys]),
@@ -44,6 +45,9 @@ const YELLOW_CATALOG = { pageSize: 12, heroGallery: true } as const;
 /**
  * Public themes. Add a theme: folder under src/themes/<name>/ + entry here
  * + matching row in theme-definitions.ts (layoutKeys).
+ *
+ * Yellow entries are wrapped with `withResolvedThemeProps` so App routes stay
+ * fetch/delegate-only while Yellow paint components receive resolved props.
  */
 export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
   default: {
@@ -102,10 +106,10 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     name: "yellow",
     layoutKeys: LAYOUT_KEYS_BY_THEME.yellow,
     catalog: YELLOW_CATALOG,
-    Catalog: YellowCatalog,
-    ListingDetail: YellowListingDetail,
-    ListingLoadError: YellowListingLoadError,
-    LegalPage: YellowLegalPage,
+    Catalog: withResolvedThemeProps(YellowCatalog),
+    ListingDetail: withResolvedThemeProps(YellowListingDetail),
+    ListingLoadError: withResolvedThemeProps(YellowListingLoadError),
+    LegalPage: withResolvedThemeProps(YellowLegalPage),
   },
 };
 

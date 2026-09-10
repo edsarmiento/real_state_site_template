@@ -11,7 +11,7 @@ import {
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref, localizeSiteHref } from "@/lib/site-i18n";
-import type { ListingDetailThemeProps } from "@/themes/theme-types";
+import type { ListingDetailThemeRouteProps } from "@/themes/theme-types";
 import { ElegantFooter } from "@/themes/elegant/elegant-footer";
 import { ElegantHeader } from "@/themes/elegant/elegant-header";
 import { ElegantIconArrowLeft, ElegantIconWhatsApp } from "@/themes/elegant/elegant-icons";
@@ -21,7 +21,7 @@ import { formatElegantPriceParts, getElegantUi } from "@/themes/elegant/elegant-
 export async function ElegantListingDetail({
   listing,
   lang,
-}: ListingDetailThemeProps) {
+}: ListingDetailThemeRouteProps) {
   const {
     content,
     dict,

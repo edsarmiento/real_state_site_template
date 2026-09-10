@@ -12,7 +12,7 @@ import { googleMapsSearchUrl } from "@/lib/maps-links";
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref } from "@/lib/site-i18n";
-import type { ListingDetailThemeProps } from "@/themes/theme-types";
+import type { ListingDetailThemeRouteProps } from "@/themes/theme-types";
 import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
@@ -35,7 +35,7 @@ const SPEC_STAGGER_MS = [0, 80, 160, 240] as const;
 export async function BeigeListingDetail({
   listing,
   lang,
-}: ListingDetailThemeProps) {
+}: ListingDetailThemeRouteProps) {
   const { content, dict, locale, defaultLocale, showShareButton, siteOrigin } =
     await getBeigeUi(lang);
   const photos = listing.photos ?? [];

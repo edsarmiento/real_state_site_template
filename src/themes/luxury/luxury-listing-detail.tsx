@@ -11,7 +11,7 @@ import {
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref } from "@/lib/site-i18n";
-import type { ListingDetailThemeProps } from "@/themes/theme-types";
+import type { ListingDetailThemeRouteProps } from "@/themes/theme-types";
 import {
   LuxuryButton,
   luxuryButtonClassName,
@@ -56,7 +56,7 @@ function SpecValue({ value }: { value: string }) {
 export async function LuxuryListingDetail({
   listing,
   lang,
-}: ListingDetailThemeProps) {
+}: ListingDetailThemeRouteProps) {
   const { content, dict, locale, defaultLocale, showShareButton, siteOrigin } =
     await getLuxuryUi(lang);
   const photos = listing.photos ?? [];

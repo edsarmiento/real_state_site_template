@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { fillTemplate, localizedHref } from "@/lib/site-i18n";
 import { getSiteUi } from "@/lib/site-ui";
-import type { CatalogThemeProps } from "@/themes/theme-types";
+import type { CatalogThemeRouteProps } from "@/themes/theme-types";
 
 export async function DefaultCatalog({
   oferta,
@@ -19,7 +19,7 @@ export async function DefaultCatalog({
   catalogOk,
   catalogStatus,
   lang,
-}: CatalogThemeProps) {
+}: CatalogThemeRouteProps) {
   const ui = await getSiteUi(lang);
   const emptyKind =
     oferta === "sale"

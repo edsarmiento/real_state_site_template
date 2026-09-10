@@ -1,3 +1,5 @@
+import { localizedHref, type SiteLocale } from "@/lib/site-i18n";
+
 export type YellowListingPlace = {
   city?: string | null;
   photo_url?: string | null;
@@ -79,4 +81,13 @@ export function yellowLocationGridClass(total: number): string {
 
 export function yellowEditorialIndex(index: number): string {
   return String(Math.max(0, index) + 1).padStart(2, "0");
+}
+
+/** Catalog filter link used by YellowLocations (city + optional lang + #catalogo). */
+export function yellowLocationCatalogHref(
+  city: string,
+  locale: SiteLocale,
+  defaultLocale: SiteLocale,
+): string {
+  return localizedHref("/#catalogo", locale, { city }, defaultLocale);
 }

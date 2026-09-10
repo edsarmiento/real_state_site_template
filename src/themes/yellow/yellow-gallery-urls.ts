@@ -42,3 +42,37 @@ export function yellowGalleryIndexAfterKey(
 }
 
 export const YELLOW_GALLERY_ASPECT_FALLBACK = 4 / 3;
+
+/** Stable content key for gallery URL lists (avoids effect churn on new array refs). */
+export function yellowGalleryUrlsKey(urls: readonly string[]): string {
+  return JSON.stringify(urls);
+}
+
+/**
+ * Track offset so the active slide is visible without wrapping.
+ * Measurements come from the live DOM (viewport/track/slide).
+ */
+export function computeYellowGalleryTrackOffset(input: {
+  viewportWidth: number;
+  trackWidth: number;
+  slideOffsetLeft: number;
+}): number {
+  const max = Math.max(0, input.trackWidth - input.viewportWidth);
+  return Math.min(Math.max(0, input.slideOffsetLeft), max);
+}
+
+/**
+ * Strip keyboard handling: only when focus is inside the gallery region
+ * (or the event target is inside it). Does not wrap. Ignores editables.
+ */
+export function shouldHandleYellowGalleryArrowKey(input: {
+  key: string;
+  index: number;
+  count: number;
+  focusInsideRegion: boolean;
+  targetIsEditable: boolean;
+}): number | null {
+  if (input.targetIsEditable) return null;
+  if (!input.focusInsideRegion) return null;
+  return yellowGalleryIndexAfterKey(input.key, input.index, input.count);
+}

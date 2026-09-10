@@ -3,12 +3,12 @@ import { UltraFooter } from "@/themes/ultra/ultra-footer";
 import { UltraHeader } from "@/themes/ultra/ultra-header";
 import { UltraShell } from "@/themes/ultra/ultra-shell";
 import { getUltraUi } from "@/themes/ultra/ultra-ui";
-import type { ListingLoadErrorThemeProps } from "@/themes/theme-types";
+import type { ListingLoadErrorThemeRouteProps } from "@/themes/theme-types";
 
 export async function UltraListingLoadError({
   status,
   lang,
-}: ListingLoadErrorThemeProps) {
+}: ListingLoadErrorThemeRouteProps) {
   const { dict } = await getUltraUi(lang);
   const message = fillTemplate(dict.results.listingError, { status });
 

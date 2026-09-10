@@ -2,9 +2,9 @@ import { getLuxuryUi } from "@/themes/luxury/luxury-ui";
 import { LuxuryFooter } from "@/themes/luxury/luxury-footer";
 import { LuxuryHeader } from "@/themes/luxury/luxury-header";
 import { LuxuryShell } from "@/themes/luxury/luxury-shell";
-import type { LegalPageThemeProps } from "@/themes/theme-types";
+import type { LegalPageThemeRouteProps } from "@/themes/theme-types";
 
-export async function LuxuryLegalPage({ kind, lang }: LegalPageThemeProps) {
+export async function LuxuryLegalPage({ kind, lang }: LegalPageThemeRouteProps) {
   const { dict } = await getLuxuryUi(lang);
   const title =
     kind === "privacy"

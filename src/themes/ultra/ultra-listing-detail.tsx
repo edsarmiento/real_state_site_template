@@ -13,7 +13,7 @@ import {
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import { listingPublicUrl } from "@/lib/site-config-env";
 import { localizedHref } from "@/lib/site-i18n";
-import type { ListingDetailThemeProps } from "@/themes/theme-types";
+import type { ListingDetailThemeRouteProps } from "@/themes/theme-types";
 import { UltraFooter } from "@/themes/ultra/ultra-footer";
 import { UltraHeader } from "@/themes/ultra/ultra-header";
 import { UltraIconArrowLeft, UltraIconWhatsApp } from "@/themes/ultra/ultra-icons";
@@ -25,7 +25,7 @@ import { getUltraUi } from "@/themes/ultra/ultra-ui";
 export async function UltraListingDetail({
   listing,
   lang,
-}: ListingDetailThemeProps) {
+}: ListingDetailThemeRouteProps) {
   const { content, dict, locale, defaultLocale, config } =
     await getUltraUi(lang);
   const copy = getUltraCopy(locale);

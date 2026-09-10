@@ -7,7 +7,7 @@ import {
   localizeSiteHref,
   localizedHref,
 } from "@/lib/site-i18n";
-import type { CatalogThemeProps } from "@/themes/theme-types";
+import type { CatalogThemeRouteProps } from "@/themes/theme-types";
 import { LuxuryButton } from "@/themes/luxury/luxury-button";
 import { LuxuryFooter } from "@/themes/luxury/luxury-footer";
 import { LuxuryHeader } from "@/themes/luxury/luxury-header";
@@ -28,7 +28,7 @@ import { getLuxuryUi } from "@/themes/luxury/luxury-ui";
 
 function catalogHeading(
   dict: Awaited<ReturnType<typeof getLuxuryUi>>["dict"],
-  oferta: CatalogThemeProps["oferta"],
+  oferta: CatalogThemeRouteProps["oferta"],
   city: string,
   total: number,
 ): string {
@@ -57,7 +57,7 @@ export async function LuxuryCatalog({
   catalogOk,
   catalogStatus,
   lang,
-}: CatalogThemeProps) {
+}: CatalogThemeRouteProps) {
   const { content, dict, locale, defaultLocale } = await getLuxuryUi(lang);
   const heroImage = content.hero.imageUrl;
   const locations =

@@ -14,8 +14,10 @@ import { fillTemplate } from "@/lib/site-i18n";
 import {
   YELLOW_GALLERY_ASPECT_FALLBACK,
   clampYellowGalleryIndex,
-  yellowGalleryIndexAfterKey,
+  computeYellowGalleryTrackOffset,
+  shouldHandleYellowGalleryArrowKey,
   yellowGalleryUrlAfterFailure,
+  yellowGalleryUrlsKey,
 } from "@/themes/yellow/yellow-gallery-urls";
 import {
   YellowIconArrowLeft,
@@ -59,6 +61,7 @@ export function YellowListingGallery({
   const [failedUrls, setFailedUrls] = useState<Set<string>>(() => new Set());
   const [aspectByUrl, setAspectByUrl] = useState<Record<string, number>>({});
   const urls = sourceUrls.filter((url) => !failedUrls.has(url));
+  const urlsKey = yellowGalleryUrlsKey(urls);
   const count = urls.length;
   const multi = count > 1;
 
@@ -138,10 +141,14 @@ export function YellowListingGallery({
       setTrackOffset(0);
       return;
     }
-    const max = Math.max(0, track.scrollWidth - viewport.clientWidth);
-    const next = Math.min(Math.max(0, slide.offsetLeft), max);
-    setTrackOffset(next);
-  }, [safeIndex, urls, aspectByUrl, count]);
+    setTrackOffset(
+      computeYellowGalleryTrackOffset({
+        viewportWidth: viewport.clientWidth,
+        trackWidth: track.scrollWidth,
+        slideOffsetLeft: slide.offsetLeft,
+      }),
+    );
+  }, [safeIndex, urlsKey, aspectByUrl, count]);
 
   useEffect(() => {
     const node = dialogRef.current;
@@ -164,7 +171,20 @@ export function YellowListingGallery({
 
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") return;
-      const next = yellowGalleryIndexAfterKey(event.key, safeIndex, count);
+      const target = event.target;
+      const targetIsEditable =
+        target instanceof HTMLElement &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable);
+      const next = shouldHandleYellowGalleryArrowKey({
+        key: event.key,
+        index: safeIndex,
+        count,
+        focusInsideRegion: true,
+        targetIsEditable,
+      });
       if (next == null) return;
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -191,18 +211,26 @@ export function YellowListingGallery({
 
     function onKey(event: KeyboardEvent) {
       const target = event.target;
-      if (
+      const targetIsEditable =
         target instanceof HTMLElement &&
         (target.tagName === "INPUT" ||
           target.tagName === "TEXTAREA" ||
           target.tagName === "SELECT" ||
-          target.isContentEditable)
-      ) {
-        return;
-      }
+          target.isContentEditable);
       const region = document.getElementById(regionId);
-      if (!region) return;
-      const next = yellowGalleryIndexAfterKey(event.key, safeIndex, count);
+      const active = document.activeElement;
+      const focusInsideRegion = Boolean(
+        region &&
+          active instanceof Node &&
+          region.contains(active),
+      );
+      const next = shouldHandleYellowGalleryArrowKey({
+        key: event.key,
+        index: safeIndex,
+        count,
+        focusInsideRegion,
+        targetIsEditable,
+      });
       if (next == null) return;
       event.preventDefault();
       setIndex(next);

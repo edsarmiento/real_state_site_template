@@ -6,7 +6,7 @@ import {
   localizeSiteHref,
   localizedHref,
 } from "@/lib/site-i18n";
-import type { CatalogThemeProps } from "@/themes/theme-types";
+import type { CatalogThemeRouteProps } from "@/themes/theme-types";
 import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
@@ -41,7 +41,7 @@ export async function BeigeCatalog({
   catalogStatus,
   lang,
   heroPhotoUrls,
-}: CatalogThemeProps) {
+}: CatalogThemeRouteProps) {
   const { content, dict, locale, defaultLocale } = await getBeigeUi(lang);
   const collage = (heroPhotoUrls ?? []).slice(0, 3);
   const locations =

@@ -6,7 +6,7 @@ import {
   localizeSiteHref,
   localizedHref,
 } from "@/lib/site-i18n";
-import type { CatalogThemeProps } from "@/themes/theme-types";
+import type { CatalogThemeRouteProps } from "@/themes/theme-types";
 import { UltraAbout } from "@/themes/ultra/ultra-about";
 import { UltraCatalogGrid } from "@/themes/ultra/ultra-catalog-grid";
 import { UltraCatalogSearch } from "@/themes/ultra/ultra-catalog-search";
@@ -42,7 +42,7 @@ export async function UltraCatalog({
   catalogStatus,
   lang,
   heroPhotoUrls,
-}: CatalogThemeProps) {
+}: CatalogThemeRouteProps) {
   const { content, dict, locale, defaultLocale } = await getUltraUi(lang);
   const copy = getUltraCopy(locale);
   const locations =

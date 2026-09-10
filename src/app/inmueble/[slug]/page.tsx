@@ -13,7 +13,6 @@ import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
 import { getDictionary, resolveRequestLocale } from "@/lib/site-i18n";
 import { firstSearchParam } from "@/lib/search-params";
 import { resolveSiteThemeFromConfig } from "@/themes/resolve-site-theme";
-import { resolveThemeProps } from "@/themes/resolve-theme-props";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -106,7 +105,6 @@ export default async function ListingDetailPage({
   const { slug } = await params;
   const lang = firstSearchParam((await searchParams).lang);
   const theme = await resolveSiteThemeFromConfig();
-  const themeProps = await resolveThemeProps(lang);
   const result = await publicApiFetch<PublicListingDetail>(
     `/api/public/listings/${encodeURIComponent(slug)}`,
   );
@@ -115,13 +113,7 @@ export default async function ListingDetailPage({
   if (!result.ok) {
     if (theme.ListingLoadError) {
       const ListingLoadError = theme.ListingLoadError;
-      return (
-        <ListingLoadError
-          {...themeProps}
-          status={result.status}
-          lang={lang}
-        />
-      );
+      return <ListingLoadError status={result.status} lang={lang} />;
     }
     return (
       <div className="min-h-screen bg-zinc-50 px-4 py-16 text-sm text-zinc-600">
@@ -135,7 +127,6 @@ export default async function ListingDetailPage({
 
   return (
     <ListingDetail
-      {...themeProps}
       listing={result.data}
       isAdmin={session?.isStaffUser === true}
       lang={lang}

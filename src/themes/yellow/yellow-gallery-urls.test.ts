@@ -2,8 +2,11 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   clampYellowGalleryIndex,
+  computeYellowGalleryTrackOffset,
+  shouldHandleYellowGalleryArrowKey,
   yellowGalleryIndexAfterKey,
   yellowGalleryUrlAfterFailure,
+  yellowGalleryUrlsKey,
 } from "./yellow-gallery-urls.ts";
 
 describe("yellowGalleryUrlAfterFailure", () => {
@@ -56,5 +59,125 @@ describe("yellowGalleryIndexAfterKey", () => {
 
   it("ignores keys when there is a single photo", () => {
     assert.equal(yellowGalleryIndexAfterKey("ArrowRight", 0, 1), null);
+  });
+});
+
+describe("yellowGalleryUrlsKey", () => {
+  it("is stable for equal contents even when array identity differs", () => {
+    assert.equal(
+      yellowGalleryUrlsKey(["a", "b"]),
+      yellowGalleryUrlsKey(["a", "b"].slice()),
+    );
+  });
+
+  it("changes when URLs change", () => {
+    assert.notEqual(
+      yellowGalleryUrlsKey(["a", "b"]),
+      yellowGalleryUrlsKey(["a", "c"]),
+    );
+  });
+});
+
+describe("computeYellowGalleryTrackOffset", () => {
+  it("keeps the first slide at offset 0", () => {
+    assert.equal(
+      computeYellowGalleryTrackOffset({
+        viewportWidth: 400,
+        trackWidth: 1200,
+        slideOffsetLeft: 0,
+      }),
+      0,
+    );
+  });
+
+  it("scrolls to a later slide without exceeding the max", () => {
+    assert.equal(
+      computeYellowGalleryTrackOffset({
+        viewportWidth: 400,
+        trackWidth: 1000,
+        slideOffsetLeft: 500,
+      }),
+      500,
+    );
+    assert.equal(
+      computeYellowGalleryTrackOffset({
+        viewportWidth: 400,
+        trackWidth: 1000,
+        slideOffsetLeft: 900,
+      }),
+      600,
+    );
+  });
+
+  it("stays at 0 when the track fits in the viewport", () => {
+    assert.equal(
+      computeYellowGalleryTrackOffset({
+        viewportWidth: 800,
+        trackWidth: 500,
+        slideOffsetLeft: 200,
+      }),
+      0,
+    );
+  });
+});
+
+describe("shouldHandleYellowGalleryArrowKey", () => {
+  it("navigates only with focus inside the region", () => {
+    assert.equal(
+      shouldHandleYellowGalleryArrowKey({
+        key: "ArrowRight",
+        index: 0,
+        count: 3,
+        focusInsideRegion: true,
+        targetIsEditable: false,
+      }),
+      1,
+    );
+    assert.equal(
+      shouldHandleYellowGalleryArrowKey({
+        key: "ArrowRight",
+        index: 0,
+        count: 3,
+        focusInsideRegion: false,
+        targetIsEditable: false,
+      }),
+      null,
+    );
+  });
+
+  it("ignores editable targets even inside the region", () => {
+    assert.equal(
+      shouldHandleYellowGalleryArrowKey({
+        key: "ArrowLeft",
+        index: 1,
+        count: 3,
+        focusInsideRegion: true,
+        targetIsEditable: true,
+      }),
+      null,
+    );
+  });
+
+  it("does nothing for zero or one image", () => {
+    assert.equal(
+      shouldHandleYellowGalleryArrowKey({
+        key: "ArrowRight",
+        index: 0,
+        count: 0,
+        focusInsideRegion: true,
+        targetIsEditable: false,
+      }),
+      null,
+    );
+    assert.equal(
+      shouldHandleYellowGalleryArrowKey({
+        key: "ArrowRight",
+        index: 0,
+        count: 1,
+        focusInsideRegion: true,
+        targetIsEditable: false,
+      }),
+      null,
+    );
   });
 });

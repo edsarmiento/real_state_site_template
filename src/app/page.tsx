@@ -24,7 +24,6 @@ import {
 } from "@/lib/site-i18n";
 import { firstSearchParam } from "@/lib/search-params";
 import { resolveSiteThemeFromConfig } from "@/themes/resolve-site-theme";
-import { resolveThemeProps } from "@/themes/resolve-theme-props";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -84,7 +83,7 @@ export default async function CatalogPage({
 }) {
   const sp = await searchParams;
   const lang = firstSearchParam(sp.lang);
-  const themeProps = await resolveThemeProps(lang);
+  const config = await getResolvedSiteConfig();
   const theme = await resolveSiteThemeFromConfig();
   const city = firstSearchParam(sp.city).trim();
   const oferta = parseCatalogOfferFilter(firstSearchParam(sp.oferta));
@@ -115,6 +114,8 @@ export default async function CatalogPage({
       : [];
   const total = result.ok ? (result.data.meta?.total ?? listings.length) : 0;
 
+  const locale = resolveRequestLocale(lang, config.locale);
+
   if (result.ok) {
     const resolved = resolveCatalogPage(
       firstSearchParam(sp.page),
@@ -125,7 +126,7 @@ export default async function CatalogPage({
       redirect(
         localizedHref(
           "/",
-          themeProps.locale,
+          locale,
           catalogSearchParams({
             oferta,
             city,
@@ -133,7 +134,7 @@ export default async function CatalogPage({
             bedrooms,
             page: resolved.page,
           }),
-          themeProps.config.locale.defaultLocale,
+          config.locale.defaultLocale,
         ) + "#catalogo",
       );
     }
@@ -156,7 +157,7 @@ export default async function CatalogPage({
     }
   }
 
-  const dict = getDictionary(themeProps.locale);
+  const dict = getDictionary(locale);
   const typeLabel = propertyType
     ? (dict.propertyTypes[propertyType as PropertyType] ?? propertyType)
     : null;
@@ -166,7 +167,6 @@ export default async function CatalogPage({
 
   return (
     <Catalog
-      {...themeProps}
       oferta={oferta}
       city={city}
       propertyType={propertyType}

@@ -22,7 +22,8 @@ export type ThemeResolvedProps = {
   locale: SiteLocale;
 };
 
-export type CatalogThemeProps = ThemeResolvedProps & {
+/** Props that App Router routes pass into theme surfaces (no resolved site data). */
+export type CatalogThemeRouteProps = {
   oferta: CatalogOfferFilter;
   city: string;
   propertyType: string;
@@ -41,23 +42,34 @@ export type CatalogThemeProps = ThemeResolvedProps & {
   heroPhotoUrls?: string[];
 };
 
-export type ListingDetailThemeProps = ThemeResolvedProps & {
+/** Paint contract: route props + values injected by `withResolvedThemeProps`. */
+export type CatalogThemeProps = ThemeResolvedProps & CatalogThemeRouteProps;
+
+export type ListingDetailThemeRouteProps = {
   listing: PublicListingDetail;
   isAdmin: boolean;
   lang?: string;
 };
 
-export type ListingLoadErrorThemeProps = ThemeResolvedProps & {
+export type ListingDetailThemeProps = ThemeResolvedProps &
+  ListingDetailThemeRouteProps;
+
+export type ListingLoadErrorThemeRouteProps = {
   status: number;
   lang?: string;
 };
 
+export type ListingLoadErrorThemeProps = ThemeResolvedProps &
+  ListingLoadErrorThemeRouteProps;
+
 export type LegalPageKind = "privacy" | "terms" | "cookies";
 
-export type LegalPageThemeProps = ThemeResolvedProps & {
+export type LegalPageThemeRouteProps = {
   kind: LegalPageKind;
   lang?: string;
 };
+
+export type LegalPageThemeProps = ThemeResolvedProps & LegalPageThemeRouteProps;
 
 /** Catalog fetch knobs — data-driven so `app/` never branches on theme name. */
 export type ThemeCatalogOptions = {
@@ -71,12 +83,13 @@ export type SiteTheme = {
   /** Ops/API layout_key values that resolve to this theme. */
   layoutKeys: readonly string[];
   catalog: ThemeCatalogOptions;
-  Catalog: (props: CatalogThemeProps) => Promise<ReactNode> | ReactNode;
+  /** Route-facing entry: may inject ThemeResolvedProps inside a registry wrapper. */
+  Catalog: (props: CatalogThemeRouteProps) => Promise<ReactNode> | ReactNode;
   ListingDetail: (
-    props: ListingDetailThemeProps,
+    props: ListingDetailThemeRouteProps,
   ) => Promise<ReactNode> | ReactNode;
   ListingLoadError?: (
-    props: ListingLoadErrorThemeProps,
+    props: ListingLoadErrorThemeRouteProps,
   ) => Promise<ReactNode> | ReactNode;
-  LegalPage: (props: LegalPageThemeProps) => Promise<ReactNode> | ReactNode;
+  LegalPage: (props: LegalPageThemeRouteProps) => Promise<ReactNode> | ReactNode;
 };
