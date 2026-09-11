@@ -46,16 +46,17 @@ async function overflowX(page) {
 }
 
 async function main() {
-  const browser = await puppeteer.launch({
-    executablePath: CHROME,
-    headless: true,
-    args: ["--no-sandbox", "--disable-gpu", "--window-size=1440,900"],
-    defaultViewport: null,
-  });
-  const page = await browser.newPage();
-  page.setDefaultTimeout(25000);
-
+  let browser;
   try {
+    browser = await puppeteer.launch({
+      executablePath: CHROME,
+      headless: true,
+      args: ["--no-sandbox", "--disable-gpu", "--window-size=1440,900"],
+      defaultViewport: null,
+    });
+    const page = await browser.newPage();
+    page.setDefaultTimeout(25000);
+
     // —— Home / theme ——
     await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
     await page.goto(BASE + "/", { waitUntil: "networkidle2" });
@@ -444,7 +445,7 @@ async function main() {
     );
     console.log("\nSUMMARY", report.summary);
     if (report.summary.fail > 0) process.exitCode = 1;
-    await browser.close();
+    await browser?.close();
   }
 }
 
