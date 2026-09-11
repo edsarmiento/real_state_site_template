@@ -1,6 +1,14 @@
-import type { SiteLayoutKey } from "@/lib/site-config-types";
+import {
+  themeNameFromLayoutKey,
+  type SiteLayoutKey,
+} from "@/themes/theme-definitions";
 
-/** Layouts con estilo de marca (gradientes, acentos). `default` = solo estructura. */
-export function isStyledSiteLayout(layoutKey: SiteLayoutKey): boolean {
-  return layoutKey !== "default";
+/**
+ * Brand accents on admin/login for resolved non-default themes only.
+ * Unknown layout keys resolve to `default` (unstyled), same as THEME_REGISTRY.
+ */
+export function isStyledSiteLayout(
+  layoutKey: SiteLayoutKey | string,
+): boolean {
+  return themeNameFromLayoutKey(layoutKey) !== "default";
 }

@@ -29,6 +29,8 @@ export type CatalogThemeRouteProps = {
   propertyType: string;
   bedrooms: string;
   listings: PublicListingCard[];
+  /** Unfiltered cards resolved before the theme renders location links. */
+  locationListings?: PublicListingCard[];
   total: number;
   page?: number;
   pageSize?: number;
@@ -76,6 +78,8 @@ export type ThemeCatalogOptions = {
   pageSize: number;
   /** Fetch first listing gallery URLs for the hero collage. */
   heroGallery: boolean;
+  /** Resolve an unfiltered source for location cards before rendering. */
+  locationListings?: boolean;
 };
 
 export type SiteTheme = {

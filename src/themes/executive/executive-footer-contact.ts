@@ -1,3 +1,5 @@
+import { isExampleEmail, isExamplePhone } from "@/lib/example-contact";
+
 export type ExecutiveFooterContact = {
   whatsappHref: string | null;
   phone: string | null;
@@ -17,7 +19,7 @@ function absentToNull(value?: string | null): string | null {
   return trimmed ? trimmed : null;
 }
 
-/** Normalize once; empty/whitespace strings become null. */
+/** Normalize once; empty/whitespace strings become null. Drops .env.example placeholders. */
 export function normalizeExecutiveFooterContact(input: {
   whatsappHref?: string | null;
   phone?: string | null;
@@ -25,12 +27,16 @@ export function normalizeExecutiveFooterContact(input: {
   email?: string | null;
   emailHref?: string | null;
 }): ExecutiveFooterContact {
+  const phone = absentToNull(input.phone);
+  const email = absentToNull(input.email);
+  const hidePhone = isExamplePhone(phone);
+  const hideEmail = isExampleEmail(email);
   return {
     whatsappHref: absentToNull(input.whatsappHref),
-    phone: absentToNull(input.phone),
-    phoneHref: absentToNull(input.phoneHref),
-    email: absentToNull(input.email),
-    emailHref: absentToNull(input.emailHref),
+    phone: hidePhone ? null : phone,
+    phoneHref: hidePhone ? null : absentToNull(input.phoneHref),
+    email: hideEmail ? null : email,
+    emailHref: hideEmail ? null : absentToNull(input.emailHref),
   };
 }
 

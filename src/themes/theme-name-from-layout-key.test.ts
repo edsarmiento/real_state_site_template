@@ -15,6 +15,7 @@ describe("themeNameFromLayoutKey", () => {
     assert.equal(themeNameFromLayoutKey("default"), "default");
     assert.equal(themeNameFromLayoutKey("orange"), "orange");
     assert.equal(themeNameFromLayoutKey("yellow"), "yellow");
+    assert.equal(themeNameFromLayoutKey("dark"), "dark");
   });
 
   it("falls back to default for unknown keys", () => {

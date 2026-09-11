@@ -85,6 +85,7 @@ export type SiteDictionary = {
     inPlace: string;
     emptyTitle: string;
     emptyCopy: string;
+    emptyFiltered: string;
     emptySale: string;
     emptyRent: string;
     bedroomsFilter: string;
@@ -137,6 +138,9 @@ export type SiteDictionary = {
       indicators: string;
       goTo: string;
       view: string;
+      viewAll: string;
+      close: string;
+      lightbox: string;
     };
   };
   inquiry: {
@@ -516,6 +520,7 @@ const dictionaries = {
       inPlace: "en {city}",
       emptyTitle: "No encontramos inmuebles",
       emptyCopy: "No hay anuncios publicados",
+      emptyFiltered: "No hay anuncios publicados{emptyKind}{city}{localizedType}{bedrooms}.",
       emptySale: "en venta",
       emptyRent: "en renta",
       bedroomsFilter: "{count}+ recámaras",
@@ -569,6 +574,9 @@ const dictionaries = {
         indicators: "Indicadores de foto",
         goTo: "Ir a foto {index}",
         view: "Ver foto {index}",
+        viewAll: "Ver todas las fotos",
+        close: "Cerrar",
+        lightbox: "Visor de fotos",
       },
     },
     inquiry: {
@@ -817,6 +825,7 @@ const dictionaries = {
       inPlace: "in {city}",
       emptyTitle: "No properties found",
       emptyCopy: "There are no published listings",
+      emptyFiltered: "There are no published listings{emptyKind}{city}{localizedType}{bedrooms}.",
       emptySale: "for sale",
       emptyRent: "for rent",
       bedroomsFilter: "{count}+ bedrooms",
@@ -869,6 +878,9 @@ const dictionaries = {
         indicators: "Photo indicators",
         goTo: "Go to photo {index}",
         view: "View photo {index}",
+        viewAll: "View all photos",
+        close: "Close",
+        lightbox: "Photo viewer",
       },
     },
     inquiry: {

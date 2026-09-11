@@ -1,3 +1,4 @@
+import { fetchCatalogLocationListings } from "@/lib/catalog-location-listings";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import {
@@ -46,7 +47,7 @@ function resultsHeading(
   const place = city
     ? fillTemplate(dict.results.inPlace, { city })
     : "";
-  return `${count} ${kind}${place}`;
+  return place ? `${count} ${kind} ${place}` : `${count} ${kind}`;
 }
 
 export async function generateMetadata({
@@ -108,10 +109,10 @@ export default async function CatalogPage({
   }>(`/api/public/listings?${qs.toString()}`);
 
   const listings =
-    result.ok && Array.isArray(result.data.listings)
+    result.ok && Array.isArray(result.data?.listings)
       ? result.data.listings
       : [];
-  const total = result.ok ? (result.data.meta?.total ?? listings.length) : 0;
+  const total = result.ok ? (result.data?.meta?.total ?? listings.length) : 0;
 
   if (result.ok) {
     const resolved = resolveCatalogPage(
@@ -151,7 +152,7 @@ export default async function CatalogPage({
         `/api/public/listings/${encodeURIComponent(first.slug)}`,
       );
       heroPhotoUrls = (
-        detail.ok
+        detail.ok && detail.data
           ? listingGalleryUrls(detail.data)
           : listingGalleryUrls({ photo_url: first.photo_url })
       ).slice(0, 3);
@@ -164,6 +165,9 @@ export default async function CatalogPage({
     ? (dict.propertyTypes[propertyType as PropertyType] ?? propertyType)
     : null;
 
+  const locationListings = theme.catalog.locationListings
+    ? await fetchCatalogLocationListings()
+    : undefined;
   const session = await getSessionContext();
   const Catalog = theme.Catalog;
 
@@ -174,6 +178,7 @@ export default async function CatalogPage({
       propertyType={propertyType}
       bedrooms={bedrooms}
       listings={listings}
+      locationListings={locationListings}
       total={total}
       page={page}
       pageSize={pageSize}

@@ -1,33 +1,25 @@
 "use client";
 
+import type { SiteThemeName } from "@/themes/theme-definitions";
+
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ListingPhotoGalleryStrip } from "@/components/listing-photo-gallery-strip";
+import {
+  listingGalleryLabelsForLocale,
+  type ListingGalleryLabels,
+} from "@/lib/listing-gallery-labels";
+import {
+  listingGalleryStripChrome,
+  type ListingGalleryStripChrome,
+} from "@/lib/listing-gallery-strip";
+import { listingGalleryPhotoUrls } from "@/lib/listing-gallery-urls";
 import { galleryIndexAfterKey, wrapGalleryIndex } from "@/lib/listing-gallery-nav";
 import type { ListingPhoto } from "@/lib/listing-types";
-import { fillTemplate } from "@/lib/site-i18n";
+import { fillTemplate, type SiteLocale } from "@/lib/site-i18n";
 
-export type ListingGalleryLabels = {
-  empty: string;
-  carouselRole: string;
-  photosOf: string;
-  photoAlt: string;
-  prev: string;
-  next: string;
-  indicators: string;
-  goTo: string;
-  view: string;
-};
+export type { ListingGalleryLabels } from "@/lib/listing-gallery-labels";
 
-const DEFAULT_GALLERY_LABELS: ListingGalleryLabels = {
-  empty: "Sin fotos",
-  carouselRole: "carrusel",
-  photosOf: "Fotos de {title}",
-  photoAlt: "{title} — foto {index} de {count}",
-  prev: "Foto anterior",
-  next: "Foto siguiente",
-  indicators: "Indicadores de foto",
-  goTo: "Ir a foto {index}",
-  view: "Ver foto {index}",
-};
+export type ListingGalleryVariant = "carousel" | "strip";
 
 type Props = {
   title: string;
@@ -36,6 +28,13 @@ type Props = {
   className?: string;
   labels?: ListingGalleryLabels;
   styledLayout?: boolean;
+  /** Default `carousel` preserves existing theme behavior. */
+  variant?: ListingGalleryVariant;
+  /** Required chrome copy when `variant="strip"` (defaults from locale). */
+  stripChrome?: ListingGalleryStripChrome;
+  locale?: SiteLocale;
+  /** Theme attribute on the strip lightbox portal for scoped CSS. */
+  portalSiteTheme?: SiteThemeName;
 };
 
 function ChevronLeft({ className }: { className?: string }) {
@@ -72,19 +71,19 @@ function ChevronRight({ className }: { className?: string }) {
   );
 }
 
-export function ListingPhotoGallery({
+function ListingPhotoGalleryCarousel({
   title,
-  photos,
-  fallbackUrl,
+  urls,
+  labels,
   className,
-  labels = DEFAULT_GALLERY_LABELS,
-  styledLayout = true,
-}: Props) {
-  const urls = photos
-    .map((p) => p.url)
-    .filter((url): url is string => Boolean(url?.trim()));
-  if (urls.length === 0 && fallbackUrl) urls.push(fallbackUrl);
-
+  styledLayout,
+}: {
+  title: string;
+  urls: string[];
+  labels: ListingGalleryLabels;
+  className?: string;
+  styledLayout: boolean;
+}) {
   const count = urls.length;
   const [activeIndex, setActiveIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
@@ -113,7 +112,6 @@ export function ListingPhotoGallery({
   }, [activeIndex, count]);
 
   const activeUrl = urls[activeIndex] ?? null;
-
   const rootClass = ["listing-gallery", className].filter(Boolean).join(" ");
 
   const stageRing = styledLayout ? "ring-blue-950/10" : "ring-zinc-200";
@@ -282,5 +280,44 @@ export function ListingPhotoGallery({
         </ul>
       ) : null}
     </div>
+  );
+}
+
+export function ListingPhotoGallery({
+  title,
+  photos,
+  fallbackUrl,
+  className,
+  labels,
+  styledLayout = true,
+  variant = "carousel",
+  stripChrome,
+  locale = "es",
+  portalSiteTheme,
+}: Props) {
+  const resolvedLabels = labels ?? listingGalleryLabelsForLocale(locale);
+  const urls = listingGalleryPhotoUrls(photos, fallbackUrl);
+
+  if (variant === "strip") {
+    return (
+      <ListingPhotoGalleryStrip
+        title={title}
+        urls={urls}
+        labels={resolvedLabels}
+        chrome={stripChrome ?? listingGalleryStripChrome(locale)}
+        className={className}
+        portalSiteTheme={portalSiteTheme}
+      />
+    );
+  }
+
+  return (
+    <ListingPhotoGalleryCarousel
+      title={title}
+      urls={urls}
+      labels={resolvedLabels}
+      className={className}
+      styledLayout={styledLayout}
+    />
   );
 }

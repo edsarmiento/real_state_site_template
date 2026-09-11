@@ -81,6 +81,7 @@ export function DefaultListingDetail({
           photos={photos}
           fallbackUrl={listing.photo_url}
           styledLayout={false}
+          locale={locale}
         />
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">

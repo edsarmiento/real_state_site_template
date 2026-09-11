@@ -1,4 +1,5 @@
 import type { ContactContent } from "@/lib/public-site-content";
+import { isExampleEmail, isExamplePhone } from "@/lib/example-contact";
 import type { SiteDictionary } from "@/lib/site-i18n";
 import {
   LuxuryIconArrowRight,
@@ -33,7 +34,7 @@ function collectChannels(
       whatsapp: true,
     });
   }
-  if (contact.phoneHref) {
+  if (contact.phoneHref && !isExamplePhone(contact.phone)) {
     channels.push({
       key: "phone",
       eyebrow: dict.contact.callUs,
@@ -41,7 +42,7 @@ function collectChannels(
       href: contact.phoneHref,
     });
   }
-  if (contact.emailHref && contact.email) {
+  if (contact.emailHref && contact.email && !isExampleEmail(contact.email)) {
     channels.push({
       key: "email",
       eyebrow: dict.contact.email,
@@ -80,8 +81,8 @@ function ChannelIcon({ name }: { name: string }) {
 export function hasContactChannels(contact: ContactContent): boolean {
   return Boolean(
     contact.whatsappHref ||
-      contact.phoneHref ||
-      (contact.emailHref && contact.email) ||
+      (contact.phoneHref && !isExamplePhone(contact.phone)) ||
+      (contact.emailHref && contact.email && !isExampleEmail(contact.email)) ||
       contact.scheduleCallUrl ||
       contact.location,
   );

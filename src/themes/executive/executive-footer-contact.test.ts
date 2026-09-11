@@ -34,15 +34,15 @@ describe("normalizeExecutiveFooterContact", () => {
         whatsappHref: " https://wa.me/521 ",
         phone: " +52 55 1234 ",
         phoneHref: " tel:+52551234 ",
-        email: " a@example.com ",
-        emailHref: " mailto:a@example.com ",
+        email: " a@agencia.mx ",
+        emailHref: " mailto:a@agencia.mx ",
       }),
       {
         whatsappHref: "https://wa.me/521",
         phone: "+52 55 1234",
         phoneHref: "tel:+52551234",
-        email: "a@example.com",
-        emailHref: "mailto:a@example.com",
+        email: "a@agencia.mx",
+        emailHref: "mailto:a@agencia.mx",
       },
     );
   });
@@ -63,7 +63,7 @@ describe("executiveFooterContactChannels", () => {
       phone: "  ",
       phoneHref: " tel:1 ",
       email: " ",
-      emailHref: " mailto:a@example.com ",
+      emailHref: " mailto:a@agencia.mx ",
     });
     assert.deepEqual(
       executiveFooterContactChannels(contact, { whatsapp: WA_LABEL }),
@@ -75,7 +75,7 @@ describe("executiveFooterContactChannels", () => {
     const contact = normalizeExecutiveFooterContact({
       whatsappHref: "https://wa.me/521",
       email: " ",
-      emailHref: "mailto:a@example.com",
+      emailHref: "mailto:a@agencia.mx",
     });
     assert.deepEqual(
       executiveFooterContactChannels(contact, { whatsapp: WA_LABEL }),
@@ -91,8 +91,8 @@ describe("executiveFooterContactChannels", () => {
 
   it("includes complete email and complete phone channels", () => {
     const contact = normalizeExecutiveFooterContact({
-      email: "a@example.com",
-      emailHref: "mailto:a@example.com",
+      email: "a@agencia.mx",
+      emailHref: "mailto:a@agencia.mx",
       phone: "+52 1",
       phoneHref: "tel:+521",
     });
@@ -101,8 +101,8 @@ describe("executiveFooterContactChannels", () => {
       [
         {
           kind: "email",
-          href: "mailto:a@example.com",
-          label: "a@example.com",
+          href: "mailto:a@agencia.mx",
+          label: "a@agencia.mx",
         },
         {
           kind: "phone",
@@ -115,7 +115,7 @@ describe("executiveFooterContactChannels", () => {
 
   it("omits text without href and href without text", () => {
     const contact = normalizeExecutiveFooterContact({
-      email: "a@example.com",
+      email: "a@agencia.mx",
       phoneHref: "tel:+521",
     });
     assert.deepEqual(
@@ -128,7 +128,7 @@ describe("executiveFooterContactChannels", () => {
     const contact = normalizeExecutiveFooterContact({
       phone: "+52 1",
       phoneHref: "tel:+521",
-      email: "a@example.com",
+      email: "a@agencia.mx",
       emailHref: "   ",
     });
     assert.deepEqual(
@@ -146,8 +146,8 @@ describe("executiveFooterContactChannels", () => {
   it("never emits empty href or blank labels for valid trimmed values", () => {
     const contact = normalizeExecutiveFooterContact({
       whatsappHref: " https://wa.me/521 ",
-      email: " a@example.com ",
-      emailHref: " mailto:a@example.com ",
+      email: " a@agencia.mx ",
+      emailHref: " mailto:a@agencia.mx ",
       phone: " +52 1 ",
       phoneHref: " tel:+521 ",
     });
@@ -173,8 +173,8 @@ describe("executiveHasVisibleContact", () => {
     );
     assert.equal(
       executiveHasVisibleContact({
-        email: "a@example.com",
-        emailHref: "mailto:a@example.com",
+        email: "a@agencia.mx",
+        emailHref: "mailto:a@agencia.mx",
       }),
       true,
     );
@@ -182,14 +182,14 @@ describe("executiveHasVisibleContact", () => {
       executiveHasVisibleContact({
         phone: "+52 1",
         phoneHref: "tel:+521",
-        email: "a@example.com",
+        email: "a@agencia.mx",
         emailHref: "   ",
       }),
       true,
     );
     assert.equal(
       executiveHasVisibleContact({
-        emailHref: "mailto:a@example.com",
+        emailHref: "mailto:a@agencia.mx",
         phoneHref: "tel:+521",
       }),
       false,
