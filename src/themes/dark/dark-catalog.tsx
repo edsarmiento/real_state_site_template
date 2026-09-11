@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { catalogSearchParams, catalogTotalPages } from "@/lib/catalog-pagination";
-import { getSessionContext } from "@/lib/session-context";
 import {
   fillTemplate,
   localizedHref,
@@ -54,7 +53,7 @@ function offerHref(
   );
 }
 
-export async function DarkCatalog({
+export function DarkCatalog({
   oferta,
   city,
   propertyType,
@@ -68,12 +67,12 @@ export async function DarkCatalog({
   typeLabel,
   catalogOk,
   catalogStatus,
+  isAdmin,
   heroPhotoUrls,
   content,
   config,
   locale,
 }: CatalogThemeProps) {
-  const session = await getSessionContext();
   const ui = getDarkUi({ content, config, locale });
   const { dict, defaultLocale } = ui;
   const validListings = keepValidPublicListings(listings);
@@ -131,7 +130,7 @@ export async function DarkCatalog({
       <Suspense fallback={null}>
         <DarkCatalogHashScroll />
       </Suspense>
-      <DarkHeader ui={ui} session={session} />
+      <DarkHeader ui={ui} isAdmin={isAdmin} />
 
       <section className="dark-hero">
         <div className="dark-hero__media" aria-hidden={!heroSrc}>

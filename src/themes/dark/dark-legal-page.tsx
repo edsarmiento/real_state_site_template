@@ -23,7 +23,7 @@ export async function DarkLegalPage({
 
   return (
     <DarkShell content={content} locale={locale} dict={dict}>
-      <DarkHeader ui={ui} session={session} />
+      <DarkHeader ui={ui} isAdmin={session?.isStaffUser === true} />
       <main className="dark-legal">
         <div className="dark-shell dark-legal__inner">
           <p className="dark-eyebrow">{dict.legal.kicker}</p>

@@ -5,7 +5,6 @@ import {
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
-import { resolveThemeProps } from "@/themes/resolve-theme-props";
 import type { ThemeResolvedProps } from "@/themes/theme-types";
 
 export type DarkUi = {
@@ -37,11 +36,6 @@ export function getDarkUi({
     showShareButton: config.showShareButton,
     siteOrigin: config.siteOrigin,
   };
-}
-
-/** Async loader for rare callers that still only have `lang`. */
-export async function loadDarkUi(lang?: string): Promise<DarkUi> {
-  return getDarkUi(await resolveThemeProps(lang));
 }
 
 export function darkNavLinks(

@@ -19,7 +19,7 @@ export async function DarkListingLoadError({
 
   return (
     <DarkShell content={content} locale={locale} dict={dict}>
-      <DarkHeader ui={ui} session={session} />
+      <DarkHeader ui={ui} isAdmin={session?.isStaffUser === true} />
       <main className="dark-legal">
         <div className="dark-shell dark-legal__inner">
           <h1 className="dark-section__title">{message}</h1>
