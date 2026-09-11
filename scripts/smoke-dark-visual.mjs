@@ -1,3 +1,4 @@
+import { thumbnailTarget, thumbnailIsSynced, hasVisibleInteractiveFocus } from "./smoke-dark-checks.mjs";
 /**
  * Dark theme visual smoke.
  * Usage: node scripts/smoke-dark-visual.mjs
@@ -87,7 +88,7 @@ async function main() {
     const emptyCards = await page.$$(".dark-card");
     note(
       "empty-results",
-      emptyCards.length === 0 ? "PASS" : "WARN",
+      emptyCards.length === 0 ? "PASS" : "FAIL",
       `cards=${emptyCards.length}; snippet=${emptyText.slice(0, 120).replace(/\s+/g, " ")}`,
     );
     await shot(page, "home-empty-1440");
@@ -212,16 +213,17 @@ async function main() {
       JSON.stringify(galleryState),
     );
 
-    if (galleryState.thumbCount > 1) {
+    const targetThumb = thumbnailTarget(galleryState.thumbCount);
+    if (targetThumb !== null) {
       const before = await page.$eval(
         ".listing-gallery__counter",
         (el) => el.textContent?.trim(),
       ).catch(() => null);
-      await page.evaluate(() => {
-        document
-          .querySelectorAll(".listing-gallery__thumbs .listing-gallery__thumb")[2]
-          ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-      });
+      await page.evaluate((index) => {
+        const thumb = document.querySelectorAll(".listing-gallery__thumbs .listing-gallery__thumb")[index];
+        if (!thumb) throw new Error("Expected gallery thumbnail missing");
+        thumb.click();
+      }, targetThumb);
       await new Promise((r) => setTimeout(r, 600));
       const after = await page.evaluate(() => ({
         counter: document.querySelector(".listing-gallery__counter")?.textContent?.trim(),
@@ -233,7 +235,7 @@ async function main() {
       }));
       note(
         "gallery-thumb-sync",
-        after.activeThumb === 2 || after.counter?.startsWith("3 ")
+        thumbnailIsSynced(after, targetThumb)
           ? "PASS"
           : "FAIL",
         `before=${before} after=${JSON.stringify(after)}`,
@@ -259,7 +261,7 @@ async function main() {
         );
         note(
           "gallery-arrow",
-          c1 !== c2 ? "PASS" : "WARN",
+          c1 !== c2 ? "PASS" : "FAIL",
           `${c1} → ${c2}`,
         );
       } else {
@@ -288,7 +290,7 @@ async function main() {
       );
       note(
         "lightbox-escape-focus",
-        lbGone && focusBack ? "PASS" : lbGone ? "WARN" : "FAIL",
+        lbGone && focusBack ? "PASS" : "FAIL",
         `closed=${lbGone} focusViewAll=${focusBack}`,
       );
 
@@ -322,11 +324,18 @@ async function main() {
     });
     note(
       "inquiry-form-present",
-      formInfo.present ? "PASS" : "WARN",
+      formInfo.present ? "PASS" : "FAIL",
       JSON.stringify(formInfo),
     );
     if (formInfo.present) {
-      // Attempt HTML5 validation path without network: click submit with empty fields
+      // Block all mutation requests while probing empty-form validation.
+      await page.setRequestInterception(true);
+      const blockMutation = (request) => {
+        if (["POST", "PUT", "PATCH", "DELETE"].includes(request.method())) request.abort();
+        else request.continue();
+      };
+      page.on("request", blockMutation);
+      const inquiryPath = new URL(page.url()).pathname;
       await page.evaluate(() => {
         const form =
           document.querySelector("form[class*='inquiry']") ||
@@ -356,12 +365,15 @@ async function main() {
         });
         note(
           "inquiry-no-send-empty",
-          validity.hasInvalid || validity.path.includes("/inmueble/")
-            ? "PASS"
-            : "WARN",
+          validity.hasInvalid ? "PASS" : "FAIL",
           JSON.stringify(validity),
         );
+        note("inquiry-stays-on-detail", validity.path === inquiryPath ? "PASS" : "FAIL", validity.path);
+      } else {
+        note("inquiry-submit", "FAIL", "submit control missing");
       }
+      await page.setRequestInterception(false);
+      page.off("request", blockMutation);
     }
 
     // Share + WhatsApp destinations (no send)
@@ -413,14 +425,25 @@ async function main() {
     await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
-    const focusTag = await page.evaluate(() => ({
-      tag: document.activeElement?.tagName,
-      className: document.activeElement?.className,
-      outline: getComputedStyle(document.activeElement || document.body).outlineStyle,
-    }));
+    const focusTag = await page.evaluate(() => {
+      const element = document.activeElement;
+      if (!(element instanceof HTMLElement)) return { interactive: false };
+      const style = getComputedStyle(element);
+      const transparent = (color) => color === "transparent" || /rgba\([^)]*,\s*0\)$/.test(color);
+      return {
+        tag: element.tagName,
+        interactive: element.matches('a[href], button, input:not([type="hidden"]), select, textarea, summary, [tabindex], [contenteditable="true"]') && !element.matches(":disabled") && element.tabIndex >= 0,
+        visible: element.getClientRects().length > 0 && style.visibility === "visible" && Number(style.opacity) > 0,
+        focusVisible: element.matches(":focus-visible"),
+        outline: style.outlineStyle,
+        outlineWidth: parseFloat(style.outlineWidth),
+        outlineVisible: !transparent(style.outlineColor),
+        shadowVisible: style.boxShadow !== "none" && !style.boxShadow.includes("rgba(0, 0, 0, 0)"),
+      };
+    });
     note(
       "keyboard-focus",
-      focusTag.tag ? "PASS" : "WARN",
+      hasVisibleInteractiveFocus(focusTag) ? "PASS" : "FAIL",
       JSON.stringify(focusTag),
     );
     await shot(page, "listing-focus-1440");

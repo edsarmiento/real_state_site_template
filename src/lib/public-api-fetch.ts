@@ -43,6 +43,7 @@ export async function publicApiFetch<T>(
       : path;
 
   let res: Response;
+  let text: string;
   try {
     res = await fetch(`${apiBaseUrl()}${scoped}`, {
       cache: "no-store",
@@ -52,13 +53,13 @@ export async function publicApiFetch<T>(
         ...(init?.headers ?? {}),
       },
     });
+    text = await res.text();
   } catch (error) {
     const kind = classifyPublicApiFetchError(error);
     if (kind === "network") return publicApiNetworkFailureResult();
     throw error;
   }
 
-  const text = await res.text();
   let data: unknown = null;
   if (text) {
     try {

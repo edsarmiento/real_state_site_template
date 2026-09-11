@@ -52,6 +52,24 @@ describe("keepValidPublicListings", () => {
     assert.deepEqual(keepValidPublicListings([{ ...validListing, photo_url: null }]), [{ ...validListing, photo_url: null }]);
   });
 
+  it("validates all nullable spec and location fields before rendering", () => {
+    const fields = ["state_or_region", "colony", "bedrooms", "bathrooms", "built_area", "land_area", "agency_logo_url"];
+    for (const field of fields) {
+      const card: Record<string, unknown> = { ...validListing };
+      delete card[field];
+      assert.deepEqual(keepValidPublicListings([card]), [], `missing ${field}`);
+      for (const bad of [{}, [], true, field === "bedrooms" ? "2" : 2]) {
+        card[field] = bad;
+        assert.deepEqual(keepValidPublicListings([card]), [], `invalid ${field}`);
+      }
+      card[field] = null;
+      assert.equal(keepValidPublicListings([card]).length, 1, `nullable ${field}`);
+    }
+    for (const bedrooms of [NaN, Infinity]) {
+      assert.deepEqual(keepValidPublicListings([{ ...validListing, bedrooms }]), []);
+    }
+  });
+
   it("returns an empty list when listings is missing or not an array", () => {
     assert.deepEqual(keepValidPublicListings(null), []);
     assert.deepEqual(keepValidPublicListings(undefined), []);

@@ -458,8 +458,8 @@ html:has([data-site-theme="dark"])::-webkit-scrollbar-thumb {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100svh;
   min-height: 100vh;
+  min-height: 100svh;
   padding: calc(var(--dark-header-h) + 2rem) var(--dark-gutter) 5rem;
   overflow: hidden;
 }

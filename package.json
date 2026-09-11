@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start -p 3002",
     "lint": "eslint",
-    "test": "node --import ./scripts/register-test-hooks.mjs --test \"src/**/*.test.ts\" \"scripts/*.test.mjs\""
+    "test": "node --import ./scripts/register-test-hooks.mjs --test \"src/**/*.test.ts\" \"scripts/*.test.mjs\"",
+    "typecheck": "tsc --noEmit && tsc --project tsconfig.test.json"
   },
   "dependencies": {
     "next": "16.2.6",

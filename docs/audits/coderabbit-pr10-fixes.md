@@ -44,3 +44,28 @@ Base revisada: `e6343fc0bc65ddddc0589718d271f133c4ed2508` (`feat/dark-theme`).
 - El repositorio hermano con BUSINESS_RULES.md no está disponible. No se modificaron contratos de dominio.
 
 Las correcciones se agrupan en un único commit para el PR #10.
+
+## Segunda revisión — 11 de septiembre de 2026
+
+Se revisaron los 12 comentarios nuevos posteriores a `efcb3f1`: 11 atendidos y 1 no aplicable a la composición actual.
+
+| Área | Resolución |
+|---|---|
+| Smoke: resultados vacíos | Anuncios visibles con un filtro vacío producen FAIL. |
+| Smoke: miniaturas | El índice existe también con dos fotos; contador y miniatura deben coincidir. |
+| Smoke: formulario | Exige un control inválido y comprueba la ruta por separado; bloquea solicitudes de mutación durante la prueba. |
+| Smoke: teclado | Exige control interactivo visible, foco de teclado e indicador visible. |
+| Galería compartida | Reutiliza orden y deduplicación de `listingGalleryUrls`; conserva la portada como fallback cuando no hay fotos válidas. |
+| Transporte público | Incluye la lectura del cuerpo en el manejo de red; devuelve 503 por fallos de stream y conserva abortos y errores inesperados. |
+| Guard de anuncios | Comprueba los siete campos omitidos, valores numéricos finitos y coordenadas opcionales. |
+| DarkSearch | No aplica: su padre ya usa una key con oferta, ciudad, tipo, recámaras e idioma; la navegación remonta los controles. No se añade estado duplicado. |
+| Altura móvil | El fallback `100vh` precede a `100svh`. No se encontró otra inversión del mismo patrón. |
+| Arquitectura de ubicaciones | Sustituye el adaptador de la primera revisión: la ruta carga mediante una opción del registro y el helper vive en `src/lib`. No hay bifurcación por nombre de tema. |
+| Fotos de ubicaciones configuradas | Siempre reciben el lote sin filtros, independientemente de la página o ciudad seleccionada. |
+| TypeScript | Las pruebas usan `tsconfig.test.json`; la app no habilita importaciones con extensión `.ts`. `npm run typecheck` valida ambas configuraciones. |
+
+La búsqueda transversal incluyó normalizadores de galería, respuestas de catálogo vacías, unidades de viewport y criterios PASS/WARN del smoke. Se corrigieron también falsos positivos en la flecha de galería, retorno de foco del lightbox y ausencia del formulario. WhatsApp y compartir conservan WARN porque dependen de configuración opcional. La ruta principal ahora tolera cuerpos vacíos de catálogo y detalle del hero; Ultra ya tenía un guard equivalente.
+
+Los comentarios anteriores sobre `puppeteer-core` y `engines` ya están corregidos. La coordinación API/Ops sigue fuera de este repositorio. Se mantiene el arreglo de espacios del encabezado: revertirlo reintroduciría concatenación incorrecta.
+
+Validación de esta revisión: 312 pruebas correctas, lint y typecheck de app/pruebas correctos. Build verificado con ACCOUNT_ID de prueba y API local sin servicio. No se ejecutó el smoke visual completo contra una cuenta real ni se afirma cobertura total de todos los comportamientos del sitio.

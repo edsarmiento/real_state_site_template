@@ -29,7 +29,7 @@ export function classifyPublicApiFetchError(
   const haystack = `${message} ${causeCode}`;
 
   if (
-    /fetch failed|failed to fetch|networkerror|load failed/i.test(haystack) ||
+    /fetch failed|failed to fetch|network\s*error|load failed/i.test(haystack) ||
     /ECONNREFUSED|ENOTFOUND|ETIMEDOUT|ECONNRESET|EAI_AGAIN|EHOSTUNREACH|UND_ERR_/i.test(
       haystack,
     )

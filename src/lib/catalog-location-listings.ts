@@ -7,7 +7,7 @@ import type { PublicListingCard } from "@/lib/listing-types";
  * only the selected city remains and switching cities from cards breaks.
  * React cache() dedupes within the same request.
  */
-export const fetchDarkLocationListings = cache(
+export const fetchCatalogLocationListings = cache(
   async (): Promise<PublicListingCard[]> => {
     try {
       const result = await publicApiFetch<{

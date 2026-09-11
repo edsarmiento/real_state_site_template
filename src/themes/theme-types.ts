@@ -78,6 +78,8 @@ export type ThemeCatalogOptions = {
   pageSize: number;
   /** Fetch first listing gallery URLs for the hero collage. */
   heroGallery: boolean;
+  /** Resolve an unfiltered source for location cards before rendering. */
+  locationListings?: boolean;
 };
 
 export type SiteTheme = {

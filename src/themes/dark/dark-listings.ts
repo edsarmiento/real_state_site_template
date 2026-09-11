@@ -22,7 +22,14 @@ export function isPublicListingCard(value: unknown): value is PublicListingCard 
     typeof item.currency === "string" &&
     typeof item.location_label === "string" &&
     (item.photo_url === null || typeof item.photo_url === "string") &&
-    typeof item.agency_name === "string"
+    typeof item.agency_name === "string" &&
+    ["state_or_region", "colony", "bathrooms", "built_area", "land_area", "agency_logo_url"].every(
+      (key) => item[key] === null || typeof item[key] === "string",
+    ) &&
+    (item.bedrooms === null || (typeof item.bedrooms === "number" && Number.isFinite(item.bedrooms))) &&
+    ["latitude", "longitude"].every(
+      (key) => item[key] === undefined || (typeof item[key] === "number" && Number.isFinite(item[key])),
+    )
   );
 }
 

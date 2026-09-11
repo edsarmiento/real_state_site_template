@@ -1,6 +1,3 @@
-import { createElement } from "react";
-import { fetchDarkLocationListings } from "@/themes/dark/dark-location-listings";
-import { getDarkUi } from "@/themes/dark/dark-ui";
 import { BeigeCatalog } from "@/themes/beige/beige-catalog";
 import { BeigeListingDetail } from "@/themes/beige/beige-listing-detail";
 import { BeigeListingLoadError } from "@/themes/beige/beige-listing-load-error";
@@ -53,7 +50,11 @@ const ORANGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ULTRA_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const YELLOW_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const EXECUTIVE_CATALOG = { pageSize: 12, heroGallery: true } as const;
-const DARK_CATALOG = { pageSize: 12, heroGallery: true } as const;
+const DARK_CATALOG = {
+  pageSize: 12,
+  heroGallery: true,
+  locationListings: true,
+} as const;
 
 /**
  * Public themes. Add a theme: folder under src/themes/<name>/ + entry here
@@ -137,16 +138,10 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
     name: "dark",
     layoutKeys: LAYOUT_KEYS_BY_THEME.dark,
     catalog: DARK_CATALOG,
-    Catalog: async (props) => {
-      const { content } = await getDarkUi(props.lang);
-      const locationListings = content.locations.length > 0
-        ? props.listings
-        : await fetchDarkLocationListings();
-      return createElement(DarkCatalog, { ...props, locationListings });
-    },
-    ListingDetail: DarkListingDetail,
-    ListingLoadError: DarkListingLoadError,
-    LegalPage: DarkLegalPage,
+    Catalog: withResolvedThemeProps(DarkCatalog),
+    ListingDetail: withResolvedThemeProps(DarkListingDetail),
+    ListingLoadError: withResolvedThemeProps(DarkListingLoadError),
+    LegalPage: withResolvedThemeProps(DarkLegalPage),
   },
 };
 

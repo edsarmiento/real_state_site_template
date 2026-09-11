@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, it, mock } from "node:test";
-import { fetchDarkLocationListings } from "./dark-location-listings.ts";
+import { fetchCatalogLocationListings } from "./catalog-location-listings.ts";
 
 const previousAccount = process.env.ACCOUNT_ID;
 afterEach(() => {
@@ -13,21 +13,21 @@ for (const body of [null, "{}", '{"listings":null}', '{"listings":{}}']) {
   it(`returns no locations for an empty or malformed response: ${body}`, async () => {
     process.env.ACCOUNT_ID = "1";
     mock.method(globalThis, "fetch", async () => new Response(body));
-    assert.deepEqual(await fetchDarkLocationListings(), []);
+    assert.deepEqual(await fetchCatalogLocationListings(), []);
   });
 }
 for (const name of ["AbortError", "TimeoutError"]) {
   it(`degrades gracefully on ${name}`, async () => {
     process.env.ACCOUNT_ID = "1";
     mock.method(globalThis, "fetch", async () => { throw new DOMException("cancelled", name); });
-    assert.deepEqual(await fetchDarkLocationListings(), []);
+    assert.deepEqual(await fetchCatalogLocationListings(), []);
   });
 }
 it("preserves unexpected errors", async () => {
   process.env.ACCOUNT_ID = "1";
   const error = new Error("unexpected");
   mock.method(globalThis, "fetch", async () => { throw error; });
-  await assert.rejects(fetchDarkLocationListings(), (actual) => actual === error);
+  await assert.rejects(fetchCatalogLocationListings(), (actual) => actual === error);
 });
 it("requests unfiltered locations with a timeout and returns the API cards", async () => {
   process.env.ACCOUNT_ID = "1";
@@ -40,5 +40,5 @@ it("requests unfiltered locations with a timeout and returns the API cards", asy
     assert.ok(init.signal instanceof AbortSignal);
     return Response.json({ listings });
   });
-  assert.deepEqual(await fetchDarkLocationListings(), listings);
+  assert.deepEqual(await fetchCatalogLocationListings(), listings);
 });

@@ -16,6 +16,15 @@ import {
 } from "./listing-gallery-nav.ts";
 
 describe("listingGalleryPhotoUrls", () => {
+  it("orders photos, removes signed duplicates, and leaves the input unchanged", () => {
+    const photos = [
+      { id: 1, url: "https://cdn.example/b.jpg?signature=one", position: 2 },
+      { id: 2, url: " https://cdn.example/a.jpg ", position: 0 },
+      { id: 3, url: "https://cdn.example/b.jpg?signature=two", position: 1 },
+    ];
+    assert.deepEqual(listingGalleryPhotoUrls(photos, "https://cover.jpg"), ["https://cdn.example/a.jpg", "https://cdn.example/b.jpg?signature=two"]);
+    assert.deepEqual(photos.map((p) => p.position), [2, 0, 1]);
+  });
   it("prefers photo urls and falls back to cover", () => {
     assert.deepEqual(
       listingGalleryPhotoUrls(
