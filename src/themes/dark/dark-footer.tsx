@@ -17,8 +17,9 @@ export function DarkFooter({ ui }: Props) {
   const { brand, footer, legal, social, contact } = content;
   const links = darkNavLinks(dict, locale, defaultLocale);
   const { whatsappHref, phone, phoneHref } = darkContactChannels(content);
+  const emailRaw = contact.email?.trim() ?? "";
   const email =
-    contact.email && !isExampleEmail(contact.email) ? contact.email : null;
+    emailRaw && !isExampleEmail(emailRaw) ? emailRaw : null;
   const emailHref = email ? contact.emailHref : null;
   const showPhone = Boolean(phone && phoneHref);
   const hasSocial = Boolean(social.instagramUrl || social.facebookUrl);
