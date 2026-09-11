@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import type { SessionContext } from "@/lib/session-context";
 import { localizedHref } from "@/lib/site-i18n";
 import { darkBrandMonogram, getDarkCopy } from "@/themes/dark/dark-copy";
 import { darkContactChannels } from "@/themes/dark/dark-contact-channels";
@@ -15,10 +14,10 @@ import { darkNavLinks, type DarkUi } from "@/themes/dark/dark-ui";
 
 type Props = {
   ui: DarkUi;
-  session: SessionContext | null;
+  isAdmin?: boolean;
 };
 
-export function DarkHeader({ ui, session }: Props) {
+export function DarkHeader({ ui, isAdmin = false }: Props) {
   const { content, dict, locale, defaultLocale } = ui;
   const { brand } = content;
   const links = darkNavLinks(dict, locale, defaultLocale);
@@ -46,7 +45,6 @@ export function DarkHeader({ ui, session }: Props) {
     switcherProps.showLocaleSwitcher,
     switcherProps.supportedLocales,
   );
-  const isAdmin = session?.isStaffUser === true;
   const copy = getDarkCopy(locale);
   const monogram = darkBrandMonogram(brand.name, copy.brandMarkFallback);
 

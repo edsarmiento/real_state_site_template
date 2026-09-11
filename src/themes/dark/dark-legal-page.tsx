@@ -1,17 +1,16 @@
-import { getSessionContext } from "@/lib/session-context";
 import type { LegalPageThemeProps } from "@/themes/theme-types";
 import { getDarkUi } from "@/themes/dark/dark-ui";
 import { DarkFooter } from "@/themes/dark/dark-footer";
 import { DarkHeader } from "@/themes/dark/dark-header";
 import { DarkShell } from "@/themes/dark/dark-shell";
 
-export async function DarkLegalPage({
+export function DarkLegalPage({
   kind,
+  isAdmin,
   content,
   config,
   locale,
 }: LegalPageThemeProps) {
-  const session = await getSessionContext();
   const ui = getDarkUi({ content, config, locale });
   const { dict } = ui;
   const title =
@@ -23,7 +22,7 @@ export async function DarkLegalPage({
 
   return (
     <DarkShell content={content} locale={locale} dict={dict}>
-      <DarkHeader ui={ui} session={session} />
+      <DarkHeader ui={ui} isAdmin={isAdmin} />
       <main className="dark-legal">
         <div className="dark-shell dark-legal__inner">
           <p className="dark-eyebrow">{dict.legal.kicker}</p>

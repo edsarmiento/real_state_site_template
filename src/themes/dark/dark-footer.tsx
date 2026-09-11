@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isExampleEmail } from "@/lib/example-contact";
 import { fillTemplate, localizeSiteHref } from "@/lib/site-i18n";
 import { darkBrandMonogram, getDarkCopy } from "@/themes/dark/dark-copy";
 import { darkContactChannels } from "@/themes/dark/dark-contact-channels";
@@ -15,13 +16,17 @@ export function DarkFooter({ ui }: Props) {
   const { content, dict, locale, defaultLocale } = ui;
   const { brand, footer, legal, social, contact } = content;
   const links = darkNavLinks(dict, locale, defaultLocale);
-  const whatsappHref = darkContactChannels(content).whatsappHref;
+  const { whatsappHref, phone, phoneHref } = darkContactChannels(content);
+  const emailRaw = contact.email?.trim() ?? "";
+  const email =
+    emailRaw && !isExampleEmail(emailRaw) ? emailRaw : null;
+  const emailHref = email ? contact.emailHref : null;
+  const showPhone = Boolean(phone && phoneHref);
   const hasSocial = Boolean(social.instagramUrl || social.facebookUrl);
-  const hasContact = Boolean(
-    whatsappHref || contact.phoneHref || contact.emailHref,
-  );
+  const hasContact = Boolean(whatsappHref || showPhone || emailHref);
   const copy = getDarkCopy(locale);
   const monogram = darkBrandMonogram(brand.name, copy.brandMarkFallback);
+  const year = new Date().getFullYear();
 
   return (
     <footer className="dark-footer">
@@ -78,17 +83,17 @@ export function DarkFooter({ ui }: Props) {
                     </a>
                   </li>
                 ) : null}
-                {contact.emailHref && contact.email ? (
+                {emailHref && email ? (
                   <li>
-                    <a href={contact.emailHref} className="dark-footer__link">
-                      {contact.email}
+                    <a href={emailHref} className="dark-footer__link">
+                      {email}
                     </a>
                   </li>
                 ) : null}
-                {contact.phoneHref && contact.phone ? (
+                {showPhone && phone && phoneHref ? (
                   <li>
-                    <a href={contact.phoneHref} className="dark-footer__link">
-                      {contact.phone}
+                    <a href={phoneHref} className="dark-footer__link">
+                      {phone}
                     </a>
                   </li>
                 ) : null}
@@ -150,12 +155,9 @@ export function DarkFooter({ ui }: Props) {
       <div className="dark-footer__bottom">
         <p>
           {fillTemplate(dict.footer.copyright, {
-            year: "",
+            year,
             name: brand.name,
-          })
-            .replace("©  ", "© ")
-            .replace("© ", "© ")
-            .trim()}
+          })}
         </p>
         {footer.showPoweredBy ? (
           <p>

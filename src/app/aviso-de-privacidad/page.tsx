@@ -1,5 +1,6 @@
 import { legalPlaceholderMetadata } from "@/lib/legal-placeholder";
 import { firstSearchParam } from "@/lib/search-params";
+import { getSessionContext } from "@/lib/session-context";
 import { resolveSiteThemeFromConfig } from "@/themes/resolve-site-theme";
 
 export const metadata = legalPlaceholderMetadata("Aviso de privacidad");
@@ -14,5 +15,12 @@ export default async function PrivacyNoticePage({
   const theme = await resolveSiteThemeFromConfig();
   const LegalPage = theme.LegalPage;
   const lang = firstSearchParam((await searchParams).lang);
-  return <LegalPage kind="privacy" lang={lang} />;
+  const session = await getSessionContext();
+  return (
+    <LegalPage
+      kind="privacy"
+      lang={lang}
+      isAdmin={session?.isStaffUser === true}
+    />
+  );
 }

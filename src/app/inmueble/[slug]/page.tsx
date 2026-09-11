@@ -110,10 +110,16 @@ export default async function ListingDetailPage({
   );
 
   if (result.status === 404) notFound();
+
+  const session = await getSessionContext();
+  const isAdmin = session?.isStaffUser === true;
+
   if (!result.ok) {
     if (theme.ListingLoadError) {
       const ListingLoadError = theme.ListingLoadError;
-      return <ListingLoadError status={result.status} lang={lang} />;
+      return (
+        <ListingLoadError status={result.status} lang={lang} isAdmin={isAdmin} />
+      );
     }
     return (
       <div className="min-h-screen bg-zinc-50 px-4 py-16 text-sm text-zinc-600">
@@ -122,14 +128,9 @@ export default async function ListingDetailPage({
     );
   }
 
-  const session = await getSessionContext();
   const ListingDetail = theme.ListingDetail;
 
   return (
-    <ListingDetail
-      listing={result.data}
-      isAdmin={session?.isStaffUser === true}
-      lang={lang}
-    />
+    <ListingDetail listing={result.data} isAdmin={isAdmin} lang={lang} />
   );
 }

@@ -10,7 +10,6 @@ import {
 import { googleMapsSearchUrl } from "@/lib/maps-links";
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import { listingPublicUrl } from "@/lib/site-config-env";
-import { getSessionContext } from "@/lib/session-context";
 import { localizedHref } from "@/lib/site-i18n";
 import type { ListingDetailThemeProps } from "@/themes/theme-types";
 import { displayListingTitle } from "@/themes/dark/dark-copy";
@@ -27,13 +26,13 @@ import {
 import { DarkShell } from "@/themes/dark/dark-shell";
 import { formatDarkPriceParts, getDarkUi } from "@/themes/dark/dark-ui";
 
-export async function DarkListingDetail({
+export function DarkListingDetail({
   listing,
+  isAdmin,
   content,
   config,
   locale,
 }: ListingDetailThemeProps) {
-  const session = await getSessionContext();
   const ui = getDarkUi({ content, config, locale });
   const { dict, defaultLocale, showShareButton, siteOrigin } = ui;
   const photos = listing.photos ?? [];
@@ -66,7 +65,7 @@ export async function DarkListingDetail({
 
   return (
     <DarkShell content={content} locale={locale} dict={dict} floatRaised>
-      <DarkHeader ui={ui} session={session} />
+      <DarkHeader ui={ui} isAdmin={isAdmin} />
 
       <main className="dark-detail">
         <div className="dark-shell dark-detail__wrap">

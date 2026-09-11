@@ -58,6 +58,7 @@ export type ListingDetailThemeProps = ThemeResolvedProps &
 
 export type ListingLoadErrorThemeRouteProps = {
   status: number;
+  isAdmin: boolean;
   lang?: string;
 };
 
@@ -68,6 +69,7 @@ export type LegalPageKind = "privacy" | "terms" | "cookies";
 
 export type LegalPageThemeRouteProps = {
   kind: LegalPageKind;
+  isAdmin: boolean;
   lang?: string;
 };
 
