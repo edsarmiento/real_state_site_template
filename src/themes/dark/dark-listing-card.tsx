@@ -47,7 +47,7 @@ export function DarkListingCard({
       <Link href={href} className="dark-card">
         <DarkCoverImage
           src={listing.photo_url}
-          alt={listing.title}
+          alt=""
           className="dark-card__photo"
           placeholderClassName="dark-card__placeholder"
           placeholder={dict.listing.noPhoto}

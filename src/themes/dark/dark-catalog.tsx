@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { catalogSearchParams, catalogTotalPages } from "@/lib/catalog-pagination";
+import { getSessionContext } from "@/lib/session-context";
 import {
   fillTemplate,
   localizedHref,
@@ -67,10 +68,14 @@ export async function DarkCatalog({
   typeLabel,
   catalogOk,
   catalogStatus,
-  lang,
   heroPhotoUrls,
+  content,
+  config,
+  locale,
 }: CatalogThemeProps) {
-  const { content, dict, locale, defaultLocale } = await getDarkUi(lang);
+  const session = await getSessionContext();
+  const ui = getDarkUi({ content, config, locale });
+  const { dict, defaultLocale } = ui;
   const validListings = keepValidPublicListings(listings);
   const locationSourceListings = keepValidPublicListings(locationListings);
   const { locations, inconsistencies } = resolveDarkLocations(
@@ -122,11 +127,11 @@ export async function DarkCatalog({
   ];
 
   return (
-    <DarkShell lang={lang}>
+    <DarkShell content={content} locale={locale} dict={dict}>
       <Suspense fallback={null}>
         <DarkCatalogHashScroll />
       </Suspense>
-      <DarkHeader lang={lang} />
+      <DarkHeader ui={ui} session={session} />
 
       <section className="dark-hero">
         <div className="dark-hero__media" aria-hidden={!heroSrc}>
@@ -305,7 +310,7 @@ export async function DarkCatalog({
         defaultLocale={defaultLocale}
       />
       <DarkFinalCta content={content} dict={dict} />
-      <DarkFooter lang={lang} />
+      <DarkFooter ui={ui} />
     </DarkShell>
   );
 }

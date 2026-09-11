@@ -1,4 +1,5 @@
 import type { PublicSiteContent } from "@/lib/public-site-content";
+import { isExamplePhone } from "@/lib/example-contact";
 
 export type ExecutiveContactChannels = {
   whatsappHref: string | null;
@@ -15,6 +16,8 @@ function absentToNull(value?: string | null): string | null {
 export function executiveContactChannels(
   content: PublicSiteContent,
 ): ExecutiveContactChannels {
+  const phone = absentToNull(content.contact.phone);
+  const hidePhone = isExamplePhone(phone);
   return {
     whatsappNumber:
       absentToNull(content.whatsapp.number) ??
@@ -22,7 +25,7 @@ export function executiveContactChannels(
     whatsappHref:
       absentToNull(content.whatsapp.href) ??
       absentToNull(content.contact.whatsappHref),
-    phone: absentToNull(content.contact.phone),
-    phoneHref: absentToNull(content.contact.phoneHref),
+    phone: hidePhone ? null : phone,
+    phoneHref: hidePhone ? null : absentToNull(content.contact.phoneHref),
   };
 }

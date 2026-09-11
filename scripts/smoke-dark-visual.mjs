@@ -1,4 +1,9 @@
-import { thumbnailTarget, thumbnailIsSynced, hasVisibleInteractiveFocus } from "./smoke-dark-checks.mjs";
+import {
+  thumbnailTarget,
+  thumbnailIsSynced,
+  GALLERY_KEYBOARD_FOCUS_TARGETS,
+  keyboardFocusFindingDetail,
+} from "./smoke-dark-checks.mjs";
 /**
  * Dark theme visual smoke.
  * Usage: node scripts/smoke-dark-visual.mjs
@@ -11,7 +16,9 @@ const BASE = process.env.SMOKE_BASE || "http://localhost:3002";
 const OUT = path.resolve("docs/audits/smoke-dark");
 const CHROME =
   process.env.CHROME_PATH ||
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+  (fs.existsSync("/usr/bin/google-chrome")
+    ? "/usr/bin/google-chrome"
+    : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome");
 
 const VIEWPORTS = [
   { name: "360", width: 360, height: 800 },
@@ -44,6 +51,52 @@ async function overflowX(page) {
       overflow: doc.scrollWidth > doc.clientWidth + 1,
     };
   });
+}
+
+/** Focus a gallery control and capture keyboard-focus metrics for the report. */
+async function probeGalleryKeyboardFocus(page, selector) {
+  return page.evaluate((sel) => {
+    const element = document.querySelector(sel);
+    if (!(element instanceof HTMLElement)) {
+      return { missing: true, interactive: false, visible: false, focusVisible: false };
+    }
+    element.focus({ focusVisible: true });
+    const active = document.activeElement;
+    if (active !== element) {
+      return {
+        missing: false,
+        tag: element.tagName,
+        className: element.className,
+        interactive: false,
+        visible: false,
+        focusVisible: false,
+        focusFailed: true,
+      };
+    }
+    const style = getComputedStyle(element);
+    const transparent = (color) =>
+      color === "transparent" || /rgba\([^)]*,\s*0\)$/.test(color);
+    return {
+      missing: false,
+      tag: element.tagName,
+      className: typeof element.className === "string" ? element.className : "",
+      interactive:
+        element.matches(
+          'a[href], button, input:not([type="hidden"]), select, textarea, summary, [tabindex], [contenteditable="true"]',
+        ) &&
+        !element.matches(":disabled") &&
+        element.tabIndex >= 0,
+      visible:
+        element.getClientRects().length > 0 &&
+        style.visibility === "visible" &&
+        Number(style.opacity) > 0,
+      focusVisible: element.matches(":focus-visible"),
+      outline: style.outlineStyle,
+      outlineWidth: parseFloat(style.outlineWidth),
+      outlineVisible: !transparent(style.outlineColor),
+      boxShadow: style.boxShadow,
+    };
+  }, selector);
 }
 
 async function main() {
@@ -421,31 +474,22 @@ async function main() {
       await shot(page, `listing-${vp.name}`);
     }
 
-    // Keyboard: Tab to interactive control
+    // Keyboard: focus nav, view-all, and thumb separately (not a single Tab stop)
     await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    const focusTag = await page.evaluate(() => {
-      const element = document.activeElement;
-      if (!(element instanceof HTMLElement)) return { interactive: false };
-      const style = getComputedStyle(element);
-      const transparent = (color) => color === "transparent" || /rgba\([^)]*,\s*0\)$/.test(color);
-      return {
-        tag: element.tagName,
-        interactive: element.matches('a[href], button, input:not([type="hidden"]), select, textarea, summary, [tabindex], [contenteditable="true"]') && !element.matches(":disabled") && element.tabIndex >= 0,
-        visible: element.getClientRects().length > 0 && style.visibility === "visible" && Number(style.opacity) > 0,
-        focusVisible: element.matches(":focus-visible"),
-        outline: style.outlineStyle,
-        outlineWidth: parseFloat(style.outlineWidth),
-        outlineVisible: !transparent(style.outlineColor),
-        boxShadow: style.boxShadow,
-      };
-    });
-    note(
-      "keyboard-focus",
-      hasVisibleInteractiveFocus(focusTag) ? "PASS" : "FAIL",
-      JSON.stringify(focusTag),
-    );
+    for (const target of GALLERY_KEYBOARD_FOCUS_TARGETS) {
+      const exists = await page.$(target.selector);
+      if (!exists) {
+        note(target.id, "SKIP", `missing ${target.selector}`);
+        continue;
+      }
+      const focusTag = await probeGalleryKeyboardFocus(page, target.selector);
+      const detail = keyboardFocusFindingDetail(focusTag);
+      note(
+        target.id,
+        detail.hasVisibleInteractiveFocus ? "PASS" : "FAIL",
+        JSON.stringify(detail),
+      );
+    }
     await shot(page, "listing-focus-1440");
   } catch (error) {
     note("smoke-error", "FAIL", String(error));

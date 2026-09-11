@@ -1,4 +1,5 @@
 import type { PublicSiteContent } from "@/lib/public-site-content";
+import { isExamplePhone } from "@/lib/example-contact";
 
 export type BeigeContactChannels = {
   whatsappHref: string | null;
@@ -16,10 +17,12 @@ export type BeigeContactChannels = {
 export function beigeContactChannels(
   content: PublicSiteContent,
 ): BeigeContactChannels {
+  const phone = content.contact.phone;
+  const hidePhone = isExamplePhone(phone);
   return {
     whatsappNumber: content.whatsapp.number ?? content.contact.whatsappNumber,
     whatsappHref: content.whatsapp.href ?? content.contact.whatsappHref,
-    phone: content.contact.phone,
-    phoneHref: content.contact.phoneHref,
+    phone: hidePhone ? null : phone,
+    phoneHref: hidePhone ? null : content.contact.phoneHref,
   };
 }

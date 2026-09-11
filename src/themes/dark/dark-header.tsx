@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import type { SessionContext } from "@/lib/session-context";
 import { localizedHref } from "@/lib/site-i18n";
-import { getSessionContext } from "@/lib/session-context";
 import { darkBrandMonogram, getDarkCopy } from "@/themes/dark/dark-copy";
 import { darkContactChannels } from "@/themes/dark/dark-contact-channels";
 import { DarkHeaderChrome } from "@/themes/dark/dark-header-chrome";
@@ -11,17 +11,14 @@ import { DarkLocaleSwitcher } from "@/themes/dark/dark-locale-switcher";
 import { darkLocaleSwitcherVisible } from "@/themes/dark/dark-locale-visibility";
 import { DarkLogo } from "@/themes/dark/dark-logo";
 import { DarkMobileNav } from "@/themes/dark/dark-mobile-nav";
-import { darkNavLinks, getDarkUi } from "@/themes/dark/dark-ui";
+import { darkNavLinks, type DarkUi } from "@/themes/dark/dark-ui";
 
 type Props = {
-  lang?: string;
+  ui: DarkUi;
+  session: SessionContext | null;
 };
 
-export async function DarkHeader({ lang }: Props) {
-  const [ui, session] = await Promise.all([
-    getDarkUi(lang),
-    getSessionContext(),
-  ]);
+export function DarkHeader({ ui, session }: Props) {
   const { content, dict, locale, defaultLocale } = ui;
   const { brand } = content;
   const links = darkNavLinks(dict, locale, defaultLocale);

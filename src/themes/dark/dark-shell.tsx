@@ -1,23 +1,28 @@
 import type { ReactNode } from "react";
 import "./dark-theme.css";
+import type { PublicSiteContent } from "@/lib/public-site-content";
+import type { SiteLocale } from "@/lib/site-i18n";
 import { DARK_FONT_CLASS } from "@/themes/dark/dark-fonts";
 import { darkContactChannels } from "@/themes/dark/dark-contact-channels";
 import { DarkMotionRoot } from "@/themes/dark/dark-motion-root";
-import { getDarkUi } from "@/themes/dark/dark-ui";
+import type { DarkUi } from "@/themes/dark/dark-ui";
 import { DarkWhatsAppFloat } from "@/themes/dark/dark-whatsapp-float";
 
 type Props = {
   children: ReactNode;
+  content: PublicSiteContent;
+  locale: SiteLocale;
+  dict: DarkUi["dict"];
   floatRaised?: boolean;
-  lang?: string;
 };
 
-export async function DarkShell({
+export function DarkShell({
   children,
+  content,
+  locale,
+  dict,
   floatRaised = false,
-  lang,
 }: Props) {
-  const { content, dict, locale } = await getDarkUi(lang);
   const href = darkContactChannels(content).whatsappHref;
 
   return (

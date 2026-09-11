@@ -5,6 +5,7 @@ import {
   pickLocalized,
   type PublicLocation,
 } from "@/lib/public-site-content";
+import { isExampleEmail } from "@/lib/example-contact";
 import {
   fillTemplate,
   localizeSiteHref,
@@ -296,7 +297,7 @@ function collectChannels(
   dict: SiteDictionary,
 ): Channel[] {
   const contact = content.contact;
-  const whatsappHref = yellowContactChannels(content).whatsappHref;
+  const { whatsappHref, phone, phoneHref } = yellowContactChannels(content);
   const channels: Channel[] = [];
   if (whatsappHref) {
     channels.push({
@@ -308,16 +309,16 @@ function collectChannels(
       icon: "whatsapp",
     });
   }
-  if (contact.phoneHref) {
+  if (phoneHref) {
     channels.push({
       key: "phone",
       eyebrow: dict.contact.callUs,
-      value: contact.phone || dict.contact.callUs,
-      href: contact.phoneHref,
+      value: phone || dict.contact.callUs,
+      href: phoneHref,
       icon: "phone",
     });
   }
-  if (contact.emailHref && contact.email) {
+  if (contact.emailHref && contact.email && !isExampleEmail(contact.email)) {
     channels.push({
       key: "email",
       eyebrow: dict.contact.email,

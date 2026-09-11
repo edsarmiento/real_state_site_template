@@ -5,7 +5,7 @@ import type { SiteThemeName } from "@/themes/theme-definitions";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ListingPhotoGalleryStrip } from "@/components/listing-photo-gallery-strip";
 import {
-  DEFAULT_LISTING_GALLERY_LABELS,
+  listingGalleryLabelsForLocale,
   type ListingGalleryLabels,
 } from "@/lib/listing-gallery-labels";
 import {
@@ -288,13 +288,14 @@ export function ListingPhotoGallery({
   photos,
   fallbackUrl,
   className,
-  labels = DEFAULT_LISTING_GALLERY_LABELS,
+  labels,
   styledLayout = true,
   variant = "carousel",
   stripChrome,
   locale = "es",
   portalSiteTheme,
 }: Props) {
+  const resolvedLabels = labels ?? listingGalleryLabelsForLocale(locale);
   const urls = listingGalleryPhotoUrls(photos, fallbackUrl);
 
   if (variant === "strip") {
@@ -302,7 +303,7 @@ export function ListingPhotoGallery({
       <ListingPhotoGalleryStrip
         title={title}
         urls={urls}
-        labels={labels}
+        labels={resolvedLabels}
         chrome={stripChrome ?? listingGalleryStripChrome(locale)}
         className={className}
         portalSiteTheme={portalSiteTheme}
@@ -314,7 +315,7 @@ export function ListingPhotoGallery({
     <ListingPhotoGalleryCarousel
       title={title}
       urls={urls}
-      labels={labels}
+      labels={resolvedLabels}
       className={className}
       styledLayout={styledLayout}
     />

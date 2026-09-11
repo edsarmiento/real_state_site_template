@@ -20,22 +20,23 @@ export function DarkHeroImage({
   placeholderClassName,
   preload = false,
 }: Props) {
-  const [failed, setFailed] = useState(false);
+  const heroSrc = src.trim();
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
-  if (failed) {
+  if (!heroSrc || failedSrc === heroSrc) {
     return <div className={placeholderClassName} aria-hidden />;
   }
 
   return (
     <Image
-      src={src}
+      src={heroSrc}
       alt={alt}
       fill
       sizes={sizes}
       preload={preload}
       unoptimized
       className={className}
-      onError={() => setFailed(true)}
+      onError={() => setFailedSrc(heroSrc)}
     />
   );
 }

@@ -10,6 +10,7 @@ import {
 import { googleMapsSearchUrl } from "@/lib/maps-links";
 import { localizedPropertyTypeLabel } from "@/lib/property-labels";
 import { listingPublicUrl } from "@/lib/site-config-env";
+import { getSessionContext } from "@/lib/session-context";
 import { localizedHref } from "@/lib/site-i18n";
 import type { ListingDetailThemeProps } from "@/themes/theme-types";
 import { displayListingTitle } from "@/themes/dark/dark-copy";
@@ -28,10 +29,13 @@ import { formatDarkPriceParts, getDarkUi } from "@/themes/dark/dark-ui";
 
 export async function DarkListingDetail({
   listing,
-  lang,
+  content,
+  config,
+  locale,
 }: ListingDetailThemeProps) {
-  const { content, dict, locale, defaultLocale, showShareButton, siteOrigin } =
-    await getDarkUi(lang);
+  const session = await getSessionContext();
+  const ui = getDarkUi({ content, config, locale });
+  const { dict, defaultLocale, showShareButton, siteOrigin } = ui;
   const photos = listing.photos ?? [];
   const offerType = parseOfferType(listing.offer_type);
   const specs = listingPublicSpecsLocalized(listing, dict);
@@ -61,8 +65,8 @@ export async function DarkListingDetail({
   const locationLine = listing.location_label || typeLabel;
 
   return (
-    <DarkShell floatRaised lang={lang}>
-      <DarkHeader lang={lang} />
+    <DarkShell content={content} locale={locale} dict={dict} floatRaised>
+      <DarkHeader ui={ui} session={session} />
 
       <main className="dark-detail">
         <div className="dark-shell dark-detail__wrap">
@@ -257,7 +261,7 @@ export async function DarkListingDetail({
         </a>
       </div>
 
-      <DarkFooter lang={lang} />
+      <DarkFooter ui={ui} />
     </DarkShell>
   );
 }

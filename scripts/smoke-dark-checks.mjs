@@ -29,3 +29,34 @@ export function hasVisibleInteractiveFocus(state) {
     hasVisibleShadowColor(state.boxShadow)
   );
 }
+
+/** Gallery controls probed individually for keyboard focus (not a single Tab stop). */
+export const GALLERY_KEYBOARD_FOCUS_TARGETS = [
+  {
+    id: "keyboard-focus-nav",
+    selector: ".listing-gallery--strip .listing-gallery__nav:not([disabled])",
+  },
+  {
+    id: "keyboard-focus-view-all",
+    selector: ".listing-gallery--strip .listing-gallery__view-all",
+  },
+  {
+    id: "keyboard-focus-thumb",
+    selector: ".listing-gallery--strip .listing-gallery__thumb",
+  },
+];
+
+/** Serialize focus probe for the smoke report (includes verdict fields). */
+export function keyboardFocusFindingDetail(state) {
+  return {
+    focusTag: state.tag ?? null,
+    className: state.className ?? null,
+    hasVisibleInteractiveFocus: hasVisibleInteractiveFocus(state),
+    interactive: Boolean(state.interactive),
+    visible: Boolean(state.visible),
+    focusVisible: Boolean(state.focusVisible),
+    outline: state.outline ?? null,
+    outlineWidth: state.outlineWidth ?? null,
+    boxShadow: state.boxShadow ?? null,
+  };
+}

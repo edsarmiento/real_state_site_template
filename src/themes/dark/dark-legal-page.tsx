@@ -1,11 +1,19 @@
+import { getSessionContext } from "@/lib/session-context";
 import type { LegalPageThemeProps } from "@/themes/theme-types";
 import { getDarkUi } from "@/themes/dark/dark-ui";
 import { DarkFooter } from "@/themes/dark/dark-footer";
 import { DarkHeader } from "@/themes/dark/dark-header";
 import { DarkShell } from "@/themes/dark/dark-shell";
 
-export async function DarkLegalPage({ kind, lang }: LegalPageThemeProps) {
-  const { dict } = await getDarkUi(lang);
+export async function DarkLegalPage({
+  kind,
+  content,
+  config,
+  locale,
+}: LegalPageThemeProps) {
+  const session = await getSessionContext();
+  const ui = getDarkUi({ content, config, locale });
+  const { dict } = ui;
   const title =
     kind === "privacy"
       ? dict.legal.privacyTitle
@@ -14,8 +22,8 @@ export async function DarkLegalPage({ kind, lang }: LegalPageThemeProps) {
         : dict.legal.cookiesTitle;
 
   return (
-    <DarkShell lang={lang}>
-      <DarkHeader lang={lang} />
+    <DarkShell content={content} locale={locale} dict={dict}>
+      <DarkHeader ui={ui} session={session} />
       <main className="dark-legal">
         <div className="dark-shell dark-legal__inner">
           <p className="dark-eyebrow">{dict.legal.kicker}</p>
@@ -24,7 +32,7 @@ export async function DarkLegalPage({ kind, lang }: LegalPageThemeProps) {
           <p className="dark-legal__body">{dict.legal.body}</p>
         </div>
       </main>
-      <DarkFooter lang={lang} />
+      <DarkFooter ui={ui} />
     </DarkShell>
   );
 }

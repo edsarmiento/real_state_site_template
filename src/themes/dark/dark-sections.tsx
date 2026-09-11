@@ -9,6 +9,7 @@ import {
   pickLocalized,
   type PublicLocation,
 } from "@/lib/public-site-content";
+import { isExampleEmail, isExamplePhone } from "@/lib/example-contact";
 import {
   fillTemplate,
   localizeSiteHref,
@@ -486,7 +487,7 @@ function collectChannels(
   }
   if (contact.phoneHref && contact.phone?.trim()) {
     const phone = contact.phone.trim();
-    if (!/example/i.test(phone)) {
+    if (!isExamplePhone(phone)) {
       channels.push({
         key: "phone",
         eyebrow: dict.contact.callUs,
@@ -498,7 +499,7 @@ function collectChannels(
   }
   if (contact.emailHref && contact.email?.trim()) {
     const email = contact.email.trim();
-    if (!/\.example\b/i.test(email) && !/@example\./i.test(email)) {
+    if (!isExampleEmail(email)) {
       channels.push({
         key: "email",
         eyebrow: dict.contact.email,

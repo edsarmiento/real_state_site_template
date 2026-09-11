@@ -216,7 +216,7 @@ export function ListingPhotoGalleryStrip({
     if (!lightboxOpen) return;
     function onKey(event: KeyboardEvent) {
       const focusables = lightboxRef.current?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        'button:not([disabled]):not([tabindex="-1"]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
       const list = focusables ? [...focusables] : [];
       const focusIndex = list.indexOf(document.activeElement as HTMLElement);

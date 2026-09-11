@@ -18,9 +18,9 @@ export function DarkCoverImage({
   placeholder = null,
 }: Props) {
   const imageSrc = src?.trim() || null;
-  const [failed, setFailed] = useState(false);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
-  if (!imageSrc || failed) {
+  if (!imageSrc || failedSrc === imageSrc) {
     return <div className={placeholderClassName}>{placeholder}</div>;
   }
 
@@ -31,7 +31,7 @@ export function DarkCoverImage({
       alt={alt}
       className={className}
       loading="lazy"
-      onError={() => setFailed(true)}
+      onError={() => setFailedSrc(imageSrc)}
     />
   );
 }

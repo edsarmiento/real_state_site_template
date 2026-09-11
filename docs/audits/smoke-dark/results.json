@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:3002",
-  "generatedAt": "2026-09-10T22:09:25.540Z",
+  "generatedAt": "2026-09-11T23:00:56.512Z",
   "findings": [
     {
       "id": "theme-attr",
@@ -133,13 +133,23 @@
       "detail": "scrollWidth=1440 clientWidth=1440"
     },
     {
-      "id": "keyboard-focus",
+      "id": "keyboard-focus-nav",
       "status": "PASS",
-      "detail": "{\"tag\":\"DIV\",\"className\":\"listing-gallery__strip\",\"outline\":\"auto\"}"
+      "detail": "{\"focusTag\":\"BUTTON\",\"className\":\"listing-gallery__nav listing-gallery__nav--next\",\"hasVisibleInteractiveFocus\":true,\"interactive\":true,\"visible\":true,\"focusVisible\":true,\"outline\":\"solid\",\"outlineWidth\":2,\"boxShadow\":\"none\"}"
+    },
+    {
+      "id": "keyboard-focus-view-all",
+      "status": "PASS",
+      "detail": "{\"focusTag\":\"BUTTON\",\"className\":\"listing-gallery__view-all\",\"hasVisibleInteractiveFocus\":true,\"interactive\":true,\"visible\":true,\"focusVisible\":true,\"outline\":\"solid\",\"outlineWidth\":2,\"boxShadow\":\"none\"}"
+    },
+    {
+      "id": "keyboard-focus-thumb",
+      "status": "PASS",
+      "detail": "{\"focusTag\":\"BUTTON\",\"className\":\"listing-gallery__thumb\",\"hasVisibleInteractiveFocus\":true,\"interactive\":true,\"visible\":true,\"focusVisible\":true,\"outline\":\"solid\",\"outlineWidth\":2,\"boxShadow\":\"none\"}"
     }
   ],
   "summary": {
-    "pass": 27,
+    "pass": 29,
     "fail": 0,
     "warn": 0,
     "skip": 0

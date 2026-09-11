@@ -5,14 +5,14 @@ import { darkContactChannels } from "@/themes/dark/dark-contact-channels";
 import { DarkLogo } from "@/themes/dark/dark-logo";
 import { DarkReveal } from "@/themes/dark/dark-reveal";
 import { DarkSocialLinks } from "@/themes/dark/dark-social-links";
-import { darkNavLinks, getDarkUi } from "@/themes/dark/dark-ui";
+import { darkNavLinks, type DarkUi } from "@/themes/dark/dark-ui";
 
 type Props = {
-  lang?: string;
+  ui: DarkUi;
 };
 
-export async function DarkFooter({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await getDarkUi(lang);
+export function DarkFooter({ ui }: Props) {
+  const { content, dict, locale, defaultLocale } = ui;
   const { brand, footer, legal, social, contact } = content;
   const links = darkNavLinks(dict, locale, defaultLocale);
   const whatsappHref = darkContactChannels(content).whatsappHref;

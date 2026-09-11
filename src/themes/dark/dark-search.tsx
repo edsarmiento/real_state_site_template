@@ -134,6 +134,7 @@ export function DarkSearch({
           <label className="dark-search__field">
             <span className="dark-search__label">{dict.search.operation}</span>
             <select
+              key={oferta}
               name="oferta"
               defaultValue={
                 oferta === "sale"
@@ -152,6 +153,7 @@ export function DarkSearch({
           <label className="dark-search__field">
             <span className="dark-search__label">{dict.search.location}</span>
             <input
+              key={city}
               id={`${id}-city`}
               name="city"
               defaultValue={city}
@@ -162,6 +164,7 @@ export function DarkSearch({
           <label className="dark-search__field">
             <span className="dark-search__label">{dict.search.propertyType}</span>
             <select
+              key={propertyType}
               name="tipo"
               defaultValue={propertyType}
               className="dark-search__control"
@@ -177,6 +180,7 @@ export function DarkSearch({
           <label className="dark-search__field">
             <span className="dark-search__label">{dict.search.bedrooms}</span>
             <select
+              key={bedrooms}
               name="recamaras"
               defaultValue={bedrooms}
               className="dark-search__control"

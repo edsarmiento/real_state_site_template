@@ -1,15 +1,15 @@
-import { getPublicSiteContent } from "@/lib/public-site-content";
-import { getResolvedSiteConfig } from "@/lib/resolved-site-config";
+import type { PublicSiteContent } from "@/lib/public-site-content";
 import {
   getDictionary,
   localizedHref,
-  resolveRequestLocale,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
+import { resolveThemeProps } from "@/themes/resolve-theme-props";
+import type { ThemeResolvedProps } from "@/themes/theme-types";
 
 export type DarkUi = {
-  content: Awaited<ReturnType<typeof getPublicSiteContent>>;
+  content: PublicSiteContent;
   locale: SiteLocale;
   defaultLocale: SiteLocale;
   dict: SiteDictionary;
@@ -20,12 +20,15 @@ export type DarkUi = {
 /** Catalog hash aligned with HTML Dark (`#propiedades`). */
 export const DARK_CATALOG_HASH = "#propiedades";
 
-export async function getDarkUi(lang?: string): Promise<DarkUi> {
-  const [content, config] = await Promise.all([
-    getPublicSiteContent(),
-    getResolvedSiteConfig(),
-  ]);
-  const locale = resolveRequestLocale(lang, content.locale);
+/**
+ * Pure derivation of Dark UI values from already-resolved integration props.
+ * Does not fetch SiteConfig or public content.
+ */
+export function getDarkUi({
+  content,
+  config,
+  locale,
+}: ThemeResolvedProps): DarkUi {
   return {
     content,
     locale,
@@ -34,6 +37,11 @@ export async function getDarkUi(lang?: string): Promise<DarkUi> {
     showShareButton: config.showShareButton,
     siteOrigin: config.siteOrigin,
   };
+}
+
+/** Async loader for rare callers that still only have `lang`. */
+export async function loadDarkUi(lang?: string): Promise<DarkUi> {
+  return getDarkUi(await resolveThemeProps(lang));
 }
 
 export function darkNavLinks(

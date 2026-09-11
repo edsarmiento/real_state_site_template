@@ -171,7 +171,7 @@ getDarkUi(lang); selector ES|EN si show_locale_switcher; localizedHref().
 Admin / login
 -------------
 
-isStyledSiteLayout(): layout_key !== "default" -> acentos de marca en admin/login.
+isStyledSiteLayout(): tema resuelto !== default (claves desconocidas → default) -> acentos de marca en admin/login.
 
 
 Fuera de alcance
