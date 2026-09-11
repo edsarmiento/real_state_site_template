@@ -438,7 +438,7 @@ async function main() {
         outline: style.outlineStyle,
         outlineWidth: parseFloat(style.outlineWidth),
         outlineVisible: !transparent(style.outlineColor),
-        shadowVisible: style.boxShadow !== "none" && !style.boxShadow.includes("rgba(0, 0, 0, 0)"),
+        boxShadow: style.boxShadow,
       };
     });
     note(
