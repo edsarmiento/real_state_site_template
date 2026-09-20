@@ -73,6 +73,7 @@ export type SiteDictionary = {
     land: string;
     office: string;
     retail: string;
+    commercial_plaza: string;
     other: string;
   };
   results: {
@@ -508,6 +509,7 @@ const dictionaries = {
       land: "Terreno",
       office: "Oficina",
       retail: "Local comercial",
+      commercial_plaza: "Plaza comercial",
       other: "Otro",
     },
     results: {
@@ -813,6 +815,7 @@ const dictionaries = {
       land: "Land",
       office: "Office",
       retail: "Retail",
+      commercial_plaza: "Commercial plaza",
       other: "Other",
     },
     results: {

@@ -211,8 +211,13 @@ Fuente de verdad: `THEME_DEFINITIONS` en `src/themes/theme-definitions.ts` (keys
 | `elegant` | `elegant` | Catalog, ListingDetail, LegalPage |
 | `orange` | `orange` | Catalog, ListingDetail, LegalPage |
 | `ultra` | `ultra` | Catalog, ListingDetail, LegalPage |
+| `yellow` | `yellow` | Catalog, ListingDetail, LegalPage |
+| `executive` | `executive` | Catalog, ListingDetail, LegalPage |
+| `dark` | `dark` | Catalog, ListingDetail, LegalPage |
 
 Unknown `layout_key` → `default` (nunca beige).
+
+**Catálogo comercial (Productos / Rentas Fácil):** la galería pública de temas vive en `real_state_frontend` (`src/lib/site-theme-catalog.ts` + SVG en `public/site-themes/`). Debe listar **los mismos** `layout_key` / nombres que este registry. Al agregar un theme aquí, actualizar también ese catálogo (tier estándar vs Gold) y el select Ops.
 
 **Legacy:** `deo-catalog-hero.tsx` es de la Fase 3; con `layout_key: deo` **no** se usa (Luxury reemplaza el catálogo). No crear plantillas nuevas solo como hero.
 
@@ -341,7 +346,8 @@ Usa este flujo cuando pidan **una plantilla nueva** (visual distinta de default/
 
 1. `SiteConfig::LAYOUT_KEYS` en `real_state_api/app/models/site_config.rb`.
 2. Specs + `BUSINESS_RULES.md` §SiteConfig.
-3. Select en Ops (`real_state_frontend`) — hasta que exista `layout_options` desde el API (paso 3 del plan DRY).
+3. Select en Ops (`real_state_frontend` `site-config-form.tsx` `LAYOUT_OPTIONS`).
+4. **Catálogo Productos:** `real_state_frontend/src/lib/site-theme-catalog.ts` (fila + `tier`) y SVG wireframe en `public/site-themes/<name>.svg` (mismo estilo que los existentes). Standard → Sitio Profesional; Gold/premium → Sitio Business.
 
 **Template:**
 
@@ -390,6 +396,7 @@ Clonar **default**, no Luxury, como scaffold de un theme fino.
 ### 5. Verificación antes de merge
 
 - [ ] `layout_key` en API y Ops.
+- [ ] Catálogo Productos (`site-theme-catalog.ts` + SVG preview) alineado con el theme nuevo.
 - [ ] Sin JSX duplicado en `app/page.tsx` / `inmueble/[slug]/page.tsx`.
 - [ ] Sin form/WhatsApp/specs de listing copiados en `src/themes/` — widgets + helpers compartidos.
 - [ ] Branding desde SiteConfig; Vercel solo `ACCOUNT_ID` + `API_URL`.

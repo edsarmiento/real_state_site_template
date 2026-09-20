@@ -5,6 +5,7 @@ export const PROPERTY_TYPES = [
   "land",
   "office",
   "retail",
+  "commercial_plaza",
   "other",
 ] as const;
 

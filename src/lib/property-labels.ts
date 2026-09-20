@@ -12,6 +12,7 @@ export const propertyTypeLabel: Record<PropertyType, string> = {
   land: "Terreno",
   office: "Oficina",
   retail: "Local comercial",
+  commercial_plaza: "Plaza comercial",
   other: "Otro",
 };
 

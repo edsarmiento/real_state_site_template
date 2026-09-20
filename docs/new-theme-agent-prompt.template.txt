@@ -29,6 +29,9 @@ Pre-requisitos API + Ops (completar antes del handoff)
   [ ] real_state_api: SiteConfig::LAYOUT_KEYS incluye "<slug>"
   [ ] real_state_api: specs + BUSINESS_RULES.md §SiteConfig
   [ ] real_state_frontend: OpsSiteConfigLayout + opcion en LAYOUT_OPTIONS
+  [ ] real_state_frontend: SITE_THEME_CATALOG (site-theme-catalog.ts) + SVG
+      public/site-themes/<THEME_NAME>.svg (mismo estilo wireframe) + tier
+      (standard = Sitio Profesional; premium/Gold = Sitio Business)
 
 Si algo falta, hacerlo primero o incluirlo en el alcance del agente.
 
