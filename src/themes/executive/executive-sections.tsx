@@ -13,14 +13,12 @@ import {
   type SiteLocale,
 } from "@/lib/site-i18n";
 import { executiveContactChannels } from "@/themes/executive/executive-contact-channels";
-import { ExecutiveContactForm } from "@/themes/executive/executive-contact-form";
 import { ExecutiveCoverImage } from "@/themes/executive/executive-cover-image";
 import type { ExecutiveCopy } from "@/themes/executive/executive-copy";
 import {
   ExecutiveIconArrowRight,
   ExecutiveIconCalendar,
   ExecutiveIconCheck,
-  ExecutiveIconHouseUser,
   ExecutiveIconMail,
   ExecutiveIconMapPin,
   ExecutiveIconPhone,
@@ -148,12 +146,12 @@ export function ExecutiveAbout({
   copy,
   locale,
   defaultLocale,
-}: Shared) {
+  coverUrl,
+}: Shared & { coverUrl?: string | null }) {
   const { about } = content;
   const ctaHref = about.cta
     ? localizeSiteHref(about.cta.href, locale, defaultLocale)
     : localizedHref("/#propiedades", locale, null, defaultLocale);
-  const whatsappHref = executiveContactChannels(content).whatsappHref;
   const benefits = [
     { title: dict.about.benefit1, copy: copy.benefit1Copy },
     { title: dict.about.benefit2, copy: copy.benefit2Copy },
@@ -185,28 +183,17 @@ export function ExecutiveAbout({
           </Link>
         </div>
 
-        <div className="executive-ready">
-          <span className="executive-ready__icon" aria-hidden>
-            <ExecutiveIconHouseUser className="h-10 w-10" />
+        <div className="executive-about__media">
+          <ExecutiveCoverImage
+            src={coverUrl}
+            alt={dict.about.title}
+            className="executive-about__image"
+            placeholderClassName="executive-about__placeholder"
+            placeholder={content.brand.name}
+          />
+          <span className="executive-about__media-label" aria-hidden="true">
+            {copy.selectedProperties}
           </span>
-          <h3>{copy.aboutReadyTitle}</h3>
-          <p>{copy.aboutReadyCopy}</p>
-          {whatsappHref ? (
-            <a
-              href={whatsappHref}
-              className="executive-whatsapp-cta"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${copy.aboutAdvisorCta}. ${dict.a11y.opensInNewTab}`}
-            >
-              <ExecutiveIconWhatsApp className="executive-whatsapp-cta__icon" />
-              {copy.aboutAdvisorCta}
-            </a>
-          ) : (
-            <Link href={ctaHref} className="executive-btn executive-btn--ghost">
-              {dict.about.cta}
-            </Link>
-          )}
         </div>
       </div>
     </section>
@@ -340,21 +327,22 @@ export function ExecutiveContact({
   content,
   dict,
   copy,
-  locale,
-  defaultLocale,
-}: Shared) {
-  const { contact, contactForm, legal, social } = content;
-  const catalogHref = localizedHref("/#propiedades", locale, null, defaultLocale);
+}: Pick<Shared, "content" | "dict" | "copy">) {
+  const { contact, social } = content;
   const channels = collectChannels(content, dict);
   const whatsappHref = executiveContactChannels(content).whatsappHref;
 
   return (
-    <section id="contacto" className="executive-contact">
-      <div className="executive-shell executive-contact__grid">
-        <div className="executive-contact__copy">
-          <p className="executive-kicker">{dict.contact.kicker}</p>
-          <h2 className="executive-section__title">{dict.contact.heading}</h2>
-          <p className="executive-lead">{dict.contact.description}</p>
+    <section id="contacto" className="executive-contact" aria-labelledby="executive-contact-title">
+      <div className="executive-shell">
+        <div className="executive-contact__panel">
+          <header className="executive-contact__header">
+            <p className="executive-kicker">{dict.contact.kicker}</p>
+            <h2 id="executive-contact-title" className="executive-section__title">{dict.contact.heading}</h2>
+            <p className="executive-lead">{dict.contact.description}</p>
+          </header>
+          <div className="executive-contact__grid">
+            <div className="executive-contact__channels">
           {channels.length > 0 ? (
             <ul className="executive-channels">
               {channels.map((channel) => {
@@ -397,27 +385,35 @@ export function ExecutiveContact({
               })}
             </ul>
           ) : (
-            <Link href={catalogHref} className="executive-btn">
-              {dict.contact.viewProperties}
-            </Link>
+            <p className="executive-lead">{dict.contact.emptyChannels}</p>
           )}
           <ExecutiveSocialLinks
             social={social}
             dict={dict}
             heading={dict.footer.follow}
           />
+          {contact.attentionNote ? (
+            <p className="executive-contact__note">{contact.attentionNote}</p>
+          ) : null}
+            </div>
+            <aside className="executive-contact__cta">
+              <h3>{copy.aboutReadyTitle}</h3>
+              <p className="executive-lead">{copy.contactDescription}</p>
+              {whatsappHref ? (
+                <a
+                  href={whatsappHref}
+                  className="executive-whatsapp-cta"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${copy.aboutAdvisorCta}. ${dict.a11y.opensInNewTab}`}
+                >
+                  <ExecutiveIconWhatsApp className="executive-whatsapp-cta__icon" />
+                  {copy.aboutAdvisorCta}
+                </a>
+              ) : null}
+            </aside>
+          </div>
         </div>
-
-        <ExecutiveContactForm
-          contact={contact}
-          contactForm={contactForm}
-          legal={legal}
-          dict={dict}
-          copy={copy}
-          locale={locale}
-          defaultLocale={defaultLocale}
-          whatsappHref={whatsappHref}
-        />
       </div>
     </section>
   );

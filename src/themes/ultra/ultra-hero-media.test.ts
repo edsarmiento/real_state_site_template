@@ -4,7 +4,7 @@ import {
   listingPhotoUrls,
   needsUnfilteredHeroCatalog,
   resolveHeroPhotoUrls,
-} from "./ultra-hero-media.ts";
+} from "../../lib/public-hero-media.ts";
 
 describe("listingPhotoUrls", () => {
   it("keeps unique covers in listing order", () => {

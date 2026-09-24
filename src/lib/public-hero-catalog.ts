@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { publicApiFetch } from "@/lib/public-api-fetch";
-import { listingsFromCatalogLoad } from "@/themes/ultra/ultra-hero-catalog-result";
-import { listingPhotoUrls } from "@/themes/ultra/ultra-hero-media";
+import { listingsFromCatalogLoad } from "@/lib/public-hero-catalog-result";
+import { listingPhotoUrls } from "@/lib/public-hero-media";
 
 /**
  * page.tsx heroGallery uses the first *filtered* listing. When a filter

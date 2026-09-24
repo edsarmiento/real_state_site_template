@@ -8,13 +8,10 @@ import {
 import { isExampleEmail } from "@/lib/example-contact";
 import {
   fillTemplate,
-  localizeSiteHref,
-  localizedHref,
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
 import { yellowContactChannels } from "@/themes/yellow/yellow-contact-channels";
-import { YellowContactForm } from "@/themes/yellow/yellow-contact-form";
 import { YellowCoverImage } from "@/themes/yellow/yellow-cover-image";
 import {
   YellowIconArrowRight,
@@ -162,12 +159,9 @@ export function YellowLocations({
 }
 
 export function YellowAbout({
-  content,
+  imageUrl,
   dict,
-  locale,
-  defaultLocale,
-}: Shared) {
-  const whatsapp = yellowContactChannels(content).whatsappHref;
+}: Pick<Shared, "dict"> & { imageUrl?: string }) {
   const benefits = [
     dict.about.benefit1,
     dict.about.benefit2,
@@ -197,40 +191,15 @@ export function YellowAbout({
           </div>
         </YellowReveal>
         <YellowReveal variant="right">
-          <div className="yellow-about__cta">
+          <div className="yellow-about__media">
             <YellowCoverImage
-              src={content.about.imageUrl}
+              src={imageUrl}
               alt=""
               className="yellow-about__image"
               placeholderClassName="yellow-about__icon"
               placeholder={<YellowIconHome className="h-10 w-10" />}
               decorative
             />
-            <h3 className="yellow-about__cta-title">{dict.finalCta.title}</h3>
-            <p className="yellow-lead">
-              {fillTemplate(dict.finalCta.description, {
-                name: content.brand.name,
-              })}
-            </p>
-            {whatsapp ? (
-              <a
-                href={whatsapp}
-                className="yellow-btn yellow-btn--whatsapp"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${dict.about.cta}. ${dict.a11y.opensInNewTab}`}
-              >
-                <YellowIconWhatsApp className="h-4 w-4" />
-                {dict.about.cta}
-              </a>
-            ) : (
-              <Link
-                href={localizedHref("/#contacto", locale, null, defaultLocale)}
-                className="yellow-btn yellow-btn--whatsapp"
-              >
-                {dict.about.cta}
-              </Link>
-            )}
           </div>
         </YellowReveal>
       </div>
@@ -339,22 +308,22 @@ function ChannelIcon({ name }: { name: Channel["icon"] }) {
 export function YellowContact({
   content,
   dict,
-  locale,
-  defaultLocale,
-}: Shared) {
-  const { contact, legal, social } = content;
-  const catalogHref = localizeSiteHref("#propiedades", locale, defaultLocale);
+  description,
+}: Pick<Shared, "content" | "dict"> & { description: string }) {
+  const { social } = content;
   const channels = collectChannels(content, dict);
-  const hasChannels = channels.length > 0;
+  const whatsapp = yellowContactChannels(content).whatsappHref;
 
   return (
-    <section id="contacto" className="yellow-contact">
-      <div className="yellow-shell yellow-contact__grid">
-        <div className="yellow-contact__copy">
+    <section id="contacto" className="yellow-contact" aria-labelledby="yellow-contact-title">
+      <div className="yellow-shell yellow-contact__panel">
+        <div className="yellow-contact__header">
           <p className="yellow-eyebrow">{dict.contact.kicker}</p>
-          <h2 className="yellow-section__title">{dict.contact.heading}</h2>
+          <h2 id="yellow-contact-title" className="yellow-section__title">{dict.contact.heading}</h2>
           <p className="yellow-lead">{dict.contact.description}</p>
-          <YellowReveal variant="up">
+        </div>
+        <div className="yellow-contact__grid">
+          <div>
             {channels.length > 0 ? (
               <ul className="yellow-channels">
                 {channels.map((channel) => {
@@ -364,14 +333,10 @@ export function YellowContact({
                         <ChannelIcon name={channel.icon} />
                       </span>
                       <span className="yellow-channel__copy">
-                        <span className="yellow-channel__eyebrow">
-                          {channel.eyebrow}
-                        </span>
-                        <span className="yellow-channel__value">
-                          {channel.value}
-                        </span>
+                        <span className="yellow-channel__eyebrow">{channel.eyebrow}</span>
+                        <span className="yellow-channel__value">{channel.value}</span>
                       </span>
-                      <YellowIconArrowRight className="yellow-channel__arrow" />
+                      {channel.href ? <YellowIconArrowRight className="yellow-channel__arrow" /> : null}
                     </>
                   );
                   return (
@@ -380,53 +345,47 @@ export function YellowContact({
                         <a
                           href={channel.href}
                           className="yellow-channel"
-                          aria-label={
-                            channel.external
-                              ? `${channel.eyebrow}: ${channel.value}. ${dict.a11y.opensInNewTab}`
-                              : `${channel.eyebrow}: ${channel.value}`
-                          }
-                          {...(channel.external
-                            ? { target: "_blank", rel: "noopener noreferrer" }
-                            : {})}
+                          aria-label={channel.external
+                            ? `${channel.eyebrow}: ${channel.value}. ${dict.a11y.opensInNewTab}`
+                            : `${channel.eyebrow}: ${channel.value}`}
+                          {...(channel.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                         >
                           {body}
                         </a>
                       ) : (
-                        <p className="yellow-channel yellow-channel--static">
-                          {body}
-                        </p>
+                        <p className="yellow-channel yellow-channel--static">{body}</p>
                       )}
                     </li>
                   );
                 })}
               </ul>
-            ) : null}
+            ) : <p className="yellow-lead">{dict.contact.emptyChannels}</p>}
             <div className="yellow-contact__social">
-              <YellowSocialLinks
-                social={social}
-                dict={dict}
-                heading={dict.a11y.followUs}
-              />
+              <YellowSocialLinks social={social} dict={dict} heading={dict.a11y.followUs} />
             </div>
-            {!hasChannels ? (
-              <Link href={catalogHref} className="yellow-btn">
-                {dict.contact.viewProperties}
-              </Link>
+            {content.contact.attentionNote ? (
+              <p className="yellow-contact__note">{content.contact.attentionNote}</p>
             ) : null}
-            {contact.attentionNote ? (
-              <p className="yellow-contact__note">{contact.attentionNote}</p>
+          </div>
+          <div className="yellow-contact__cta">
+            <h3 className="yellow-about__cta-title">
+              {content.finalCta.title || dict.finalCta.title}
+            </h3>
+            <p className="yellow-lead">{description}</p>
+            {whatsapp ? (
+              <a
+                href={whatsapp}
+                className="yellow-btn yellow-btn--whatsapp"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${dict.whatsapp.label}. ${dict.a11y.opensInNewTab}`}
+              >
+                <YellowIconWhatsApp className="h-4 w-4" />
+                {dict.whatsapp.label}
+              </a>
             ) : null}
-          </YellowReveal>
+          </div>
         </div>
-        <YellowReveal variant="up" delayMs={80}>
-          <YellowContactForm
-            contact={contact}
-            legal={legal}
-            dict={dict}
-            locale={locale}
-            defaultLocale={defaultLocale}
-          />
-        </YellowReveal>
       </div>
     </section>
   );

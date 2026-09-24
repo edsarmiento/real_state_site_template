@@ -1,6 +1,7 @@
 import type { SiteLocale } from "@/lib/site-i18n";
 
 export type ElegantCopy = {
+  contactUnifiedDescription: string;
   paginationPrev: string;
   paginationNext: string;
   paginationPageOf: string;
@@ -10,6 +11,7 @@ export type ElegantCopy = {
 };
 
 const ES: ElegantCopy = {
+  contactUnifiedDescription: "Consultas de renta y venta. Elige el canal que prefieras.",
   paginationPrev: "Anterior",
   paginationNext: "Siguiente",
   paginationPageOf: "Página {current} de {total}",
@@ -19,6 +21,7 @@ const ES: ElegantCopy = {
 };
 
 const EN: ElegantCopy = {
+  contactUnifiedDescription: "Rental and sale inquiries. Choose the channel you prefer.",
   paginationPrev: "Previous",
   paginationNext: "Next",
   paginationPageOf: "Page {current} of {total}",

@@ -22,6 +22,7 @@ type WhatsAppCta = {
 type Props = {
   links: NavLink[];
   whatsapp: WhatsAppCta | null;
+  access: { href: string; label: string };
   menuLabel: string;
   openLabel: string;
   closeLabel: string;
@@ -31,6 +32,7 @@ type Props = {
 export function YellowMobileNav({
   links,
   whatsapp,
+  access,
   menuLabel,
   openLabel,
   closeLabel,
@@ -130,6 +132,9 @@ export function YellowMobileNav({
           {localeSwitcher ? (
             <div className="yellow-mobile-nav__locale">{localeSwitcher}</div>
           ) : null}
+          <Link href={access.href} className="yellow-mobile-nav__access" onClick={() => setOpen(false)}>
+            {access.label}
+          </Link>
           {whatsapp ? (
             <a
               href={whatsapp.href}

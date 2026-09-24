@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { getSessionContext } from "@/lib/session-context";
 import { localizedHref } from "@/lib/site-i18n";
 import { elegantContactChannels } from "@/themes/elegant/elegant-contact-channels";
 import { ElegantHeaderChrome } from "@/themes/elegant/elegant-header-chrome";
@@ -19,7 +20,12 @@ type Props = {
 };
 
 export async function ElegantHeader({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await loadElegantUi(lang);
+  const [ui, session] = await Promise.all([
+    loadElegantUi(lang),
+    getSessionContext(),
+  ]);
+  const { content, dict, locale, defaultLocale } = ui;
+  const isAdmin = session?.isStaffUser === true;
   const { brand } = content;
   const links = elegantNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
@@ -83,6 +89,12 @@ export async function ElegantHeader({ lang }: Props) {
               <span>{whatsapp.label}</span>
             </a>
           ) : null}
+          <Link
+            href={isAdmin ? "/listings" : "/login"}
+            className="elegant-btn elegant-btn--ghost elegant-header__access"
+          >
+            {isAdmin ? dict.admin.manage : dict.admin.signIn}
+          </Link>
           <ElegantMobileNav
             links={links}
             whatsapp={whatsapp}

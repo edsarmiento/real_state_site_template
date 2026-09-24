@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { getSessionContext } from "@/lib/session-context";
 import { localizedHref } from "@/lib/site-i18n";
 import { executiveContactChannels } from "@/themes/executive/executive-contact-channels";
 import { ExecutiveIconWhatsApp } from "@/themes/executive/executive-icons";
@@ -17,7 +18,10 @@ type Props = {
 };
 
 export async function ExecutiveHeader({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await loadExecutiveUi(lang);
+  const [{ content, dict, locale, defaultLocale }, session] = await Promise.all([
+    loadExecutiveUi(lang),
+    getSessionContext(),
+  ]);
   const { brand } = content;
   const links = executiveNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
@@ -41,6 +45,11 @@ export async function ExecutiveHeader({ lang }: Props) {
     } as const,
   };
   const initial = executiveBrandInitial(brand.name);
+  const isAdmin = session?.isStaffUser === true;
+  const access = {
+    href: isAdmin ? "/listings" : "/login",
+    label: isAdmin ? dict.admin.manage : dict.admin.signIn,
+  };
 
   return (
     <header className="executive-header">
@@ -99,9 +108,13 @@ export async function ExecutiveHeader({ lang }: Props) {
               <span>{whatsapp.label}</span>
             </a>
           ) : null}
+          <Link href={access.href} className="executive-access-cta">
+            {access.label}
+          </Link>
           <ExecutiveMobileNav
             links={links}
             whatsapp={whatsapp}
+            access={access}
             menuLabel={dict.a11y.primaryNav}
             openLabel={dict.a11y.openMenu}
             closeLabel={dict.a11y.closeMenu}

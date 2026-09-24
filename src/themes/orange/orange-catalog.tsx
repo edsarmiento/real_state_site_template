@@ -1,6 +1,9 @@
+import { locationsFromListings } from "@/lib/public-site-content";
+import { resolveHeroPhotoUrls, needsUnfilteredHeroCatalog } from "@/lib/public-hero-media";
+import { fetchUnfilteredHeroPhotoUrls } from "@/lib/public-hero-catalog";
+import { OrangeHeroCollage } from "@/themes/orange/orange-hero-collage";
 import Link from "next/link";
-import type { ReactNode } from "react";
-import { fillTemplate, localizedHref } from "@/lib/site-i18n";
+import { fillTemplate, localizeSiteHref, localizedHref } from "@/lib/site-i18n";
 import type { CatalogThemeProps } from "@/themes/theme-types";
 import { OrangeFooter } from "@/themes/orange/orange-footer";
 import { OrangeHeader } from "@/themes/orange/orange-header";
@@ -11,27 +14,14 @@ import { OrangeSearch } from "@/themes/orange/orange-search";
 import {
   OrangeAbout,
   OrangeContact,
-  OrangeExperience,
-  OrangeServices,
+  OrangeLocations,
+  OrangeProcess,
 } from "@/themes/orange/orange-sections";
 import { OrangeShell } from "@/themes/orange/orange-shell";
-import { OrangeHeroImage } from "@/themes/orange/orange-hero-image";
-import {
-  OrangeIconBed,
-  OrangeIconChat,
-  OrangeIconHome,
-} from "@/themes/orange/orange-icons";
 import { orangeHeroTitleParts } from "@/themes/orange/orange-hero-title";
 import { getOrangeUi } from "@/themes/orange/orange-ui";
 
-type OrangeHeroMetric = {
-  key: string;
-  label: string;
-  value?: string;
-  icon?: (props: { className?: string }) => ReactNode;
-};
-
-export function OrangeCatalog({
+export async function OrangeCatalog({
   oferta,
   city,
   propertyType,
@@ -43,43 +33,35 @@ export function OrangeCatalog({
   catalogOk,
   catalogStatus,
   lang,
+  heroPhotoUrls,
+  heading,
+  typeLabel,
   content,
   config,
   locale,
 }: CatalogThemeProps) {
   const { dict, copy, defaultLocale } = getOrangeUi({ content, config, locale });
   const homeHref = localizedHref("/", locale, null, defaultLocale);
-  const propertiesHref = localizedHref("/#propiedades", locale, null, defaultLocale);
-  const heroImage = content.hero.imageUrl?.trim() || listings[0]?.photo_url || null;
-  const heroListing = content.hero.imageUrl ? null : listings[0] ?? null;
-  const title = content.hero.title || copy.heroTitle;
+  const propertiesHref = content.hero.primaryCta
+    ? localizeSiteHref(content.hero.primaryCta.href, locale, defaultLocale)
+    : localizedHref("/#catalogo", locale, null, defaultLocale);
+  const aboutHref = content.hero.secondaryCta
+    ? localizeSiteHref(content.hero.secondaryCta.href, locale, defaultLocale)
+    : localizedHref("/#about", locale, null, defaultLocale);
+  const hasFilters = Boolean(propertyType || bedrooms || city || oferta !== "all");
+  const heroSources = { configuredUrl: content.hero.imageUrl, galleryUrls: heroPhotoUrls, listings };
+  const resolved = resolveHeroPhotoUrls(heroSources);
+  const catalogUrls = needsUnfilteredHeroCatalog({ hasAnyFilter: hasFilters, catalogOk, resolvedCount: resolved.length })
+    ? await fetchUnfilteredHeroPhotoUrls() : [];
+  const heroUrls = resolveHeroPhotoUrls({ ...heroSources, catalogUrls });
+  const locations = content.locations.length ? content.locations : locationsFromListings(listings);
+  const localizedType = dict.propertyTypes[propertyType as keyof typeof dict.propertyTypes] ?? typeLabel;
+  const title = dict.hero.title;
   const heroTitle = orangeHeroTitleParts(title, copy.heroTitleAccent);
   const resultsLabel =
     total === 1
       ? copy.availableOne
       : fillTemplate(copy.availableMany, { count: total });
-  const configuredStats = content.hero.stats
-    .filter((stat) => stat.value.trim() && stat.label.trim())
-    .slice(0, 4);
-  const metrics: OrangeHeroMetric[] =
-    configuredStats.length > 0
-      ? configuredStats.map((stat, index) => ({
-          key: `stat-${index}`,
-          value: stat.value,
-          label: stat.label,
-        }))
-      : catalogOk
-        ? [
-            {
-              key: "published",
-              value: String(total),
-              label: copy.propertiesAvailable,
-            },
-            { key: "sale", icon: OrangeIconHome, label: copy.metricSale },
-            { key: "rent", icon: OrangeIconBed, label: copy.metricRent },
-            { key: "direct", icon: OrangeIconChat, label: copy.metricDirect },
-          ]
-        : [];
   const emptyKind =
     oferta === "sale"
       ? dict.results.emptySale
@@ -95,10 +77,6 @@ export function OrangeCatalog({
         <div className="orange-hero__grid">
           <OrangeReveal variant="slow" className="orange-hero__reveal-copy">
             <div className="orange-hero__copy">
-              <div className="orange-hero__badge">
-                <span className="orange-pulse" aria-hidden />
-                <span>{copy.heroBadge}</span>
-              </div>
               {content.hero.eyebrow ? (
                 <p className="orange-hero__eyebrow">{content.hero.eyebrow}</p>
               ) : null}
@@ -108,89 +86,49 @@ export function OrangeCatalog({
                 {heroTitle.after}
               </h1>
               <p className="orange-hero__lead">
-                {content.hero.subtitle || copy.heroLead}
+                {dict.hero.subtitle}
               </p>
               <div className="orange-hero__actions">
                 <Link href={propertiesHref} className="orange-btn orange-btn--dark">
-                  {copy.exploreCta}
+                  {dict.hero.primaryCta}
+                </Link>
+                <Link href={aboutHref} className="orange-btn orange-btn--outline">
+                  {dict.hero.secondaryCta}
                 </Link>
               </div>
-              {metrics.length > 0 ? (
-                <div className="orange-metrics">
-                  {metrics.map((metric) => (
-                    <div key={metric.key}>
-                      {metric.value ? (
-                        <p className="orange-metrics__value">{metric.value}</p>
-                      ) : metric.icon ? (
-                        <p className="orange-metrics__value orange-metrics__value--icon">
-                          <metric.icon className="h-6 w-6" />
-                        </p>
-                      ) : null}
-                      <p className="orange-metrics__label">{metric.label}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
             </div>
           </OrangeReveal>
 
           <OrangeReveal variant="left" className="orange-hero__reveal-media">
-            <div className="orange-hero__media">
-              <div className="orange-hero__frame">
-                {heroImage ? (
-                  <OrangeHeroImage
-                    src={heroImage}
-                    alt={heroListing ? heroListing.title : content.brand.name}
-                    sizes="(max-width: 1023px) 92vw, 40vw"
-                    preload
-                    className="orange-hero__image"
-                    placeholderClassName="orange-hero__placeholder"
-                  />
-                ) : (
-                  <div className="orange-hero__placeholder" aria-hidden />
-                )}
-                <div className="orange-hero__caption">
-                  <span>
-                    {heroListing
-                      ? heroListing.offer_type === "sale"
-                        ? dict.listing.sale
-                        : dict.listing.rent
-                      : copy.heroBadge}
-                  </span>
-                  <p>
-                    {heroListing?.title ||
-                      content.brand.name}
-                  </p>
-                  <p>
-                    {heroListing?.location_label || content.brand.tagline}
-                  </p>
-                </div>
-              </div>
-              <div className="orange-hero__plate" aria-hidden />
-            </div>
+            <OrangeHeroCollage
+              urls={heroUrls}
+              title={listings[0]?.title || content.brand.name}
+              photoAltTemplate={dict.listing.gallery.photoAlt}
+            />
           </OrangeReveal>
+        </div>
+        <div className="orange-search-shell">
+          <OrangeSearch
+            oferta={oferta}
+            city={city}
+            propertyType={propertyType}
+            bedrooms={bedrooms}
+            locale={locale}
+            defaultLocale={defaultLocale}
+            dict={dict}
+            resultsLabel={resultsLabel}
+          />
         </div>
       </section>
 
-      <section id="propiedades" className="orange-catalog">
+      <main id="catalogo" className="orange-catalog" tabIndex={-1}>
         <OrangeReveal>
           <div className="orange-section__intro">
-            <span className="orange-kicker">{copy.catalogEyebrow}</span>
-            <h2 className="orange-section__title">{copy.catalogTitle}</h2>
-            <p className="orange-section__lead">{copy.catalogDescription}</p>
+            <span className="orange-kicker">{dict.results.kicker}</span>
+            <h2 className="orange-section__title">{heading}</h2>
+            {hasFilters ? <Link href={homeHref} className="orange-inline-link">{dict.results.clearFilters}</Link> : null}
           </div>
         </OrangeReveal>
-
-        <OrangeSearch
-          oferta={oferta}
-          city={city}
-          propertyType={propertyType}
-          bedrooms={bedrooms}
-          locale={locale}
-          defaultLocale={defaultLocale}
-          dict={dict}
-          resultsLabel={resultsLabel}
-        />
 
         {!catalogOk ? (
           <p className="orange-state">
@@ -201,7 +139,10 @@ export function OrangeCatalog({
             <h2>{dict.results.emptyTitle}</h2>
             <p>
               {dict.results.emptyCopy}
-              {emptyKind ? ` ${emptyKind}` : ""}.
+              {emptyKind ? ` ${emptyKind}` : ""}
+              {city ? ` ${fillTemplate(dict.results.inPlace, { city })}` : ""}
+              {localizedType ? ` · ${localizedType}` : ""}
+              {bedrooms ? ` · ${fillTemplate(dict.results.bedroomsFilter, { count: bedrooms })}` : ""}.
             </p>
             <Link href={homeHref} className="orange-btn orange-btn--dark">
               {dict.results.clearFilters}
@@ -239,23 +180,12 @@ export function OrangeCatalog({
             />
           </>
         )}
-      </section>
+      </main>
 
-      <OrangeServices copy={copy} />
-      <OrangeExperience
-        content={content}
-        dict={dict}
-        copy={copy}
-        locale={locale}
-      />
-      <OrangeAbout content={content} />
-      <OrangeContact
-        content={content}
-        dict={dict}
-        copy={copy}
-        locale={locale}
-        defaultLocale={defaultLocale}
-      />
+      <OrangeLocations locations={locations} listings={listings} locale={locale} defaultLocale={defaultLocale} dict={dict} />
+      <OrangeAbout content={content} dict={dict} locale={locale} defaultLocale={defaultLocale} imageUrl={heroUrls[0]} />
+      <OrangeProcess dict={dict} />
+      <OrangeContact content={content} dict={dict} description={copy.contactUnifiedDescription} />
       <OrangeFooter lang={lang} />
     </OrangeShell>
   );

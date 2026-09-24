@@ -87,7 +87,7 @@ export function OrangeSearch({
       key={`${oferta}-${city}-${propertyType}-${bedrooms}`}
       className="orange-search"
       method="get"
-      action="/#propiedades"
+      action="/#catalogo"
       onSubmit={onSubmit}
     >
       {locale !== defaultLocale ? (

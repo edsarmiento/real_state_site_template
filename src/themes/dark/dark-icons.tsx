@@ -189,11 +189,3 @@ export function DarkIconComments({ className }: IconProps) {
     </svg>
   );
 }
-
-export function DarkIconQuote({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M7.2 11.4c1.7 0 3 1.4 3 3.2 0 1.9-1.5 3.4-3.4 3.4S3.4 16.5 3.4 14.6c0-4.2 2.4-7.3 7.1-9.1l.8 1.6c-2.6 1.1-4 2.8-4.2 5 .4-.2.9-.3 1.5-.3Zm10 0c1.7 0 3 1.4 3 3.2 0 1.9-1.5 3.4-3.4 3.4s-3.4-1.5-3.4-3.4c0-4.2 2.4-7.3 7.1-9.1l.8 1.6c-2.6 1.1-4 2.8-4.2 5 .4-.2.9-.3 1.5-.3Z" />
-    </svg>
-  );
-}

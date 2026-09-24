@@ -14,7 +14,6 @@ import {
   type SiteLocale,
 } from "@/lib/site-i18n";
 import { elegantContactChannels } from "@/themes/elegant/elegant-contact-channels";
-import { ElegantContactForm } from "@/themes/elegant/elegant-contact-form";
 import { ElegantCoverImage } from "@/themes/elegant/elegant-cover-image";
 import {
   ElegantIconCalendar,
@@ -138,11 +137,12 @@ export function ElegantLocations({
 }
 
 export function ElegantAbout({
+  imageUrl,
   content,
   dict,
   locale,
   defaultLocale,
-}: Shared) {
+}: Shared & { imageUrl?: string }) {
   const { about } = content;
   const ctaHref = about.cta
     ? localizeSiteHref(about.cta.href, locale, defaultLocale)
@@ -170,10 +170,10 @@ export function ElegantAbout({
             </Link>
           </div>
           <div className="elegant-about__media" aria-hidden>
-            {about.imageUrl ? (
+            {imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={about.imageUrl}
+                src={imageUrl}
                 alt=""
                 className="elegant-about__image"
                 loading="lazy"
@@ -298,109 +298,79 @@ function ChannelIcon({ name }: { name: Channel["icon"] }) {
 export function ElegantContact({
   content,
   dict,
-  locale,
-  defaultLocale,
-  inquirySlug = null,
-}: Shared & { inquirySlug?: string | null }) {
-  const { contact, legal, social } = content;
+  description,
+}: Pick<Shared, "content" | "dict"> & { description: string }) {
+  const { social } = content;
   const channels = collectChannels(content, dict);
+  const whatsapp = elegantContactChannels(content).whatsappHref;
 
   return (
-    <section id="contacto" className="elegant-contact">
-      <div className="elegant-shell elegant-contact__grid">
-        <div>
+    <section id="contacto" className="elegant-contact" aria-labelledby="elegant-contact-title">
+      <div className="elegant-shell elegant-contact__panel">
+        <div className="elegant-contact__header">
           <p className="elegant-kicker">{dict.contact.kicker}</p>
-          <h2 className="elegant-section__title">{dict.contact.heading}</h2>
+          <h2 id="elegant-contact-title" className="elegant-section__title">{dict.contact.heading}</h2>
           <p className="elegant-muted">{dict.contact.description}</p>
-          {channels.length > 0 ? (
-            <ul className="elegant-channels">
-              {channels.map((channel) => {
-                const body = (
-                  <>
-                    <span className="elegant-channel__icon" aria-hidden>
-                      <ChannelIcon name={channel.icon} />
-                    </span>
-                    <span>
-                      <span className="elegant-channel__eyebrow">{channel.eyebrow}</span>
-                      <span className="elegant-channel__value">{channel.value}</span>
-                    </span>
-                  </>
-                );
-                return (
-                  <li key={channel.key}>
-                    {channel.href ? (
-                      <a
-                        href={channel.href}
-                        className="elegant-channel"
-                        aria-label={
-                          channel.external
+        </div>
+        <div className="elegant-contact__grid">
+          <div>
+            {channels.length ? (
+              <ul className="elegant-channels">
+                {channels.map((channel) => {
+                  const body = (
+                    <>
+                      <span className="elegant-channel__icon" aria-hidden>
+                        <ChannelIcon name={channel.icon} />
+                      </span>
+                      <span className="elegant-channel__copy">
+                        <span className="elegant-channel__eyebrow">{channel.eyebrow}</span>
+                        <span className="elegant-channel__value">{channel.value}</span>
+                      </span>
+                    </>
+                  );
+                  return (
+                    <li key={channel.key}>
+                      {channel.href ? (
+                        <a
+                          href={channel.href}
+                          className="elegant-channel"
+                          aria-label={channel.external
                             ? `${channel.eyebrow}: ${channel.value}. ${dict.a11y.opensInNewTab}`
-                            : `${channel.eyebrow}: ${channel.value}`
-                        }
-                        {...(channel.external
-                          ? { target: "_blank", rel: "noopener noreferrer" }
-                          : {})}
-                      >
-                        {body}
-                      </a>
-                    ) : (
-                      <p className="elegant-channel elegant-channel--static">{body}</p>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          ) : null}
-          <div className="elegant-contact__social">
-            <ElegantSocialLinks
-              social={social}
-              dict={dict}
-              heading={dict.footer.follow}
-              accentHeading
-            />
+                            : `${channel.eyebrow}: ${channel.value}`}
+                          {...(channel.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                        >
+                          {body}
+                        </a>
+                      ) : (
+                        <p className="elegant-channel elegant-channel--static">{body}</p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : <p className="elegant-muted">{dict.contact.emptyChannels}</p>}
+            <div className="elegant-contact__social">
+              <ElegantSocialLinks
+                social={social}
+                dict={dict}
+                heading={dict.footer.follow}
+                accentHeading
+              />
+            </div>
+          </div>
+          <div className="elegant-contact__cta">
+            <h3 className="elegant-section__title elegant-section__title--on-gold">
+              {content.finalCta.title || dict.finalCta.title}
+            </h3>
+            <p>{description}</p>
+            {whatsapp ? (
+              <a href={whatsapp} className="elegant-btn elegant-btn--gold" target="_blank" rel="noopener noreferrer" aria-label={`${dict.whatsapp.label}. ${dict.a11y.opensInNewTab}`}>
+                <ElegantIconWhatsApp className="h-4 w-4" />
+                {dict.whatsapp.label}
+              </a>
+            ) : null}
           </div>
         </div>
-        <ElegantContactForm
-          contact={contact}
-          legal={legal}
-          dict={dict}
-          locale={locale}
-          defaultLocale={defaultLocale}
-          inquirySlug={inquirySlug}
-        />
-      </div>
-    </section>
-  );
-}
-
-export function ElegantFinalCta({
-  content,
-  dict,
-}: Pick<Shared, "content" | "dict">) {
-  const whatsapp = elegantContactChannels(content).whatsappHref;
-  if (!whatsapp) return null;
-
-  return (
-    <section className="elegant-final-cta" aria-label={dict.contact.finalCtaAria}>
-      <div className="elegant-shell elegant-final-cta__inner">
-        <h2 className="elegant-section__title elegant-section__title--on-gold">
-          {dict.finalCta.title}
-        </h2>
-        <p>
-          {fillTemplate(dict.finalCta.description, {
-            name: content.brand.name,
-          })}
-        </p>
-        <a
-          href={whatsapp}
-          className="elegant-btn elegant-btn--gold"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${dict.whatsapp.label}. ${dict.a11y.opensInNewTab}`}
-        >
-          <ElegantIconWhatsApp className="h-4 w-4" />
-          {dict.whatsapp.label}
-        </a>
       </div>
     </section>
   );

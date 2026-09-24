@@ -23,6 +23,7 @@ type WhatsAppCta = {
 type Props = {
   links: NavLink[];
   whatsapp: WhatsAppCta | null;
+  access: { href: string; label: string };
   menuLabel: string;
   openLabel: string;
   closeLabel: string;
@@ -35,6 +36,7 @@ const FOCUSABLE =
 export function DarkMobileNav({
   links,
   whatsapp,
+  access,
   menuLabel,
   openLabel,
   closeLabel,
@@ -126,6 +128,13 @@ export function DarkMobileNav({
           {localeSwitcher ? (
             <div className="dark-mobile-nav__locale">{localeSwitcher}</div>
           ) : null}
+          <Link
+            href={access.href}
+            className="dark-header__admin dark-header__admin--mobile"
+            onClick={() => setOpen(false)}
+          >
+            {access.label}
+          </Link>
           {whatsapp ? (
             <a
               href={whatsapp.href}

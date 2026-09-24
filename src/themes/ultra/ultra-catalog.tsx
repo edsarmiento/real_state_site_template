@@ -12,15 +12,14 @@ import { UltraCatalogGrid } from "@/themes/ultra/ultra-catalog-grid";
 import { UltraCatalogSearch } from "@/themes/ultra/ultra-catalog-search";
 import { UltraContact } from "@/themes/ultra/ultra-contact";
 import { getUltraCopy } from "@/themes/ultra/ultra-copy";
-import { UltraFinalCta } from "@/themes/ultra/ultra-final-cta";
 import { UltraFooter } from "@/themes/ultra/ultra-footer";
 import { UltraHeader } from "@/themes/ultra/ultra-header";
 import { UltraHero } from "@/themes/ultra/ultra-hero";
-import { fetchUnfilteredHeroPhotoUrls } from "@/themes/ultra/ultra-hero-catalog";
+import { fetchUnfilteredHeroPhotoUrls } from "@/lib/public-hero-catalog";
 import {
   needsUnfilteredHeroCatalog,
   resolveHeroPhotoUrls,
-} from "@/themes/ultra/ultra-hero-media";
+} from "@/lib/public-hero-media";
 import { UltraLocations } from "@/themes/ultra/ultra-locations";
 import { UltraPagination } from "@/themes/ultra/ultra-pagination";
 import { UltraProcess } from "@/themes/ultra/ultra-process";
@@ -215,10 +214,8 @@ export async function UltraCatalog({
       <UltraContact
         content={content}
         dict={dict}
-        locale={locale}
-        defaultLocale={defaultLocale}
+        description={copy.contactDescription}
       />
-      <UltraFinalCta content={content} dict={dict} />
       <UltraFooter lang={lang} />
     </UltraShell>
   );

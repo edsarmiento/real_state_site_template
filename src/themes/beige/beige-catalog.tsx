@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { fetchUnfilteredHeroPhotoUrls } from "@/lib/public-hero-catalog";
+import { needsUnfilteredHeroCatalog, resolveHeroPhotoUrls } from "@/lib/public-hero-media";
 import { catalogTotalPages } from "@/lib/catalog-pagination";
 import { locationsFromListings } from "@/lib/public-site-content";
 import {
@@ -7,6 +9,7 @@ import {
   localizedHref,
 } from "@/lib/site-i18n";
 import type { CatalogThemeProps } from "@/themes/theme-types";
+import { getBeigeCopy } from "@/themes/beige/beige-copy";
 import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
@@ -19,14 +22,13 @@ import { BeigeSearch } from "@/themes/beige/beige-search";
 import {
   BeigeAbout,
   BeigeContact,
-  BeigeFinalCta,
   BeigeLocations,
   BeigeProcess,
 } from "@/themes/beige/beige-sections";
 import { BeigeShell } from "@/themes/beige/beige-shell";
 import { getBeigeUi } from "@/themes/beige/beige-ui";
 
-export function BeigeCatalog({
+export async function BeigeCatalog({
   oferta,
   city,
   propertyType,
@@ -62,6 +64,20 @@ export function BeigeCatalog({
   );
   const totalPages = catalogTotalPages(total, pageSize);
   const hasFilters = Boolean(propertyType || bedrooms || city);
+  const heroSources = {
+    configuredUrl: content.hero.imageUrl,
+    galleryUrls: heroPhotoUrls,
+    listings,
+  };
+  const resolvedHeroUrls = resolveHeroPhotoUrls(heroSources);
+  const catalogUrls = needsUnfilteredHeroCatalog({
+    hasAnyFilter: hasFilters || oferta !== "all",
+    catalogOk,
+    resolvedCount: resolvedHeroUrls.length,
+  })
+    ? await fetchUnfilteredHeroPhotoUrls()
+    : [];
+  const aboutImageUrl = resolveHeroPhotoUrls({ ...heroSources, catalogUrls })[0];
   const emptyKind =
     oferta === "sale"
       ? dict.results.emptySale
@@ -221,6 +237,7 @@ export function BeigeCatalog({
         dict={dict}
       />
       <BeigeAbout
+        imageUrl={aboutImageUrl}
         content={content}
         dict={dict}
         locale={locale}
@@ -230,10 +247,8 @@ export function BeigeCatalog({
       <BeigeContact
         content={content}
         dict={dict}
-        locale={locale}
-        defaultLocale={defaultLocale}
+        description={getBeigeCopy(locale).contactDescription}
       />
-      <BeigeFinalCta content={content} dict={dict} />
       <BeigeFooter lang={lang} />
     </BeigeShell>
   );

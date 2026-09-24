@@ -51,7 +51,7 @@ export function OrangeListingDetail({
   const agency = listing.agency_name || content.brand.name;
   const hasMap = listing.latitude != null && listing.longitude != null;
   const hasLocation = Boolean(listing.address_label) || hasMap;
-  const backHref = localizedHref("/#propiedades", locale, null, defaultLocale);
+  const backHref = localizedHref("/#catalogo", locale, null, defaultLocale);
   const listingPath = localizedHref(
     `/inmueble/${listing.slug}`,
     locale,

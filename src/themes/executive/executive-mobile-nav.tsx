@@ -22,6 +22,7 @@ type WhatsAppCta = {
 type Props = {
   links: NavLink[];
   whatsapp: WhatsAppCta | null;
+  access: { href: string; label: string };
   menuLabel: string;
   openLabel: string;
   closeLabel: string;
@@ -31,6 +32,7 @@ type Props = {
 export function ExecutiveMobileNav({
   links,
   whatsapp,
+  access,
   menuLabel,
   openLabel,
   closeLabel,
@@ -134,6 +136,13 @@ export function ExecutiveMobileNav({
           {localeSwitcher ? (
             <div className="executive-mobile-nav__locale">{localeSwitcher}</div>
           ) : null}
+          <Link
+            href={access.href}
+            className="executive-access-cta executive-access-cta--block"
+            onClick={() => setOpen(false)}
+          >
+            {access.label}
+          </Link>
           {whatsapp ? (
             <a
               href={whatsapp.href}

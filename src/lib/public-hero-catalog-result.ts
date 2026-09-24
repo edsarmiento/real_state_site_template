@@ -29,7 +29,7 @@ export function listingsFromCatalogResult(result: {
   });
 }
 
-/** Optional hero fallback: a thrown fetch must not fail UltraCatalog SSR. */
+/** Optional hero fallback: a thrown fetch must not fail catalog SSR. */
 export async function listingsFromCatalogLoad(
   load: () => Promise<{ ok: boolean; data: unknown }>,
 ): Promise<PhotoSource[]> {

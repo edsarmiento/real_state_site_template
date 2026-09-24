@@ -103,6 +103,10 @@ export function DarkHeader({ ui, isAdmin = false }: Props) {
           <DarkMobileNav
             links={links}
             whatsapp={whatsapp}
+            access={{
+              href: isAdmin ? "/listings" : "/login",
+              label: isAdmin ? dict.admin.manage : dict.admin.signIn,
+            }}
             menuLabel={dict.a11y.primaryNav}
             openLabel={dict.a11y.openMenu}
             closeLabel={dict.a11y.closeMenu}

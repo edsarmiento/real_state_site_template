@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { fetchUnfilteredHeroPhotoUrls } from "@/lib/public-hero-catalog";
+import { needsUnfilteredHeroCatalog, resolveHeroPhotoUrls } from "@/lib/public-hero-media";
 import {
   locationsFromListings,
 } from "@/lib/public-site-content";
@@ -18,7 +20,6 @@ import { LuxurySearch } from "@/themes/luxury/luxury-search";
 import {
   LuxuryAbout,
   LuxuryContact,
-  LuxuryFinalCta,
   LuxuryProcess,
 } from "@/themes/luxury/luxury-sections";
 import { LuxuryTestimonials } from "@/themes/luxury/luxury-testimonials";
@@ -46,7 +47,7 @@ function catalogHeading(
   return `${count} ${kind}${place}`;
 }
 
-export function LuxuryCatalog({
+export async function LuxuryCatalog({
   oferta,
   city,
   propertyType,
@@ -57,12 +58,27 @@ export function LuxuryCatalog({
   catalogOk,
   catalogStatus,
   lang,
+  heroPhotoUrls,
   content,
   config,
   locale,
 }: CatalogThemeProps) {
   const { dict, defaultLocale } = getLuxuryUi({ content, config, locale });
   const heroImage = content.hero.imageUrl;
+  const heroSources = {
+    configuredUrl: heroImage,
+    galleryUrls: heroPhotoUrls,
+    listings,
+  };
+  const resolvedHeroUrls = resolveHeroPhotoUrls(heroSources);
+  const catalogUrls = needsUnfilteredHeroCatalog({
+    hasAnyFilter: Boolean(propertyType || bedrooms || city || oferta !== "all"),
+    catalogOk,
+    resolvedCount: resolvedHeroUrls.length,
+  })
+    ? await fetchUnfilteredHeroPhotoUrls()
+    : [];
+  const aboutImageUrl = resolveHeroPhotoUrls({ ...heroSources, catalogUrls })[0];
   const locations =
     content.locations.length > 0
       ? content.locations
@@ -208,7 +224,13 @@ export function LuxuryCatalog({
         defaultLocale={defaultLocale}
         dict={dict}
       />
-      <LuxuryAbout content={content} dict={dict} locale={locale} defaultLocale={defaultLocale} />
+      <LuxuryAbout
+        content={content}
+        dict={dict}
+        locale={locale}
+        defaultLocale={defaultLocale}
+        imageUrl={aboutImageUrl}
+      />
       <LuxuryProcess dict={dict} />
       <LuxuryTestimonials
         testimonials={content.testimonials}
@@ -218,10 +240,10 @@ export function LuxuryCatalog({
       <LuxuryContact
         content={content}
         dict={dict}
-        locale={locale}
-        defaultLocale={defaultLocale}
+        description={locale === "en"
+          ? "Sale and rental inquiries. Choose the channel you prefer."
+          : "Consulta de venta y renta. Elige el canal que prefieras."}
       />
-      <LuxuryFinalCta content={content} dict={dict} />
       <LuxuryFooter lang={lang} />
     </LuxuryShell>
   );

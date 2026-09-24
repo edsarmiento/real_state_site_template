@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import {
   listingsFromCatalogLoad,
   listingsFromCatalogResult,
-} from "./ultra-hero-catalog-result.ts";
+} from "../../lib/public-hero-catalog-result.ts";
 
 describe("listingsFromCatalogResult", () => {
   it("returns photo sources from a valid listings payload", () => {

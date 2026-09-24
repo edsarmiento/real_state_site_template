@@ -1,6 +1,5 @@
 import type { PublicSiteContent } from "@/lib/public-site-content";
 import {
-  fillTemplate,
   localizeSiteHref,
   type SiteDictionary,
   type SiteLocale,
@@ -10,7 +9,6 @@ import {
   hasContactChannels,
   LuxuryContactChannels,
 } from "@/themes/luxury/luxury-contact-channels";
-import { LuxuryContactForm } from "@/themes/luxury/luxury-contact-form";
 import { LuxuryReveal } from "@/themes/luxury/luxury-reveal";
 import { LuxurySocialLinks } from "@/themes/luxury/luxury-social-links";
 import { LuxuryWhatsAppLink } from "@/themes/luxury/luxury-whatsapp-link";
@@ -23,11 +21,12 @@ type LocaleProps = {
 };
 
 export function LuxuryAbout({
+  imageUrl,
   content,
   dict,
   locale = "es",
   defaultLocale = "es",
-}: LocaleProps) {
+}: LocaleProps & { imageUrl?: string }) {
   const { about, brand } = content;
   const mark = (about.badge?.value || brand.name).trim();
 
@@ -55,10 +54,10 @@ export function LuxuryAbout({
           </div>
 
           <div className="luxury-about__media">
-            {about.imageUrl ? (
+            {imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={about.imageUrl}
+                src={imageUrl}
                 alt={dict.about.title}
                 className="luxury-about__image"
                 loading="lazy"
@@ -131,106 +130,58 @@ export function LuxuryProcess({ dict }: Pick<LocaleProps, "dict">) {
 export function LuxuryContact({
   content,
   dict,
-  locale = "es",
-  defaultLocale = "es",
-}: LocaleProps) {
-  const { contact, legal, social } = content;
-  const catalogHref = localizeSiteHref("#catalogo", locale, defaultLocale);
-  const hasChannels = hasContactChannels(contact);
+  description,
+}: Pick<LocaleProps, "content" | "dict"> & { description: string }) {
+  const { contact, social } = content;
+  const whatsapp = content.whatsapp.href ?? contact.whatsappHref;
+  const channels = { ...contact, whatsappHref: whatsapp };
 
   return (
-    <section id="contact" className="luxury-section luxury-contact">
+    <section
+      id="contact"
+      className="luxury-section luxury-contact"
+      aria-labelledby="luxury-contact-title"
+    >
       <LuxuryReveal>
         <div className="luxury-section__inner luxury-contact__shell">
+          <div className="luxury-contact__header">
+            <p className="luxury-kicker">{dict.contact.kicker}</p>
+            <h2 id="luxury-contact-title" className="luxury-section__title luxury-contact__title">
+              {dict.contact.heading}
+            </h2>
+            <p className="luxury-section__lead">{dict.contact.description}</p>
+          </div>
           <div className="luxury-contact__layout">
             <div className="luxury-contact__intro">
-              <p className="luxury-kicker">{dict.contact.kicker}</p>
-              <h2 className="luxury-section__title luxury-contact__title">
-                {dict.contact.heading}
-              </h2>
-              <p className="luxury-section__lead">{dict.contact.description}</p>
-              <LuxuryContactChannels contact={contact} dict={dict} />
+              <LuxuryContactChannels contact={channels} dict={dict} />
+              {!hasContactChannels(channels) ? (
+                <p className="luxury-section__lead">{dict.contact.emptyChannels}</p>
+              ) : null}
               <LuxurySocialLinks
                 social={social}
                 dict={dict}
                 heading={dict.footer.follow}
               />
-              {!hasChannels ? (
-                <div className="luxury-contact__fallback">
-                  <LuxuryButton href={catalogHref} variant="gold">
-                    {dict.contact.viewProperties}
-                  </LuxuryButton>
-                </div>
-              ) : null}
               {contact.attentionNote ? (
                 <p className="luxury-contact__note">{contact.attentionNote}</p>
               ) : null}
-              {contact.imageUrl ? (
-                <div className="luxury-contact__media">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={contact.imageUrl}
-                    alt=""
-                    className="luxury-contact__image"
-                    loading="lazy"
-                  />
-                </div>
+            </div>
+            <div className="luxury-contact__cta">
+              <h3 className="luxury-section__title">
+                {content.finalCta.title || dict.finalCta.title}
+              </h3>
+              <p className="luxury-section__lead luxury-section__lead--on-dark">
+                {description}
+              </p>
+              {whatsapp ? (
+                <LuxuryWhatsAppLink
+                  href={whatsapp}
+                  ariaLabel={`${dict.whatsapp.label}. ${dict.a11y.opensInNewTab}`}
+                >
+                  {dict.whatsapp.label}
+                </LuxuryWhatsAppLink>
               ) : null}
             </div>
-            <LuxuryContactForm
-              contact={contact}
-              legal={legal}
-              dict={dict}
-              locale={locale}
-              defaultLocale={defaultLocale}
-            />
-          </div>
-        </div>
-      </LuxuryReveal>
-    </section>
-  );
-}
-
-export function LuxuryFinalCta({
-  content,
-  dict,
-}: Pick<LocaleProps, "content" | "dict">) {
-  const whatsapp = content.whatsapp.href ?? content.contact.whatsappHref;
-  const schedule = content.contact.scheduleCallUrl;
-  if (!whatsapp && !schedule) return null;
-
-  return (
-    <section
-      className="luxury-section luxury-final-cta"
-      aria-label={dict.contact.finalCtaAria}
-    >
-      <LuxuryReveal>
-        <div className="luxury-section__inner luxury-final-cta__panel">
-          <h2 className="luxury-section__title">{dict.finalCta.title}</h2>
-          <p className="luxury-section__lead luxury-section__lead--on-dark">
-            {fillTemplate(dict.finalCta.description, {
-              name: content.brand.name,
-            })}
-          </p>
-          <div className="luxury-final-cta__actions">
-            {whatsapp ? (
-              <LuxuryWhatsAppLink
-                href={whatsapp}
-                ariaLabel={`${dict.whatsapp.label}. ${dict.a11y.opensInNewTab}`}
-              >
-                {dict.whatsapp.label}
-              </LuxuryWhatsAppLink>
-            ) : null}
-            {schedule ? (
-              <LuxuryButton
-                href={schedule}
-                variant="ghost"
-                surface="dark"
-                target="_blank"
-              >
-                {dict.contact.scheduleCall}
-              </LuxuryButton>
-            ) : null}
           </div>
         </div>
       </LuxuryReveal>

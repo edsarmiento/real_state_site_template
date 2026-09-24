@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { catalogSearchParams } from "@/lib/catalog-pagination";
 import type { CatalogOfferFilter, PublicListingCard } from "@/lib/listing-types";
-import type {
-  PublicSiteContent,
-  PublicTestimonial,
-} from "@/lib/public-site-content";
+import type { PublicSiteContent } from "@/lib/public-site-content";
 import {
   pickLocalized,
   type PublicLocation,
@@ -18,7 +15,6 @@ import {
   type SiteLocale,
 } from "@/lib/site-i18n";
 import { darkContactChannels } from "@/themes/dark/dark-contact-channels";
-import { DarkContactForm } from "@/themes/dark/dark-contact-form";
 import { DarkCoverImage } from "@/themes/dark/dark-cover-image";
 import {
   DarkIconArrowRight,
@@ -30,7 +26,6 @@ import {
   DarkIconMail,
   DarkIconMapPin,
   DarkIconPhone,
-  DarkIconQuote,
   DarkIconWhatsApp,
 } from "@/themes/dark/dark-icons";
 import {
@@ -39,7 +34,7 @@ import {
 } from "@/themes/dark/dark-locations";
 import { DarkReveal } from "@/themes/dark/dark-reveal";
 import { DarkSocialLinks } from "@/themes/dark/dark-social-links";
-import { darkBrandMonogram, getDarkCopy } from "@/themes/dark/dark-copy";
+import { getDarkCopy } from "@/themes/dark/dark-copy";
 import { DARK_CATALOG_HASH } from "@/themes/dark/dark-ui";
 
 type Shared = {
@@ -242,7 +237,8 @@ export function DarkAbout({
   dict,
   locale,
   defaultLocale,
-}: Shared) {
+  heroImage,
+}: Shared & { heroImage?: string | null }) {
   const { about } = content;
   const ctaHref = about.cta
     ? localizeSiteHref(about.cta.href, locale, defaultLocale)
@@ -270,11 +266,11 @@ export function DarkAbout({
             </div>
           </DarkReveal>
           <DarkReveal variant="right" delayMs={150}>
-            <div className="dark-about__panel" aria-hidden={!about.imageUrl}>
-              {about.imageUrl ? (
+            <div className="dark-about__panel" aria-hidden={!heroImage}>
+              {heroImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={about.imageUrl}
+                  src={heroImage}
                   alt=""
                   className="dark-about__image"
                   loading="lazy"
@@ -345,115 +341,6 @@ export function DarkProcess({ dict }: Pick<Shared, "dict">) {
             );
           })}
         </ol>
-      </div>
-    </section>
-  );
-}
-
-function validTestimonials(
-  testimonials: PublicTestimonial[],
-  locale: SiteLocale,
-): PublicTestimonial[] {
-  return testimonials.filter((item) => {
-    if (!item || typeof item !== "object") return false;
-    if (!item.id || !item.name?.trim()) return false;
-    return Boolean(pickLocalized(item.quote, locale)?.trim());
-  });
-}
-
-export function DarkTestimonials({
-  testimonials,
-  dict,
-  locale,
-}: {
-  testimonials: PublicTestimonial[];
-  dict: SiteDictionary;
-  locale: SiteLocale;
-}) {
-  const copy = getDarkCopy(locale);
-  const items = validTestimonials(testimonials, locale);
-
-  return (
-    <section id="opiniones" className="dark-testimonials">
-      <div className="dark-shell">
-        {items.length > 0 ? (
-          <>
-            <DarkReveal variant="up">
-              <div className="dark-section__head dark-section__head--center">
-                <p className="dark-eyebrow">{dict.testimonials.eyebrow}</p>
-                <h2 className="dark-section__title">{dict.testimonials.title}</h2>
-              </div>
-            </DarkReveal>
-            <ul className="dark-testimonials__grid">
-              {items.map((item, index) => {
-                const quote = pickLocalized(item.quote, locale);
-                const role = pickLocalized(item.role, locale);
-                if (!quote) return null;
-                return (
-                  <li key={item.id}>
-                    <DarkReveal
-                      variant="up"
-                      delayMs={[0, 150, 300][index % 3] ?? 0}
-                    >
-                      <figure className="dark-quote">
-                        <DarkIconQuote className="dark-quote__mark" />
-                        <blockquote>
-                          <p>{quote}</p>
-                        </blockquote>
-                        {item.preview ? (
-                          <p className="dark-quote__preview">
-                            {dict.testimonials.previewNote}
-                          </p>
-                        ) : null}
-                        <figcaption>
-                          <span className="dark-quote__avatar" aria-hidden>
-                            {darkBrandMonogram(
-                              item.name,
-                              copy.brandMarkFallback,
-                            )}
-                          </span>
-                          <span>
-                            <span className="dark-quote__name">{item.name}</span>
-                            {role ? (
-                              <span className="dark-quote__role">{role}</span>
-                            ) : null}
-                          </span>
-                        </figcaption>
-                      </figure>
-                    </DarkReveal>
-                  </li>
-                );
-              })}
-            </ul>
-          </>
-        ) : (
-          <>
-            <DarkReveal variant="up">
-              <div className="dark-section__head dark-section__head--center">
-                <p className="dark-eyebrow">{copy.principlesEyebrow}</p>
-                <h2 className="dark-section__title">{copy.principlesTitle}</h2>
-              </div>
-            </DarkReveal>
-            <ul className="dark-testimonials__grid">
-              {copy.principles.map((principle, index) => (
-                <li key={principle.title}>
-                  <DarkReveal
-                    variant="up"
-                    delayMs={[0, 150, 300][index] ?? 0}
-                  >
-                    <article className="dark-principle">
-                      <p className="dark-principle__mark" aria-hidden>
-                        {String(index + 1).padStart(2, "0")}
-                      </p>
-                      <h3 className="dark-principle__title">{principle.title}</h3>
-                      <p className="dark-principle__body">{principle.body}</p>
-                    </article>
-                  </DarkReveal>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
       </div>
     </section>
   );
@@ -545,7 +432,8 @@ export function DarkContact({
   locale,
   defaultLocale,
 }: Shared) {
-  const { contact, legal, social } = content;
+  const { contact, social } = content;
+  const copy = getDarkCopy(locale);
   const catalogHref = localizedHref(
     "/#propiedades",
     locale,
@@ -554,18 +442,21 @@ export function DarkContact({
   );
   const channels = collectChannels(content, dict);
   const hasChannels = channels.length > 0;
+  const whatsappHref = darkContactChannels(content).whatsappHref;
 
   return (
-    <section id="contacto" className="dark-contact">
+    <section id="contacto" className="dark-contact" aria-labelledby="dark-contact-title">
       <div className="dark-shell">
-        <div className="dark-contact__grid">
-          <div className="dark-contact__copy">
-            <DarkReveal variant="up">
-              <p className="dark-eyebrow">{dict.contact.kicker}</p>
-              <h2 className="dark-section__title">{dict.contact.heading}</h2>
-              <p className="dark-lead">{dict.contact.description}</p>
-            </DarkReveal>
-            <DarkReveal variant="up" delayMs={150}>
+        <div className="dark-contact__panel">
+          <header className="dark-contact__header">
+            <p className="dark-eyebrow">{dict.contact.kicker}</p>
+            <h2 id="dark-contact-title" className="dark-section__title">
+              {dict.contact.heading}
+            </h2>
+            <p className="dark-lead">{dict.contact.description}</p>
+          </header>
+          <div className="dark-contact__grid">
+            <div className="dark-contact__copy">
               {channels.length > 0 ? (
                 <ul className="dark-channels">
                   {channels.map((channel) => {
@@ -615,11 +506,7 @@ export function DarkContact({
                 </ul>
               ) : null}
               <div className="dark-contact__social">
-                <DarkSocialLinks
-                  social={social}
-                  dict={dict}
-                  heading={dict.footer.follow}
-                />
+                <DarkSocialLinks social={social} dict={dict} heading={dict.footer.follow} />
               </div>
               {!hasChannels ? (
                 <div className="dark-contact__fallback">
@@ -631,47 +518,15 @@ export function DarkContact({
               {contact.attentionNote ? (
                 <p className="dark-contact__note">{contact.attentionNote}</p>
               ) : null}
-            </DarkReveal>
-          </div>
-          <DarkReveal variant="up" delayMs={300}>
-            <DarkContactForm
-              contact={contact}
-              legal={legal}
-              dict={dict}
-              locale={locale}
-              defaultLocale={defaultLocale}
-            />
-          </DarkReveal>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/** Final CTA kept for DiseñoBase1 parity; copy from SiteConfig/dict only. */
-export function DarkFinalCta({
-  content,
-  dict,
-}: Pick<Shared, "content" | "dict">) {
-  const whatsapp = darkContactChannels(content).whatsappHref;
-  const schedule = content.contact.scheduleCallUrl;
-  if (!whatsapp && !schedule) return null;
-
-  return (
-    <section className="dark-final-cta" aria-label={dict.contact.finalCtaAria}>
-      <div className="dark-shell">
-        <DarkReveal variant="up">
-          <div className="dark-final-cta__panel">
-            <h2 className="dark-section__title">{dict.finalCta.title}</h2>
-            <p className="dark-lead">
-              {fillTemplate(dict.finalCta.description, {
-                name: content.brand.name,
-              })}
-            </p>
-            <div className="dark-final-cta__actions">
-              {whatsapp ? (
+            </div>
+            <aside className="dark-contact__cta">
+              <h3 className="dark-section__title">
+                {content.finalCta.title || dict.finalCta.title}
+              </h3>
+              <p className="dark-lead">{copy.contactDescription}</p>
+              {whatsappHref ? (
                 <a
-                  href={whatsapp}
+                  href={whatsappHref}
                   className="dark-btn"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -681,9 +536,9 @@ export function DarkFinalCta({
                   {dict.whatsapp.label}
                 </a>
               ) : null}
-              {schedule ? (
+              {content.contact.scheduleCallUrl ? (
                 <a
-                  href={schedule}
+                  href={content.contact.scheduleCallUrl}
                   aria-label={`${dict.contact.scheduleCall}. ${dict.a11y.opensInNewTab}`}
                   className="dark-btn dark-btn--ghost"
                   target="_blank"
@@ -692,9 +547,9 @@ export function DarkFinalCta({
                   {dict.contact.scheduleCall}
                 </a>
               ) : null}
-            </div>
+            </aside>
           </div>
-        </DarkReveal>
+        </div>
       </div>
     </section>
   );

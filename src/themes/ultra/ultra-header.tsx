@@ -91,7 +91,7 @@ export async function UltraHeader({ lang }: Props) {
           ) : null}
           <Link
             href={isAdmin ? "/listings" : "/login"}
-            className="ultra-header__admin"
+            className="ultra-btn ultra-btn--ghost ultra-header__admin"
           >
             {isAdmin ? dict.admin.manage : dict.admin.signIn}
           </Link>
