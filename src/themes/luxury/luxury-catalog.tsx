@@ -240,9 +240,7 @@ export async function LuxuryCatalog({
       <LuxuryContact
         content={content}
         dict={dict}
-        description={locale === "en"
-          ? "Sale and rental inquiries. Choose the channel you prefer."
-          : "Consulta de venta y renta. Elige el canal que prefieras."}
+        description={dict.contact.inquiryDescription}
       />
       <LuxuryFooter lang={lang} />
     </LuxuryShell>

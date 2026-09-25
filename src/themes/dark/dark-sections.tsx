@@ -6,7 +6,11 @@ import {
   pickLocalized,
   type PublicLocation,
 } from "@/lib/public-site-content";
-import { isExampleEmail, isExamplePhone } from "@/lib/example-contact";
+import {
+  collectPublicContactChannels,
+  publicContactChannels,
+  type PublicContactChannel,
+} from "@/lib/public-contact-channels";
 import {
   fillTemplate,
   localizeSiteHref,
@@ -14,7 +18,6 @@ import {
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
-import { darkContactChannels } from "@/themes/dark/dark-contact-channels";
 import { DarkCoverImage } from "@/themes/dark/dark-cover-image";
 import {
   DarkIconArrowRight,
@@ -346,79 +349,7 @@ export function DarkProcess({ dict }: Pick<Shared, "dict">) {
   );
 }
 
-type Channel = {
-  key: string;
-  eyebrow: string;
-  value: string;
-  href: string | null;
-  external?: boolean;
-  icon: "whatsapp" | "phone" | "email" | "schedule" | "location";
-};
-
-function collectChannels(
-  content: PublicSiteContent,
-  dict: SiteDictionary,
-): Channel[] {
-  const contact = content.contact;
-  const whatsappHref = darkContactChannels(content).whatsappHref;
-  const channels: Channel[] = [];
-  if (whatsappHref) {
-    channels.push({
-      key: "whatsapp",
-      eyebrow: dict.contact.writeUs,
-      value: dict.whatsapp.label,
-      href: whatsappHref,
-      external: true,
-      icon: "whatsapp",
-    });
-  }
-  if (contact.phoneHref && contact.phone?.trim()) {
-    const phone = contact.phone.trim();
-    if (!isExamplePhone(phone)) {
-      channels.push({
-        key: "phone",
-        eyebrow: dict.contact.callUs,
-        value: phone,
-        href: contact.phoneHref,
-        icon: "phone",
-      });
-    }
-  }
-  if (contact.emailHref && contact.email?.trim()) {
-    const email = contact.email.trim();
-    if (!isExampleEmail(email)) {
-      channels.push({
-        key: "email",
-        eyebrow: dict.contact.email,
-        value: email,
-        href: contact.emailHref,
-        icon: "email",
-      });
-    }
-  }
-  if (contact.scheduleCallUrl) {
-    channels.push({
-      key: "schedule",
-      eyebrow: dict.contact.schedule,
-      value: dict.contact.scheduleValue,
-      href: contact.scheduleCallUrl,
-      external: true,
-      icon: "schedule",
-    });
-  }
-  if (contact.location?.trim()) {
-    channels.push({
-      key: "location",
-      eyebrow: dict.contact.location,
-      value: contact.location,
-      href: null,
-      icon: "location",
-    });
-  }
-  return channels;
-}
-
-function ChannelIcon({ name }: { name: Channel["icon"] }) {
+function ChannelIcon({ name }: { name: PublicContactChannel["icon"] }) {
   if (name === "whatsapp") return <DarkIconWhatsApp className="h-5 w-5" />;
   if (name === "phone") return <DarkIconPhone className="h-5 w-5" />;
   if (name === "email") return <DarkIconMail className="h-5 w-5" />;
@@ -440,9 +371,13 @@ export function DarkContact({
     null,
     defaultLocale,
   );
-  const channels = collectChannels(content, dict);
+  const channels = collectPublicContactChannels(content, dict).map((channel) =>
+    channel.key === "phone" || channel.key === "email"
+      ? { ...channel, value: channel.value.trim() }
+      : channel,
+  );
   const hasChannels = channels.length > 0;
-  const whatsappHref = darkContactChannels(content).whatsappHref;
+  const whatsappHref = publicContactChannels(content).whatsappHref;
 
   return (
     <section id="contacto" className="dark-contact" aria-labelledby="dark-contact-title">
