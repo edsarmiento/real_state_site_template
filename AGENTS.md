@@ -310,7 +310,7 @@ Helpers: `isStyledSiteLayout(layoutKey)`, `SiteLayoutVariantProvider`, `useSiteL
 
 ---
 
-## Nueva plantilla pública — playbook para agentes
+## Nueva plantilla pública — playbook para agentes.
 
 Usa este flujo cuando pidan **una plantilla nueva** (visual distinta de default/Luxury). **Preguntar diseño** al humano y codificar según el checklist.
 
