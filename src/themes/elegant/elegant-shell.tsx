@@ -1,7 +1,7 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import type { ReactNode } from "react";
 import "./elegant-theme.css";
 import { ELEGANT_FONT_CLASS } from "@/themes/elegant/elegant-fonts";
-import { elegantContactChannels } from "@/themes/elegant/elegant-contact-channels";
 import { ElegantMotionRoot } from "@/themes/elegant/elegant-motion-root";
 import { loadElegantUi } from "@/themes/elegant/elegant-ui";
 import { ElegantWhatsAppFloat } from "@/themes/elegant/elegant-whatsapp-float";
@@ -18,7 +18,7 @@ export async function ElegantShell({
   lang,
 }: Props) {
   const { content, dict, locale } = await loadElegantUi(lang);
-  const href = elegantContactChannels(content).whatsappHref;
+  const href = publicContactChannels(content).whatsappHref;
 
   return (
     <div

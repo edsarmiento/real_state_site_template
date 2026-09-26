@@ -1,5 +1,4 @@
-import type { ContactContent } from "@/lib/public-site-content";
-import { isExampleEmail, isExamplePhone } from "@/lib/example-contact";
+import type { PublicContactChannel } from "@/lib/public-contact-channels";
 import type { SiteDictionary } from "@/lib/site-i18n";
 import {
   LuxuryIconArrowRight,
@@ -10,67 +9,7 @@ import {
   LuxuryIconWhatsApp,
 } from "@/themes/luxury/luxury-icons";
 
-type Channel = {
-  key: string;
-  eyebrow: string;
-  value: string;
-  href: string | null;
-  external?: boolean;
-  whatsapp?: boolean;
-};
-
-function collectChannels(
-  contact: ContactContent,
-  dict: SiteDictionary,
-): Channel[] {
-  const channels: Channel[] = [];
-  if (contact.whatsappHref) {
-    channels.push({
-      key: "whatsapp",
-      eyebrow: dict.contact.writeUs,
-      value: dict.whatsapp.label,
-      href: contact.whatsappHref,
-      external: true,
-      whatsapp: true,
-    });
-  }
-  if (contact.phoneHref && !isExamplePhone(contact.phone)) {
-    channels.push({
-      key: "phone",
-      eyebrow: dict.contact.callUs,
-      value: contact.phone || dict.contact.callUs,
-      href: contact.phoneHref,
-    });
-  }
-  if (contact.emailHref && contact.email && !isExampleEmail(contact.email)) {
-    channels.push({
-      key: "email",
-      eyebrow: dict.contact.email,
-      value: contact.email,
-      href: contact.emailHref,
-    });
-  }
-  if (contact.scheduleCallUrl) {
-    channels.push({
-      key: "schedule",
-      eyebrow: dict.contact.schedule,
-      value: dict.contact.scheduleValue,
-      href: contact.scheduleCallUrl,
-      external: true,
-    });
-  }
-  if (contact.location) {
-    channels.push({
-      key: "location",
-      eyebrow: dict.contact.location,
-      value: contact.location,
-      href: null,
-    });
-  }
-  return channels;
-}
-
-function ChannelIcon({ name }: { name: string }) {
+function ChannelIcon({ name }: { name: PublicContactChannel["icon"] }) {
   if (name === "whatsapp") return <LuxuryIconWhatsApp />;
   if (name === "phone") return <LuxuryIconPhone />;
   if (name === "email") return <LuxuryIconEmail />;
@@ -78,23 +17,12 @@ function ChannelIcon({ name }: { name: string }) {
   return <LuxuryIconLocation />;
 }
 
-export function hasContactChannels(contact: ContactContent): boolean {
-  return Boolean(
-    contact.whatsappHref ||
-      (contact.phoneHref && !isExamplePhone(contact.phone)) ||
-      (contact.emailHref && contact.email && !isExampleEmail(contact.email)) ||
-      contact.scheduleCallUrl ||
-      contact.location,
-  );
-}
-
 type Props = {
-  contact: ContactContent;
+  channels: PublicContactChannel[];
   dict: SiteDictionary;
 };
 
-export function LuxuryContactChannels({ contact, dict }: Props) {
-  const channels = collectChannels(contact, dict);
+export function LuxuryContactChannels({ channels, dict }: Props) {
   if (channels.length === 0) return null;
 
   return (
@@ -109,7 +37,7 @@ export function LuxuryContactChannels({ contact, dict }: Props) {
         const body = (
           <>
             <span className="luxury-channel__icon" aria-hidden>
-              <ChannelIcon name={channel.key} />
+              <ChannelIcon name={channel.icon} />
             </span>
             <span className="luxury-channel__copy">
               <span className="luxury-channel__eyebrow">{channel.eyebrow}</span>
@@ -127,7 +55,7 @@ export function LuxuryContactChannels({ contact, dict }: Props) {
               <a
                 href={channel.href}
                 className={
-                  channel.whatsapp
+                  channel.key === "whatsapp"
                     ? "luxury-channel luxury-channel--whatsapp"
                     : "luxury-channel"
                 }

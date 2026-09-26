@@ -1,5 +1,6 @@
 import {
   collectPublicContactChannels,
+  publicContactChannels,
   type PublicContactChannel,
 } from "@/lib/public-contact-channels";
 import Link from "next/link";
@@ -14,7 +15,6 @@ import {
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
-import { yellowContactChannels } from "@/themes/yellow/yellow-contact-channels";
 import { YellowCoverImage } from "@/themes/yellow/yellow-cover-image";
 import {
   YellowIconArrowRight,
@@ -272,7 +272,7 @@ export function YellowContact({
 }: Pick<Shared, "content" | "dict"> & { description: string }) {
   const { social } = content;
   const channels = collectPublicContactChannels(content, dict);
-  const whatsapp = yellowContactChannels(content).whatsappHref;
+  const whatsapp = publicContactChannels(content).whatsappHref;
 
   return (
     <section id="contacto" className="yellow-contact" aria-labelledby="yellow-contact-title">

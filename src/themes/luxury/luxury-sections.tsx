@@ -1,3 +1,4 @@
+import { collectPublicContactChannels, publicContactChannels } from "@/lib/public-contact-channels";
 import type { PublicSiteContent } from "@/lib/public-site-content";
 import {
   localizeSiteHref,
@@ -6,7 +7,6 @@ import {
 } from "@/lib/site-i18n";
 import { LuxuryButton } from "@/themes/luxury/luxury-button";
 import {
-  hasContactChannels,
   LuxuryContactChannels,
 } from "@/themes/luxury/luxury-contact-channels";
 import { LuxuryReveal } from "@/themes/luxury/luxury-reveal";
@@ -133,8 +133,8 @@ export function LuxuryContact({
   description,
 }: Pick<LocaleProps, "content" | "dict"> & { description: string }) {
   const { contact, social } = content;
-  const whatsapp = content.whatsapp.href ?? contact.whatsappHref;
-  const channels = { ...contact, whatsappHref: whatsapp };
+  const whatsapp = publicContactChannels(content).whatsappHref;
+  const channels = collectPublicContactChannels(content, dict);
 
   return (
     <section
@@ -153,8 +153,8 @@ export function LuxuryContact({
           </div>
           <div className="luxury-contact__layout">
             <div className="luxury-contact__intro">
-              <LuxuryContactChannels contact={channels} dict={dict} />
-              {!hasContactChannels(channels) ? (
+              <LuxuryContactChannels channels={channels} dict={dict} />
+              {channels.length === 0 ? (
                 <p className="luxury-section__lead">{dict.contact.emptyChannels}</p>
               ) : null}
               <LuxurySocialLinks

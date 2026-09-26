@@ -1,8 +1,8 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import Link from "next/link";
 import { isExampleEmail } from "@/lib/example-contact";
 import { fillTemplate, localizeSiteHref } from "@/lib/site-i18n";
 import { darkBrandMonogram, getDarkCopy } from "@/themes/dark/dark-copy";
-import { darkContactChannels } from "@/themes/dark/dark-contact-channels";
 import { DarkLogo } from "@/themes/dark/dark-logo";
 import { DarkReveal } from "@/themes/dark/dark-reveal";
 import { DarkSocialLinks } from "@/themes/dark/dark-social-links";
@@ -16,7 +16,7 @@ export function DarkFooter({ ui }: Props) {
   const { content, dict, locale, defaultLocale } = ui;
   const { brand, footer, legal, social, contact } = content;
   const links = darkNavLinks(dict, locale, defaultLocale);
-  const { whatsappHref, phone, phoneHref } = darkContactChannels(content);
+  const { whatsappHref, phone, phoneHref } = publicContactChannels(content);
   const emailRaw = contact.email?.trim() ?? "";
   const email =
     emailRaw && !isExampleEmail(emailRaw) ? emailRaw : null;

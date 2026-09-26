@@ -1,10 +1,10 @@
 import {
   collectPublicContactChannels,
+  publicContactChannels,
   type PublicContactChannel,
 } from "@/lib/public-contact-channels";
 import type { PublicSiteContent } from "@/lib/public-site-content";
 import type { SiteDictionary } from "@/lib/site-i18n";
-import { ultraContactChannels } from "@/themes/ultra/ultra-contact-channels";
 import {
   UltraIconCalendar,
   UltraIconMail,
@@ -31,7 +31,7 @@ type Props = {
 
 export function UltraContact({ content, dict, description }: Props) {
   const { social } = content;
-  const whatsappHref = ultraContactChannels(content).whatsappHref;
+  const whatsappHref = publicContactChannels(content).whatsappHref;
   const channels = collectPublicContactChannels(content, dict);
   const title = content.finalCta.title || dict.finalCta.title;
 

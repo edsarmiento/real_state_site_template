@@ -1,7 +1,7 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import type { ReactNode } from "react";
 import "./ultra-theme.css";
 import { ULTRA_FONT_CLASS } from "@/themes/ultra/ultra-fonts";
-import { ultraContactChannels } from "@/themes/ultra/ultra-contact-channels";
 import { UltraMotionRoot } from "@/themes/ultra/ultra-motion-root";
 import { UltraParticles } from "@/themes/ultra/ultra-particles";
 import { loadUltraUi } from "@/themes/ultra/ultra-ui";
@@ -21,7 +21,7 @@ export async function UltraShell({
   particles = "ambient",
 }: Props) {
   const { content, dict, locale } = await loadUltraUi(lang);
-  const href = ultraContactChannels(content).whatsappHref;
+  const href = publicContactChannels(content).whatsappHref;
   const motionOn = content.motion.preset !== "none";
 
   return (

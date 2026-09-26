@@ -1,5 +1,6 @@
 import {
   collectPublicContactChannels,
+  publicContactChannels,
   type PublicContactChannel,
 } from "@/lib/public-contact-channels";
 import Link from "next/link";
@@ -16,7 +17,6 @@ import {
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
-import { elegantContactChannels } from "@/themes/elegant/elegant-contact-channels";
 import { ElegantCoverImage } from "@/themes/elegant/elegant-cover-image";
 import {
   ElegantIconCalendar,
@@ -241,7 +241,7 @@ export function ElegantContact({
   const channels = collectPublicContactChannels(content, dict).sort(
     (a, b) => Number(b.key === "phone") - Number(a.key === "phone"),
   );
-  const whatsapp = elegantContactChannels(content).whatsappHref;
+  const whatsapp = publicContactChannels(content).whatsappHref;
 
   return (
     <section id="contacto" className="elegant-contact" aria-labelledby="elegant-contact-title">

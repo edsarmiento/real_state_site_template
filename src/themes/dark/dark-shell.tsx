@@ -1,9 +1,9 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import type { ReactNode } from "react";
 import "./dark-theme.css";
 import type { PublicSiteContent } from "@/lib/public-site-content";
 import type { SiteLocale } from "@/lib/site-i18n";
 import { DARK_FONT_CLASS } from "@/themes/dark/dark-fonts";
-import { darkContactChannels } from "@/themes/dark/dark-contact-channels";
 import { DarkMotionRoot } from "@/themes/dark/dark-motion-root";
 import type { DarkUi } from "@/themes/dark/dark-ui";
 import { DarkWhatsAppFloat } from "@/themes/dark/dark-whatsapp-float";
@@ -23,7 +23,7 @@ export function DarkShell({
   dict,
   floatRaised = false,
 }: Props) {
-  const href = darkContactChannels(content).whatsappHref;
+  const href = publicContactChannels(content).whatsappHref;
 
   return (
     <div

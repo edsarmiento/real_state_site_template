@@ -1,8 +1,8 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getSessionContext } from "@/lib/session-context";
 import { localizedHref } from "@/lib/site-i18n";
-import { elegantContactChannels } from "@/themes/elegant/elegant-contact-channels";
 import { ElegantHeaderChrome } from "@/themes/elegant/elegant-header-chrome";
 import { ElegantHeaderNav } from "@/themes/elegant/elegant-header-nav";
 import { ElegantIconWhatsApp } from "@/themes/elegant/elegant-icons";
@@ -29,7 +29,7 @@ export async function ElegantHeader({ lang }: Props) {
   const { brand } = content;
   const links = elegantNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
-  const whatsappHref = elegantContactChannels(content).whatsappHref;
+  const whatsappHref = publicContactChannels(content).whatsappHref;
   const whatsapp = whatsappHref
     ? {
         href: whatsappHref,

@@ -1,6 +1,6 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import Link from "next/link";
 import { fillTemplate, localizeSiteHref } from "@/lib/site-i18n";
-import { yellowContactChannels } from "@/themes/yellow/yellow-contact-channels";
 import {
   brandInitial,
   YELLOW_LOGO_FOOTER_CLASS,
@@ -17,7 +17,7 @@ export function YellowFooter({ ui }: Props) {
   const { content, dict, locale, defaultLocale } = ui;
   const { brand, footer, legal, social, contact } = content;
   const links = yellowNavLinks(dict, locale, defaultLocale);
-  const whatsappHref = yellowContactChannels(content).whatsappHref;
+  const whatsappHref = publicContactChannels(content).whatsappHref;
   const hasSocial = Boolean(social.instagramUrl || social.facebookUrl);
   const hasContact = Boolean(
     whatsappHref || contact.phoneHref || contact.emailHref,
