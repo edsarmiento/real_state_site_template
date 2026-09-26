@@ -22,10 +22,8 @@ import { DarkSearch } from "@/themes/dark/dark-search";
 import {
   DarkAbout,
   DarkContact,
-  DarkFinalCta,
   DarkLocations,
   DarkProcess,
-  DarkTestimonials,
 } from "@/themes/dark/dark-sections";
 import { DarkShell } from "@/themes/dark/dark-shell";
 import { DARK_CATALOG_HASH, getDarkUi } from "@/themes/dark/dark-ui";
@@ -295,20 +293,15 @@ export function DarkCatalog({
         dict={dict}
         locale={locale}
         defaultLocale={defaultLocale}
+        heroImage={content.about.imageUrl?.trim() || heroSrc}
       />
       <DarkProcess dict={dict} />
-      <DarkTestimonials
-        testimonials={content.testimonials}
-        dict={dict}
-        locale={locale}
-      />
       <DarkContact
         content={content}
         dict={dict}
         locale={locale}
         defaultLocale={defaultLocale}
       />
-      <DarkFinalCta content={content} dict={dict} />
       <DarkFooter ui={ui} />
     </DarkShell>
   );

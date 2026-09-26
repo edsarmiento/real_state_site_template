@@ -1,8 +1,8 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import Link from "next/link";
 import { Suspense } from "react";
 import { localizedHref } from "@/lib/site-i18n";
 import { darkBrandMonogram, getDarkCopy } from "@/themes/dark/dark-copy";
-import { darkContactChannels } from "@/themes/dark/dark-contact-channels";
 import { DarkHeaderChrome } from "@/themes/dark/dark-header-chrome";
 import { DarkHeaderNav } from "@/themes/dark/dark-header-nav";
 import { DarkIconWhatsApp } from "@/themes/dark/dark-icons";
@@ -22,7 +22,7 @@ export function DarkHeader({ ui, isAdmin = false }: Props) {
   const { brand } = content;
   const links = darkNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
-  const whatsappHref = darkContactChannels(content).whatsappHref;
+  const whatsappHref = publicContactChannels(content).whatsappHref;
   const whatsapp = whatsappHref
     ? {
         href: whatsappHref,
@@ -103,6 +103,10 @@ export function DarkHeader({ ui, isAdmin = false }: Props) {
           <DarkMobileNav
             links={links}
             whatsapp={whatsapp}
+            access={{
+              href: isAdmin ? "/listings" : "/login",
+              label: isAdmin ? dict.admin.manage : dict.admin.signIn,
+            }}
             menuLabel={dict.a11y.primaryNav}
             openLabel={dict.a11y.openMenu}
             closeLabel={dict.a11y.closeMenu}

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { getSessionContext } from "@/lib/session-context";
 import { localizedHref } from "@/lib/site-i18n";
-import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
+import { publicContactChannels as beigeContactChannels } from "@/lib/public-contact-channels";
 import { BEIGE_LOGO_NAV_CLASS } from "@/themes/beige/beige-display";
 import { BeigeHeaderChrome } from "@/themes/beige/beige-header-chrome";
 import { BeigeHeaderNav } from "@/themes/beige/beige-header-nav";
@@ -16,7 +17,12 @@ type Props = {
 };
 
 export async function BeigeHeader({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await loadBeigeUi(lang);
+  const [ui, session] = await Promise.all([
+    loadBeigeUi(lang),
+    getSessionContext(),
+  ]);
+  const { content, dict, locale, defaultLocale } = ui;
+  const isAdmin = session?.isStaffUser === true;
   const { brand } = content;
   const links = beigeNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
@@ -76,6 +82,12 @@ export async function BeigeHeader({ lang }: Props) {
               <span>{whatsapp.label}</span>
             </a>
           ) : null}
+          <Link
+            href={isAdmin ? "/listings" : "/login"}
+            className="beige-btn beige-btn--ghost beige-header__admin"
+          >
+            {isAdmin ? dict.admin.manage : dict.admin.signIn}
+          </Link>
           <BeigeMobileNav
             links={links}
             whatsapp={whatsapp}

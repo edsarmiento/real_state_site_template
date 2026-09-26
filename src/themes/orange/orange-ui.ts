@@ -39,50 +39,17 @@ export async function loadOrangeUi(lang?: string): Promise<OrangeUi> {
   return getOrangeUi(await resolveThemeProps(lang));
 }
 
-export function orangeNavLinks(input: {
+export function orangeNavLinks({ dict, locale, defaultLocale }: {
   dict: SiteDictionary;
-  copy: OrangeCopy;
   locale: SiteLocale;
   defaultLocale: SiteLocale;
-  showServices: boolean;
-  showTestimonials: boolean;
-  showAbout: boolean;
 }): { href: string; label: string }[] {
-  const { dict, copy, locale, defaultLocale } = input;
-  const links: { href: string; label: string }[] = [
-    {
-      href: localizedHref("/#propiedades", locale, null, defaultLocale),
-      label: dict.nav.properties,
-    },
+  return [
+    { href: localizedHref("/#catalogo", locale, null, defaultLocale), label: dict.nav.properties },
+    { href: localizedHref("/#about", locale, null, defaultLocale), label: dict.nav.about },
+    { href: localizedHref("/#process", locale, null, defaultLocale), label: dict.nav.process },
+    { href: localizedHref("/#contact", locale, null, defaultLocale), label: dict.nav.contact },
   ];
-  if (input.showServices) {
-    links.push({
-      href: localizedHref("/#servicios", locale, null, defaultLocale),
-      label: copy.navServices,
-    });
-  }
-  links.push(
-    input.showTestimonials
-      ? {
-          href: localizedHref("/#testimonios", locale, null, defaultLocale),
-          label: copy.navTestimonials,
-        }
-      : {
-          href: localizedHref("/#principios", locale, null, defaultLocale),
-          label: copy.navExperience,
-        },
-  );
-  if (input.showAbout) {
-    links.push({
-      href: localizedHref("/#nosotros", locale, null, defaultLocale),
-      label: dict.nav.about,
-    });
-  }
-  links.push({
-    href: localizedHref("/#contacto", locale, null, defaultLocale),
-    label: dict.nav.contact,
-  });
-  return links;
 }
 
 function resolveOrangeCurrency(currency?: string | null): string {

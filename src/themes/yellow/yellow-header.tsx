@@ -1,7 +1,8 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import Link from "next/link";
 import { Suspense } from "react";
+import { getSessionContext } from "@/lib/session-context";
 import { localizedHref } from "@/lib/site-i18n";
-import { yellowContactChannels } from "@/themes/yellow/yellow-contact-channels";
 import {
   brandInitial,
   YELLOW_LOGO_NAV_CLASS,
@@ -16,12 +17,14 @@ type Props = {
   ui: YellowUi;
 };
 
-export function YellowHeader({ ui }: Props) {
+export async function YellowHeader({ ui }: Props) {
   const { content, dict, locale, defaultLocale } = ui;
+  const session = await getSessionContext();
+  const isAdmin = session?.isStaffUser === true;
   const { brand } = content;
   const links = yellowNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
-  const whatsappHref = yellowContactChannels(content).whatsappHref;
+  const whatsappHref = publicContactChannels(content).whatsappHref;
   const whatsapp = whatsappHref
     ? {
         href: whatsappHref,
@@ -99,10 +102,14 @@ export function YellowHeader({ ui }: Props) {
                 <span>{whatsapp.label}</span>
               </a>
             ) : null}
+            <Link href={isAdmin ? "/listings" : "/login"} className="yellow-access-cta">
+              {isAdmin ? dict.admin.manage : dict.admin.signIn}
+            </Link>
           </div>
           <YellowMobileNav
             links={links}
             whatsapp={whatsapp}
+            access={{ href: isAdmin ? "/listings" : "/login", label: isAdmin ? dict.admin.manage : dict.admin.signIn }}
             menuLabel={dict.a11y.primaryNav}
             openLabel={dict.a11y.openMenu}
             closeLabel={dict.a11y.closeMenu}

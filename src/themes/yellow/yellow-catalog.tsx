@@ -238,30 +238,15 @@ export function YellowCatalog({
         dict={dict}
       />
       <YellowAbout
-        content={content}
+        imageUrl={content.about.imageUrl?.trim() || collage[0]}
         dict={dict}
-        locale={locale}
-        defaultLocale={defaultLocale}
       />
       <YellowProcess dict={dict} />
       <YellowContact
         content={content}
         dict={dict}
-        locale={locale}
-        defaultLocale={defaultLocale}
+        description={dict.contact.inquiryDescription}
       />
-
-      <section className="yellow-admin-bar" aria-label={dict.admin.catalogPrompt}>
-        <div className="yellow-shell yellow-admin-bar__inner">
-          <p>
-            <strong>{dict.admin.catalogPrompt}</strong>{" "}
-            {dict.admin.catalogPromptAction}
-          </p>
-          <Link href="/login" className="yellow-btn yellow-btn--ghost">
-            {dict.admin.manage}
-          </Link>
-        </div>
-      </section>
 
       <YellowFooter ui={ui} />
     </YellowShell>

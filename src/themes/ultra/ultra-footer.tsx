@@ -1,6 +1,6 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import Link from "next/link";
 import { fillTemplate, localizeSiteHref } from "@/lib/site-i18n";
-import { ultraContactChannels } from "@/themes/ultra/ultra-contact-channels";
 import { UltraSocialLinks } from "@/themes/ultra/ultra-social-links";
 import { getUltraCopy } from "@/themes/ultra/ultra-copy";
 import { loadUltraUi, ultraNavLinks } from "@/themes/ultra/ultra-ui";
@@ -13,7 +13,7 @@ export async function UltraFooter({ lang }: Props) {
   const { content, dict, locale, defaultLocale } = await loadUltraUi(lang);
   const { brand, footer, legal, social, contact } = content;
   const links = ultraNavLinks(dict, locale, defaultLocale);
-  const whatsappHref = ultraContactChannels(content).whatsappHref;
+  const whatsappHref = publicContactChannels(content).whatsappHref;
   const hasSocial = Boolean(
     social.instagramUrl || social.facebookUrl || whatsappHref,
   );

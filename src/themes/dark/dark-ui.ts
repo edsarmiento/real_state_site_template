@@ -57,10 +57,6 @@ export function darkNavLinks(
       label: dict.nav.process,
     },
     {
-      href: localizedHref("/#opiniones", locale, null, defaultLocale),
-      label: dict.testimonials.title,
-    },
-    {
       href: localizedHref("/#contacto", locale, null, defaultLocale),
       label: dict.nav.contact,
     },

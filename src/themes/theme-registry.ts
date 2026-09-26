@@ -44,6 +44,7 @@ const LAYOUT_KEYS_BY_THEME = Object.fromEntries(
 ) as Record<SiteThemeName, (typeof THEME_DEFINITIONS)[number]["layoutKeys"]>;
 
 const DEFAULT_CATALOG = { pageSize: 24, heroGallery: false } as const;
+const LUXURY_CATALOG = { ...DEFAULT_CATALOG, heroGallery: true } as const;
 const BEIGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ELEGANT_CATALOG = { pageSize: 12, heroGallery: true } as const;
 const ORANGE_CATALOG = { pageSize: 12, heroGallery: true } as const;
@@ -75,7 +76,7 @@ export const THEME_REGISTRY: Record<SiteThemeName, SiteTheme> = {
   luxury: {
     name: "luxury",
     layoutKeys: LAYOUT_KEYS_BY_THEME.luxury,
-    catalog: DEFAULT_CATALOG,
+    catalog: LUXURY_CATALOG,
     Catalog: withResolvedThemeProps(LuxuryCatalog),
     ListingDetail: withResolvedThemeProps(LuxuryListingDetail),
     ListingLoadError: withResolvedThemeProps(LuxuryListingLoadError),

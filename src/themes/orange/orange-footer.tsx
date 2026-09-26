@@ -12,21 +12,14 @@ type Props = {
 };
 
 export async function OrangeFooter({ lang }: Props) {
-  const { content, dict, copy, locale, defaultLocale } = await loadOrangeUi(lang);
-  const { brand, contact, footer, legal, about, social } = content;
-  const showTestimonials = content.testimonials.length > 0;
-  const showAbout = Boolean(about.title.trim());
+  const { content, dict, locale, defaultLocale } = await loadOrangeUi(lang);
+  const { brand, contact, footer, legal, social } = content;
   const links = orangeNavLinks({
     dict,
-    copy,
     locale,
     defaultLocale,
-    showServices: true,
-    showTestimonials,
-    showAbout,
   });
   const whatsappHref = content.whatsapp.href ?? contact.whatsappHref;
-  const quote = about.description.trim();
   const year = new Date().getFullYear();
 
   return (
@@ -103,6 +96,10 @@ export async function OrangeFooter({ lang }: Props) {
                 <li className="orange-footer__location">{contact.location}</li>
               ) : null}
             </ul>
+
+          </div>
+        ) : null}
+        <div>
             {social.facebookUrl || social.instagramUrl ? (
               <nav
                 aria-label={dict.a11y.socialNav}
@@ -134,17 +131,7 @@ export async function OrangeFooter({ lang }: Props) {
                 ) : null}
               </nav>
             ) : null}
-          </div>
-        ) : null}
-      </div>
-
-      <div className="orange-footer__bottom">
-        <p>
-          {fillTemplate(dict.footer.copyright, {
-            year,
-            name: brand.name,
-          })}
-        </p>
+          <p className="orange-footer__heading">{dict.footer.legal}</p>
         <nav aria-label={dict.a11y.legalNav} className="orange-footer__legal">
           <Link
             href={localizeSiteHref(legal.privacyNoticeUrl, locale, defaultLocale)}
@@ -167,7 +154,17 @@ export async function OrangeFooter({ lang }: Props) {
             </Link>
           ) : null}
         </nav>
-        {quote ? <p className="orange-signature orange-footer__quote">{quote}</p> : null}
+        </div>
+      </div>
+
+      <div className="orange-footer__bottom">
+        <p>
+          {fillTemplate(dict.footer.copyright, {
+            year,
+            name: brand.name,
+          })}
+        </p>
+
         {footer.showPoweredBy ? (
           <p className="orange-footer__powered">
             {dict.footer.poweredBy}{" "}

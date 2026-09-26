@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { getSessionContext } from "@/lib/session-context";
+import { LuxuryButton } from "@/themes/luxury/luxury-button";
 import { localizedHref } from "@/lib/site-i18n";
 import { LuxuryLocaleSwitcher } from "@/themes/luxury/luxury-locale-switcher";
 import { LuxuryLogo } from "@/themes/luxury/luxury-logo";
@@ -12,7 +14,12 @@ type Props = {
 };
 
 export async function LuxuryHeader({ lang }: Props) {
-  const { content, dict, locale, defaultLocale } = await loadLuxuryUi(lang);
+  const [ui, session] = await Promise.all([
+    loadLuxuryUi(lang),
+    getSessionContext(),
+  ]);
+  const { content, dict, locale, defaultLocale } = ui;
+  const isAdmin = session?.isStaffUser === true;
   const { brand, contact, social } = content;
   const links = luxuryNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
@@ -77,6 +84,14 @@ export async function LuxuryHeader({ lang }: Props) {
               {whatsapp.label}
             </LuxuryWhatsAppLink>
           ) : null}
+          <LuxuryButton
+            href={isAdmin ? "/listings" : "/login"}
+            variant="outline"
+            size="sm"
+            className="luxury-header__access"
+          >
+            {isAdmin ? dict.admin.manage : dict.admin.signIn}
+          </LuxuryButton>
           <div className="luxury-header__mobile">
             <LuxuryMobileNav
               links={links}

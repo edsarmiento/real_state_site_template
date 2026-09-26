@@ -204,3 +204,10 @@ export function OrangeIconCatalog(props: IconProps) {
     </Icon>
   );
 }
+
+export function OrangeIconMail(props: IconProps) {
+  return <Icon {...props}><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.6" /><path d="m3 6 9 7 9-7" stroke="currentColor" strokeWidth="1.6" /></Icon>;
+}
+export function OrangeIconCalendar(props: IconProps) {
+  return <Icon {...props}><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.6" /><path d="M8 3v4m8-4v4M3 11h18" stroke="currentColor" strokeWidth="1.6" /></Icon>;
+}

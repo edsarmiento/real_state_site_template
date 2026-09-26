@@ -196,14 +196,13 @@ export function ExecutiveCatalog({
           copy={copy}
           locale={locale}
           defaultLocale={defaultLocale}
+          coverUrl={content.about.imageUrl?.trim() || collage[0]}
         />
         <ExecutiveProcess dict={dict} />
         <ExecutiveContact
           content={content}
           dict={dict}
           copy={copy}
-          locale={locale}
-          defaultLocale={defaultLocale}
         />
       </main>
       <ExecutiveFooter lang={lang} />

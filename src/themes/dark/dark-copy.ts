@@ -7,10 +7,6 @@ export type DarkCopy = {
   paginationAria: string;
   goToPage: string;
   brandMarkFallback: string;
-  /** Honest principles when SiteConfig has no testimonials (not fake quotes). */
-  principlesEyebrow: string;
-  principlesTitle: string;
-  principles: readonly { title: string; body: string }[];
 };
 
 const ES: DarkCopy = {
@@ -20,22 +16,6 @@ const ES: DarkCopy = {
   paginationAria: "Paginación de propiedades",
   goToPage: "Ir a la página {page}",
   brandMarkFallback: "·",
-  principlesEyebrow: "Cómo acompañamos",
-  principlesTitle: "Principios de atención",
-  principles: [
-    {
-      title: "Información clara",
-      body: "Publicamos precio, ubicación y características visibles desde el anuncio.",
-    },
-    {
-      title: "Contacto directo",
-      body: "WhatsApp o formulario en la ficha: tu mensaje llega a la inmobiliaria.",
-    },
-    {
-      title: "Sin fricción",
-      body: "Filtra, compara y agenda desde el catálogo sin pasos inventados.",
-    },
-  ],
 };
 
 const EN: DarkCopy = {
@@ -45,22 +25,6 @@ const EN: DarkCopy = {
   paginationAria: "Property pagination",
   goToPage: "Go to page {page}",
   brandMarkFallback: "·",
-  principlesEyebrow: "How we work with you",
-  principlesTitle: "Attention principles",
-  principles: [
-    {
-      title: "Clear information",
-      body: "Price, location, and specs stay visible on every listing.",
-    },
-    {
-      title: "Direct contact",
-      body: "WhatsApp or the listing form reaches the agency directly.",
-    },
-    {
-      title: "Low friction",
-      body: "Filter, compare, and reach out from the catalog without invented steps.",
-    },
-  ],
 };
 
 export function getDarkCopy(locale: SiteLocale): DarkCopy {

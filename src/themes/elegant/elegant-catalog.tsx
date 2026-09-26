@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { fetchUnfilteredHeroPhotoUrls } from "@/lib/public-hero-catalog";
+import { needsUnfilteredHeroCatalog, resolveHeroPhotoUrls } from "@/lib/public-hero-media";
 import { PublicListingCard } from "@/components/public-listing-card";
 import { catalogTotalPages } from "@/lib/catalog-pagination";
 import { locationsFromListings } from "@/lib/public-site-content";
@@ -17,14 +19,13 @@ import { ElegantSearch } from "@/themes/elegant/elegant-search";
 import {
   ElegantAbout,
   ElegantContact,
-  ElegantFinalCta,
   ElegantLocations,
   ElegantProcess,
 } from "@/themes/elegant/elegant-sections";
 import { ElegantShell } from "@/themes/elegant/elegant-shell";
 import { elegantContentHref, getElegantUi } from "@/themes/elegant/elegant-ui";
 
-export function ElegantCatalog({
+export async function ElegantCatalog({
   oferta,
   city,
   propertyType,
@@ -77,8 +78,20 @@ export function ElegantCatalog({
     : localizeSiteHref("#sobre-nosotros", locale, defaultLocale);
   const heroTitle = content.hero.title?.trim() || dict.hero.title;
   const parts = elegantHeroTitleParts(heroTitle, dict.hero.titleAccent);
-  const heroImage =
-    content.hero.imageUrl?.trim() || heroPhotoUrls?.[0]?.trim() || "";
+  const heroSources = {
+    configuredUrl: content.hero.imageUrl,
+    galleryUrls: heroPhotoUrls,
+    listings,
+  };
+  const resolvedHeroUrls = resolveHeroPhotoUrls(heroSources);
+  const catalogUrls = needsUnfilteredHeroCatalog({
+    hasAnyFilter: hasFilters || oferta !== "all",
+    catalogOk,
+    resolvedCount: resolvedHeroUrls.length,
+  })
+    ? await fetchUnfilteredHeroPhotoUrls()
+    : [];
+  const heroImage = resolveHeroPhotoUrls({ ...heroSources, catalogUrls })[0] ?? "";
   const countLabel =
     total === 1
       ? dict.results.one
@@ -211,6 +224,7 @@ export function ElegantCatalog({
           dict={dict}
         />
         <ElegantAbout
+          imageUrl={content.about.imageUrl?.trim() || heroImage}
           content={content}
           dict={dict}
           locale={locale}
@@ -220,10 +234,8 @@ export function ElegantCatalog({
         <ElegantContact
           content={content}
           dict={dict}
-          locale={locale}
-          defaultLocale={defaultLocale}
+          description={dict.contact.inquiryDescription}
         />
-        <ElegantFinalCta content={content} dict={dict} />
       </main>
       <ElegantFooter lang={lang} />
     </ElegantShell>

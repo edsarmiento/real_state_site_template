@@ -9,7 +9,6 @@ export type ExecutiveCopy = {
   locationsExplore: string;
   aboutKicker: string;
   aboutReadyTitle: string;
-  aboutReadyCopy: string;
   aboutAdvisorCta: string;
   benefit1Copy: string;
   benefit2Copy: string;
@@ -33,8 +32,6 @@ const ES: ExecutiveCopy = {
   locationsExplore: "Explorar propiedades",
   aboutKicker: "Confianza y transparencia",
   aboutReadyTitle: "¿Listo para dar el siguiente paso?",
-  aboutReadyCopy:
-    "Agenda una asesoría con la inmobiliaria y encuentra la opción que mejor se ajuste a lo que buscas.",
   aboutAdvisorCta: "Hablar con un asesor",
   benefit1Copy: "Información al día sobre disponibilidad y precios publicados.",
   benefit2Copy: "Datos visibles desde el anuncio, sin costos inventados en el sitio.",
@@ -59,8 +56,6 @@ const EN: ExecutiveCopy = {
   locationsExplore: "Browse properties",
   aboutKicker: "Trust and transparency",
   aboutReadyTitle: "Ready for the next step?",
-  aboutReadyCopy:
-    "Book a consultation with the agency and find the option that fits what you are looking for.",
   aboutAdvisorCta: "Talk to an advisor",
   benefit1Copy: "Up-to-date availability and published prices.",
   benefit2Copy: "Visible listing data, with no invented fees on this site.",

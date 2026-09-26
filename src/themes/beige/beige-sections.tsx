@@ -1,3 +1,5 @@
+import { collectPublicContactChannels, type PublicContactChannel } from "@/lib/public-contact-channels";
+import { representativeListingPhoto } from "@/lib/representative-listing-photo";
 import Link from "next/link";
 import type { PublicListingCard } from "@/lib/listing-types";
 import type { PublicSiteContent } from "@/lib/public-site-content";
@@ -5,7 +7,6 @@ import {
   pickLocalized,
   type PublicLocation,
 } from "@/lib/public-site-content";
-import { isExampleEmail } from "@/lib/example-contact";
 import {
   fillTemplate,
   localizeSiteHref,
@@ -13,8 +14,7 @@ import {
   type SiteDictionary,
   type SiteLocale,
 } from "@/lib/site-i18n";
-import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
-import { BeigeContactForm } from "@/themes/beige/beige-contact-form";
+import { publicContactChannels as beigeContactChannels } from "@/lib/public-contact-channels";
 import { BeigeCoverImage } from "@/themes/beige/beige-cover-image";
 import {
   BeigeIconArrowRight,
@@ -33,32 +33,6 @@ type Shared = {
   locale: SiteLocale;
   defaultLocale: SiteLocale;
 };
-
-function normalizeCity(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-}
-
-function cityKey(value: string): string {
-  return normalizeCity(value).split(",")[0]?.trim() || "";
-}
-
-function representativeListingPhoto(
-  city: string | undefined,
-  listings: PublicListingCard[],
-): string | null {
-  if (!city) return null;
-  const needle = cityKey(city);
-  if (!needle) return null;
-  const match = listings.find((listing) => {
-    if (cityKey(listing.city || "") !== needle) return false;
-    return Boolean(listing.photo_url?.trim());
-  });
-  return match?.photo_url?.trim() || null;
-}
 
 export function BeigeLocations({
   locations,
@@ -198,11 +172,12 @@ export function BeigeLocations({
 
 
 export function BeigeAbout({
+  imageUrl,
   content,
   dict,
   locale,
   defaultLocale,
-}: Shared) {
+}: Shared & { imageUrl?: string }) {
   const { about } = content;
   const ctaHref = about.cta
     ? localizeSiteHref(about.cta.href, locale, defaultLocale)
@@ -231,10 +206,10 @@ export function BeigeAbout({
           </BeigeReveal>
           <BeigeReveal variant="right">
             <div className="beige-about__media">
-              {about.imageUrl ? (
+              {imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={about.imageUrl}
+                  src={imageUrl}
                   alt={dict.about.title}
                   className="beige-about__image"
                   loading="lazy"
@@ -308,73 +283,7 @@ export function BeigeProcess({ dict }: Pick<Shared, "dict">) {
   );
 }
 
-type Channel = {
-  key: string;
-  eyebrow: string;
-  value: string;
-  href: string | null;
-  external?: boolean;
-  icon: "whatsapp" | "phone" | "email" | "schedule" | "location";
-};
-
-function collectChannels(
-  content: PublicSiteContent,
-  dict: SiteDictionary,
-): Channel[] {
-  const contact = content.contact;
-  const { whatsappHref, phone, phoneHref } = beigeContactChannels(content);
-  const channels: Channel[] = [];
-  if (whatsappHref) {
-    channels.push({
-      key: "whatsapp",
-      eyebrow: dict.contact.writeUs,
-      value: dict.whatsapp.label,
-      href: whatsappHref,
-      external: true,
-      icon: "whatsapp",
-    });
-  }
-  if (phoneHref) {
-    channels.push({
-      key: "phone",
-      eyebrow: dict.contact.callUs,
-      value: phone || dict.contact.callUs,
-      href: phoneHref,
-      icon: "phone",
-    });
-  }
-  if (contact.emailHref && contact.email && !isExampleEmail(contact.email)) {
-    channels.push({
-      key: "email",
-      eyebrow: dict.contact.email,
-      value: contact.email,
-      href: contact.emailHref,
-      icon: "email",
-    });
-  }
-  if (contact.scheduleCallUrl) {
-    channels.push({
-      key: "schedule",
-      eyebrow: dict.contact.schedule,
-      value: dict.contact.scheduleValue,
-      href: contact.scheduleCallUrl,
-      external: true,
-      icon: "schedule",
-    });
-  }
-  if (contact.location) {
-    channels.push({
-      key: "location",
-      eyebrow: dict.contact.location,
-      value: contact.location,
-      href: null,
-      icon: "location",
-    });
-  }
-  return channels;
-}
-
-function ChannelIcon({ name }: { name: Channel["icon"] }) {
+function ChannelIcon({ name }: { name: PublicContactChannel["icon"] }) {
   if (name === "whatsapp") return <BeigeIconWhatsApp className="h-5 w-5" />;
   if (name === "phone") return <BeigeIconPhone className="h-5 w-5" />;
   if (name === "email") return <BeigeIconMail className="h-5 w-5" />;
@@ -382,177 +291,118 @@ function ChannelIcon({ name }: { name: Channel["icon"] }) {
   return <BeigeIconMapPin className="h-5 w-5" />;
 }
 
-function hasContactChannels(content: PublicSiteContent): boolean {
-  const contact = content.contact;
-  return Boolean(
-    beigeContactChannels(content).whatsappHref ||
-      contact.phoneHref ||
-      (contact.emailHref && contact.email) ||
-      contact.scheduleCallUrl ||
-      contact.location,
-  );
-}
-
 export function BeigeContact({
   content,
   dict,
-  locale,
-  defaultLocale,
-}: Shared) {
-  const { contact, legal, social } = content;
-  const catalogHref = localizeSiteHref("#catalogo", locale, defaultLocale);
-  const channels = collectChannels(content, dict);
-  const hasChannels = hasContactChannels(content);
+  description,
+}: Pick<Shared, "content" | "dict"> & { description: string }) {
+  const { contact, social } = content;
+  const whatsappHref = beigeContactChannels(content).whatsappHref;
+  const channels = collectPublicContactChannels(content, dict);
+  const title = content.finalCta.title || dict.finalCta.title;
 
   return (
-    <section id="contact" className="beige-contact">
+    <section
+      id="contact"
+      className="beige-contact"
+      aria-labelledby="beige-contact-title"
+    >
       <div className="beige-shell">
-        <div className="beige-contact__grid">
-          <div className="beige-contact__copy">
+        <div className="beige-contact__panel">
+          <BeigeReveal variant="up" className="beige-contact__header">
             <p className="beige-eyebrow beige-eyebrow--on-dark">
               {dict.contact.kicker}
             </p>
-            <h2 className="beige-section__title beige-section__title--on-dark">
+            <h2
+              id="beige-contact-title"
+              className="beige-section__title beige-section__title--on-dark"
+            >
               {dict.contact.heading}
             </h2>
             <p className="beige-lead beige-lead--on-dark">
               {dict.contact.description}
             </p>
-            <BeigeReveal variant="up">
-            {channels.length > 0 ? (
-              <ul className="beige-channels">
-                {channels.map((channel) => {
-                  const body = (
-                    <>
-                      <span className="beige-channel__icon" aria-hidden>
-                        <ChannelIcon name={channel.icon} />
-                      </span>
-                      <span className="beige-channel__copy">
-                        <span className="beige-channel__eyebrow">
-                          {channel.eyebrow}
+          </BeigeReveal>
+          <div className="beige-contact__grid">
+            <BeigeReveal variant="left">
+              {channels.length > 0 ? (
+                <ul className="beige-channels">
+                  {channels.map((channel) => {
+                    const body = (
+                      <>
+                        <span className="beige-channel__icon" aria-hidden>
+                          <ChannelIcon name={channel.icon} />
                         </span>
-                        <span className="beige-channel__value">{channel.value}</span>
-                      </span>
-                    </>
-                  );
-                  return (
-                    <li key={channel.key}>
-                      {channel.href ? (
-                        <a
-                          href={channel.href}
-                          className="beige-channel"
-                          aria-label={
-                            channel.external
-                              ? `${channel.eyebrow}: ${channel.value}. ${dict.a11y.opensInNewTab}`
-                              : `${channel.eyebrow}: ${channel.value}`
-                          }
-                          {...(channel.external
-                            ? { target: "_blank", rel: "noopener noreferrer" }
-                            : {})}
-                        >
-                          {body}
-                        </a>
-                      ) : (
-                        <p className="beige-channel beige-channel--static">{body}</p>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : null}
-            <div className="beige-contact__social">
-              <BeigeSocialLinks
-                social={social}
-                dict={dict}
-                heading={dict.footer.follow}
-              />
-            </div>
-            {!hasChannels ? (
-              <div className="mt-8">
-                <Link href={catalogHref} className="beige-btn">
-                  {dict.contact.viewProperties}
-                </Link>
-              </div>
-            ) : null}
-            {contact.attentionNote ? (
-              <p className="beige-contact__note">{contact.attentionNote}</p>
-            ) : null}
-            {contact.imageUrl ? (
-              <div className="mt-8 overflow-hidden rounded-3xl">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={contact.imageUrl}
-                  alt=""
-                  className="h-48 w-full object-cover"
-                  loading="lazy"
+                        <span className="beige-channel__copy">
+                          <span className="beige-channel__eyebrow">
+                            {channel.eyebrow}
+                          </span>
+                          <span className="beige-channel__value">{channel.value}</span>
+                        </span>
+                      </>
+                    );
+                    return (
+                      <li key={channel.key}>
+                        {channel.href ? (
+                          <a
+                            href={channel.href}
+                            className="beige-channel"
+                            aria-label={
+                              channel.external
+                                ? `${channel.eyebrow}: ${channel.value}. ${dict.a11y.opensInNewTab}`
+                                : `${channel.eyebrow}: ${channel.value}`
+                            }
+                            {...(channel.external
+                              ? { target: "_blank", rel: "noopener noreferrer" }
+                              : {})}
+                          >
+                            {body}
+                          </a>
+                        ) : (
+                          <p className="beige-channel beige-channel--static">{body}</p>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="beige-lead beige-lead--on-dark">
+                  {dict.contact.emptyChannels}
+                </p>
+              )}
+
+              <div className="beige-contact__social">
+                <BeigeSocialLinks
+                  social={social}
+                  dict={dict}
+                  heading={dict.footer.follow}
                 />
               </div>
-            ) : null}
+              {contact.attentionNote ? (
+                <p className="beige-contact__note">{contact.attentionNote}</p>
+              ) : null}
+            </BeigeReveal>
+
+            <BeigeReveal variant="right" delayMs={80}>
+              <div className="beige-contact__cta">
+                <h3 className="beige-section__title">{title}</h3>
+                <p className="beige-lead">{description}</p>
+                {whatsappHref ? (
+                  <a
+                    href={whatsappHref}
+                    className="beige-btn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${dict.whatsapp.label}. ${dict.a11y.opensInNewTab}`}
+                  >
+                    <BeigeIconWhatsApp className="h-5 w-5" aria-hidden />
+                    {dict.whatsapp.label}
+                  </a>
+                ) : null}
+              </div>
             </BeigeReveal>
           </div>
-          <BeigeReveal variant="up" delayMs={100}>
-            <BeigeContactForm
-              contact={contact}
-              legal={legal}
-              dict={dict}
-              locale={locale}
-              defaultLocale={defaultLocale}
-            />
-          </BeigeReveal>
         </div>
-      </div>
-    </section>
-  );
-}
-
-export function BeigeFinalCta({
-  content,
-  dict,
-}: Pick<Shared, "content" | "dict">) {
-  const whatsapp = beigeContactChannels(content).whatsappHref;
-  const schedule = content.contact.scheduleCallUrl;
-  if (!whatsapp && !schedule) return null;
-
-  return (
-    <section
-      className="beige-final-cta"
-      aria-label={dict.contact.finalCtaAria}
-    >
-      <div className="beige-shell">
-        <BeigeReveal variant="up">
-          <div className="beige-final-cta__panel">
-            <h2 className="beige-section__title">{dict.finalCta.title}</h2>
-            <p className="beige-lead">
-              {fillTemplate(dict.finalCta.description, {
-                name: content.brand.name,
-              })}
-            </p>
-            <div className="beige-final-cta__actions">
-              {whatsapp ? (
-                <a
-                  href={whatsapp}
-                  className="beige-btn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${dict.whatsapp.label}. ${dict.a11y.opensInNewTab}`}
-                >
-                  <BeigeIconWhatsApp className="h-4 w-4" />
-                  {dict.whatsapp.label}
-                </a>
-              ) : null}
-              {schedule ? (
-                <a
-                  href={schedule}
-                  className="beige-btn beige-btn--ghost"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {dict.contact.scheduleCall}
-                </a>
-              ) : null}
-            </div>
-          </div>
-        </BeigeReveal>
       </div>
     </section>
   );

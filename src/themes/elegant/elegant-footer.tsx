@@ -1,6 +1,6 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import Link from "next/link";
 import { fillTemplate, localizeSiteHref } from "@/lib/site-i18n";
-import { elegantContactChannels } from "@/themes/elegant/elegant-contact-channels";
 import { ElegantLogo } from "@/themes/elegant/elegant-logo";
 import { ElegantSocialLinks } from "@/themes/elegant/elegant-social-links";
 import {
@@ -17,7 +17,7 @@ export async function ElegantFooter({ lang }: Props) {
   const { content, dict, locale, defaultLocale } = await loadElegantUi(lang);
   const { brand, footer, legal, social, contact } = content;
   const links = elegantNavLinks(dict, locale, defaultLocale);
-  const whatsappHref = elegantContactChannels(content).whatsappHref;
+  const whatsappHref = publicContactChannels(content).whatsappHref;
   const hasContact = Boolean(
     whatsappHref || contact.phoneHref || contact.emailHref,
   );

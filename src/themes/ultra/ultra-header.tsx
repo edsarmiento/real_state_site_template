@@ -1,8 +1,8 @@
+import { publicContactChannels } from "@/lib/public-contact-channels";
 import Link from "next/link";
 import { Suspense } from "react";
 import { localizedHref } from "@/lib/site-i18n";
 import { getSessionContext } from "@/lib/session-context";
-import { ultraContactChannels } from "@/themes/ultra/ultra-contact-channels";
 import { UltraIconWhatsApp } from "@/themes/ultra/ultra-icons";
 import { UltraHeaderChrome } from "@/themes/ultra/ultra-header-chrome";
 import { UltraLocaleSwitcher } from "@/themes/ultra/ultra-locale-switcher";
@@ -22,7 +22,7 @@ export async function UltraHeader({ lang }: Props) {
   const { brand } = content;
   const links = ultraNavLinks(dict, locale, defaultLocale);
   const homeHref = localizedHref("/", locale, null, defaultLocale);
-  const whatsappHref = ultraContactChannels(content).whatsappHref;
+  const whatsappHref = publicContactChannels(content).whatsappHref;
   const whatsapp = whatsappHref
     ? {
         href: whatsappHref,
@@ -91,7 +91,7 @@ export async function UltraHeader({ lang }: Props) {
           ) : null}
           <Link
             href={isAdmin ? "/listings" : "/login"}
-            className="ultra-header__admin"
+            className="ultra-btn ultra-btn--ghost ultra-header__admin"
           >
             {isAdmin ? dict.admin.manage : dict.admin.signIn}
           </Link>

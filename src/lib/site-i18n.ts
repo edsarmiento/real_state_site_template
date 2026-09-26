@@ -184,6 +184,7 @@ export type SiteDictionary = {
     kicker: string;
     heading: string;
     description: string;
+    inquiryDescription: string;
     writeUs: string;
     callUs: string;
     email: string;
@@ -629,6 +630,7 @@ const dictionaries = {
       heading: "Hablemos de tu próximo inmueble",
       description:
         "Elige el canal que te resulte más cómodo. Atendemos consultas de renta y venta.",
+      inquiryDescription: "Consultas de renta y venta. Elige el canal que prefieras.",
       writeUs: "Escríbenos",
       callUs: "Llámanos",
       email: "Correo",
@@ -932,6 +934,7 @@ const dictionaries = {
       heading: "Let’s talk about your next property",
       description:
         "Choose the channel that works best for you. We handle rental and sale inquiries.",
+      inquiryDescription: "Sale and rental inquiries. Choose the channel you prefer.",
       writeUs: "Message us",
       callUs: "Call us",
       email: "Email",

@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { getSessionContext } from "@/lib/session-context";
+import { publicContactChannels } from "@/lib/public-contact-channels";
+import { OrangeIconWhatsApp } from "@/themes/orange/orange-icons";
 import { localizedHref } from "@/lib/site-i18n";
 import { OrangeHeaderChrome } from "@/themes/orange/orange-header-chrome";
 import { OrangeLocaleSwitcher } from "@/themes/orange/orange-locale-switcher";
@@ -12,20 +15,17 @@ type Props = {
 };
 
 export async function OrangeHeader({ lang }: Props) {
-  const { content, dict, copy, locale, defaultLocale } = await loadOrangeUi(lang);
-  const showTestimonials = content.testimonials.length > 0;
-  const showAbout = Boolean(content.about.title.trim());
+  const [ui, session] = await Promise.all([loadOrangeUi(lang), getSessionContext()]);
+  const { content, dict, copy, locale, defaultLocale } = ui;
+  const whatsappHref = publicContactChannels(content).whatsappHref;
+  const isAdmin = session?.isStaffUser === true;
   const links = orangeNavLinks({
     dict,
-    copy,
     locale,
     defaultLocale,
-    showServices: true,
-    showTestimonials,
-    showAbout,
   });
   const homeHref = localizedHref("/", locale, null, defaultLocale);
-  const contactHref = localizedHref("/#contacto", locale, null, defaultLocale);
+  const contactHref = localizedHref("/#contact", locale, null, defaultLocale);
   const switcherProps = {
     locale,
     defaultLocale,
@@ -69,8 +69,14 @@ export async function OrangeHeader({ lang }: Props) {
           <Suspense fallback={null}>
             <OrangeLocaleSwitcher {...switcherProps} />
           </Suspense>
-          <Link href={contactHref} className="orange-btn orange-btn--dark orange-header__cta">
-            {copy.consultCta}
+          {whatsappHref ? (
+            <a href={whatsappHref} className="orange-btn orange-btn--dark orange-header__whatsapp" target="_blank" rel="noopener noreferrer" aria-label={`${dict.whatsapp.label}. ${dict.a11y.opensInNewTab}`}>
+              <OrangeIconWhatsApp className="h-5 w-5" />
+              <span>{dict.whatsapp.label}</span>
+            </a>
+          ) : null}
+          <Link href={isAdmin ? "/listings" : "/login"} className="orange-btn orange-btn--outline orange-header__access">
+            {isAdmin ? dict.admin.manage : dict.admin.signIn}
           </Link>
           <OrangeMobileNav
             links={links}

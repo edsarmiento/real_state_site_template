@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { fillTemplate, localizeSiteHref } from "@/lib/site-i18n";
-import { beigeContactChannels } from "@/themes/beige/beige-contact-channels";
+import { publicContactChannels as beigeContactChannels } from "@/lib/public-contact-channels";
 import { BEIGE_LOGO_FOOTER_CLASS } from "@/themes/beige/beige-display";
 import { BeigeLogo } from "@/themes/beige/beige-logo";
 import { BeigeReveal } from "@/themes/beige/beige-reveal";
