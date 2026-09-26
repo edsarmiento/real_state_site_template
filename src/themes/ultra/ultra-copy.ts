@@ -1,7 +1,6 @@
 import type { SiteLocale } from "@/lib/site-i18n";
 
 export type UltraCopy = {
-  contactDescription: string;
   paginationPrev: string;
   paginationNext: string;
   paginationPageOf: string;
@@ -16,7 +15,6 @@ export type UltraCopy = {
 };
 
 const ES: UltraCopy = {
-  contactDescription: "Consultas de renta y venta. Elige el canal que prefieras.",
   paginationPrev: "Anterior",
   paginationNext: "Siguiente",
   paginationPageOf: "Página {current} de {total}",
@@ -31,7 +29,6 @@ const ES: UltraCopy = {
 };
 
 const EN: UltraCopy = {
-  contactDescription: "Rental and sale inquiries. Choose the channel you prefer.",
   paginationPrev: "Previous",
   paginationNext: "Next",
   paginationPageOf: "Page {current} of {total}",

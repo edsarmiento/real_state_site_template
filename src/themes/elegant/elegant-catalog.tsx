@@ -23,7 +23,6 @@ import {
   ElegantProcess,
 } from "@/themes/elegant/elegant-sections";
 import { ElegantShell } from "@/themes/elegant/elegant-shell";
-import { getElegantCopy } from "@/themes/elegant/elegant-copy";
 import { elegantContentHref, getElegantUi } from "@/themes/elegant/elegant-ui";
 
 export async function ElegantCatalog({
@@ -225,7 +224,7 @@ export async function ElegantCatalog({
           dict={dict}
         />
         <ElegantAbout
-          imageUrl={heroImage}
+          imageUrl={content.about.imageUrl?.trim() || heroImage}
           content={content}
           dict={dict}
           locale={locale}
@@ -235,7 +234,7 @@ export async function ElegantCatalog({
         <ElegantContact
           content={content}
           dict={dict}
-          description={getElegantCopy(locale).contactUnifiedDescription}
+          description={dict.contact.inquiryDescription}
         />
       </main>
       <ElegantFooter lang={lang} />

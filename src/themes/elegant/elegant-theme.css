@@ -354,9 +354,7 @@ html:has([data-site-theme="elegant"])::-webkit-scrollbar-thumb:hover {
   padding-bottom: 1.75rem;
   border-bottom: 1px solid rgba(197, 168, 128, 0.3);
 }
-[data-site-theme="elegant"] .elegant-contact__grid { align-items: stretch; }
 [data-site-theme="elegant"] .elegant-contact__grid > * { min-width: 0; }
-[data-site-theme="elegant"] .elegant-channels { margin-top: 0; }
 [data-site-theme="elegant"] .elegant-contact__cta {
   display: flex;
   height: 100%;
@@ -1032,13 +1030,13 @@ html:has([data-site-theme="elegant"])::-webkit-scrollbar-thumb:hover {
   display: grid;
   grid-template-columns: 1fr;
   gap: 3rem;
-  align-items: center;
+  align-items: stretch;
 }
 
 [data-site-theme="elegant"] .elegant-channels {
   display: grid;
   gap: 1rem;
-  margin: 1.5rem 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }

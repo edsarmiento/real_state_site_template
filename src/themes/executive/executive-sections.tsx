@@ -348,7 +348,7 @@ export function ExecutiveContact({
             </div>
             <aside className="executive-contact__cta">
               <h3>{copy.aboutReadyTitle}</h3>
-              <p className="executive-lead">{copy.contactDescription}</p>
+              <p className="executive-lead">{dict.contact.inquiryDescription}</p>
               {whatsappHref ? (
                 <a
                   href={whatsappHref}

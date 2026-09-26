@@ -9,7 +9,6 @@ import {
   localizedHref,
 } from "@/lib/site-i18n";
 import type { CatalogThemeProps } from "@/themes/theme-types";
-import { getBeigeCopy } from "@/themes/beige/beige-copy";
 import { displayListingTitle } from "@/themes/beige/beige-display";
 import { BeigeFooter } from "@/themes/beige/beige-footer";
 import { BeigeHeader } from "@/themes/beige/beige-header";
@@ -77,7 +76,7 @@ export async function BeigeCatalog({
   })
     ? await fetchUnfilteredHeroPhotoUrls()
     : [];
-  const aboutImageUrl = resolveHeroPhotoUrls({ ...heroSources, catalogUrls })[0];
+  const aboutImageUrl = content.about.imageUrl?.trim() || resolveHeroPhotoUrls({ ...heroSources, catalogUrls })[0];
   const emptyKind =
     oferta === "sale"
       ? dict.results.emptySale
@@ -247,7 +246,7 @@ export async function BeigeCatalog({
       <BeigeContact
         content={content}
         dict={dict}
-        description={getBeigeCopy(locale).contactDescription}
+        description={dict.contact.inquiryDescription}
       />
       <BeigeFooter lang={lang} />
     </BeigeShell>

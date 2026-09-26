@@ -1,7 +1,6 @@
 import type { SiteLocale } from "@/lib/site-i18n";
 
 export type OrangeCopy = {
-  contactUnifiedDescription: string;
   consultCtaShort: string;
   heroTitleAccent: string;
   availableOne: string;
@@ -18,7 +17,6 @@ export type OrangeCopy = {
 };
 
 const ES: OrangeCopy = {
-  contactUnifiedDescription: "Consultas de renta y venta. Elige el canal que prefieras.",
   consultCtaShort: "Asesoría",
   heroTitleAccent: "bienes raíces",
   availableOne: "1 propiedad disponible",
@@ -35,7 +33,6 @@ const ES: OrangeCopy = {
 };
 
 const EN: OrangeCopy = {
-  contactUnifiedDescription: "Rental and sale inquiries. Choose the channel you prefer.",
   consultCtaShort: "Consult",
   heroTitleAccent: "real estate",
   availableOne: "1 property available",

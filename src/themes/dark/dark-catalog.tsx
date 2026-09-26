@@ -293,7 +293,7 @@ export function DarkCatalog({
         dict={dict}
         locale={locale}
         defaultLocale={defaultLocale}
-        heroImage={heroSrc}
+        heroImage={content.about.imageUrl?.trim() || heroSrc}
       />
       <DarkProcess dict={dict} />
       <DarkContact

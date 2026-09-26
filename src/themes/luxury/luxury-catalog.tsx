@@ -78,7 +78,7 @@ export async function LuxuryCatalog({
   })
     ? await fetchUnfilteredHeroPhotoUrls()
     : [];
-  const aboutImageUrl = resolveHeroPhotoUrls({ ...heroSources, catalogUrls })[0];
+  const aboutImageUrl = content.about.imageUrl?.trim() || resolveHeroPhotoUrls({ ...heroSources, catalogUrls })[0];
   const locations =
     content.locations.length > 0
       ? content.locations

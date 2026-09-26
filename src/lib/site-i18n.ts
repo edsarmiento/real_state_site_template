@@ -630,7 +630,7 @@ const dictionaries = {
       heading: "Hablemos de tu próximo inmueble",
       description:
         "Elige el canal que te resulte más cómodo. Atendemos consultas de renta y venta.",
-      inquiryDescription: "Consulta de venta y renta. Elige el canal que prefieras.",
+      inquiryDescription: "Consultas de renta y venta. Elige el canal que prefieras.",
       writeUs: "Escríbenos",
       callUs: "Llámanos",
       email: "Correo",

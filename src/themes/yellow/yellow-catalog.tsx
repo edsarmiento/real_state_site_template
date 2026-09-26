@@ -238,14 +238,14 @@ export function YellowCatalog({
         dict={dict}
       />
       <YellowAbout
-        imageUrl={collage[0]}
+        imageUrl={content.about.imageUrl?.trim() || collage[0]}
         dict={dict}
       />
       <YellowProcess dict={dict} />
       <YellowContact
         content={content}
         dict={dict}
-        description={copy.contactUnifiedDescription}
+        description={dict.contact.inquiryDescription}
       />
 
       <YellowFooter ui={ui} />

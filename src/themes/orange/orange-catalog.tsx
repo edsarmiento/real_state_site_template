@@ -192,9 +192,9 @@ export async function OrangeCatalog({
       </main>
 
       <OrangeLocations locations={locations} listings={listings} locale={locale} defaultLocale={defaultLocale} dict={dict} />
-      <OrangeAbout content={content} dict={dict} locale={locale} defaultLocale={defaultLocale} imageUrl={heroUrls[0]} />
+      <OrangeAbout content={content} dict={dict} locale={locale} defaultLocale={defaultLocale} imageUrl={content.about.imageUrl?.trim() || heroUrls[0]} />
       <OrangeProcess dict={dict} />
-      <OrangeContact content={content} dict={dict} description={copy.contactUnifiedDescription} />
+      <OrangeContact content={content} dict={dict} description={dict.contact.inquiryDescription} />
       <OrangeFooter lang={lang} />
     </OrangeShell>
   );

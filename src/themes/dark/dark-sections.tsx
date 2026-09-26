@@ -37,7 +37,6 @@ import {
 } from "@/themes/dark/dark-locations";
 import { DarkReveal } from "@/themes/dark/dark-reveal";
 import { DarkSocialLinks } from "@/themes/dark/dark-social-links";
-import { getDarkCopy } from "@/themes/dark/dark-copy";
 import { DARK_CATALOG_HASH } from "@/themes/dark/dark-ui";
 
 type Shared = {
@@ -364,7 +363,6 @@ export function DarkContact({
   defaultLocale,
 }: Shared) {
   const { contact, social } = content;
-  const copy = getDarkCopy(locale);
   const catalogHref = localizedHref(
     "/#propiedades",
     locale,
@@ -458,7 +456,7 @@ export function DarkContact({
               <h3 className="dark-section__title">
                 {content.finalCta.title || dict.finalCta.title}
               </h3>
-              <p className="dark-lead">{copy.contactDescription}</p>
+              <p className="dark-lead">{dict.contact.inquiryDescription}</p>
               {whatsappHref ? (
                 <a
                   href={whatsappHref}

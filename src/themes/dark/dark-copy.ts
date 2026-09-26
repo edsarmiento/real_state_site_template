@@ -7,7 +7,6 @@ export type DarkCopy = {
   paginationAria: string;
   goToPage: string;
   brandMarkFallback: string;
-  contactDescription: string;
 };
 
 const ES: DarkCopy = {
@@ -17,7 +16,6 @@ const ES: DarkCopy = {
   paginationAria: "Paginación de propiedades",
   goToPage: "Ir a la página {page}",
   brandMarkFallback: "·",
-  contactDescription: "Consultas de renta y venta. Elige el canal que prefieras.",
 };
 
 const EN: DarkCopy = {
@@ -27,7 +25,6 @@ const EN: DarkCopy = {
   paginationAria: "Property pagination",
   goToPage: "Go to page {page}",
   brandMarkFallback: "·",
-  contactDescription: "Rental and sale inquiries. Choose the channel you prefer.",
 };
 
 export function getDarkCopy(locale: SiteLocale): DarkCopy {

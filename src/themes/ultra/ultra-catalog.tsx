@@ -214,7 +214,7 @@ export async function UltraCatalog({
       <UltraContact
         content={content}
         dict={dict}
-        description={copy.contactDescription}
+        description={dict.contact.inquiryDescription}
       />
       <UltraFooter lang={lang} />
     </UltraShell>
