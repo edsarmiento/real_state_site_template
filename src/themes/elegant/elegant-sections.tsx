@@ -1,3 +1,7 @@
+import {
+  collectPublicContactChannels,
+  type PublicContactChannel,
+} from "@/lib/public-contact-channels";
 import Link from "next/link";
 import type { PublicListingCard } from "@/lib/listing-types";
 import type { PublicSiteContent } from "@/lib/public-site-content";
@@ -5,7 +9,6 @@ import {
   pickLocalized,
   type PublicLocation,
 } from "@/lib/public-site-content";
-import { isExampleEmail } from "@/lib/example-contact";
 import {
   fillTemplate,
   localizeSiteHref,
@@ -221,73 +224,7 @@ export function ElegantProcess({ dict }: Pick<Shared, "dict">) {
   );
 }
 
-type Channel = {
-  key: string;
-  eyebrow: string;
-  value: string;
-  href: string | null;
-  external?: boolean;
-  icon: "whatsapp" | "phone" | "email" | "schedule" | "location";
-};
-
-function collectChannels(
-  content: PublicSiteContent,
-  dict: SiteDictionary,
-): Channel[] {
-  const contact = content.contact;
-  const { whatsappHref, phone, phoneHref } = elegantContactChannels(content);
-  const channels: Channel[] = [];
-  if (phoneHref) {
-    channels.push({
-      key: "phone",
-      eyebrow: dict.contact.callUs,
-      value: phone || dict.contact.callUs,
-      href: phoneHref,
-      icon: "phone",
-    });
-  }
-  if (whatsappHref) {
-    channels.push({
-      key: "whatsapp",
-      eyebrow: dict.contact.writeUs,
-      value: dict.whatsapp.label,
-      href: whatsappHref,
-      external: true,
-      icon: "whatsapp",
-    });
-  }
-  if (contact.emailHref && contact.email && !isExampleEmail(contact.email)) {
-    channels.push({
-      key: "email",
-      eyebrow: dict.contact.email,
-      value: contact.email,
-      href: contact.emailHref,
-      icon: "email",
-    });
-  }
-  if (contact.scheduleCallUrl) {
-    channels.push({
-      key: "schedule",
-      eyebrow: dict.contact.schedule,
-      value: dict.contact.scheduleValue,
-      href: contact.scheduleCallUrl,
-      external: true,
-      icon: "schedule",
-    });
-  }
-  if (contact.location) {
-    channels.push({
-      key: "location",
-      eyebrow: dict.contact.location,
-      value: contact.location,
-      href: null,
-      icon: "location",
-    });
-  }
-  return channels;
-}
-
-function ChannelIcon({ name }: { name: Channel["icon"] }) {
+function ChannelIcon({ name }: { name: PublicContactChannel["icon"] }) {
   if (name === "whatsapp") return <ElegantIconWhatsApp className="h-5 w-5" />;
   if (name === "phone") return <ElegantIconPhone className="h-5 w-5" />;
   if (name === "email") return <ElegantIconMail className="h-5 w-5" />;
@@ -301,7 +238,9 @@ export function ElegantContact({
   description,
 }: Pick<Shared, "content" | "dict"> & { description: string }) {
   const { social } = content;
-  const channels = collectChannels(content, dict);
+  const channels = collectPublicContactChannels(content, dict).sort(
+    (a, b) => Number(b.key === "phone") - Number(a.key === "phone"),
+  );
   const whatsapp = elegantContactChannels(content).whatsappHref;
 
   return (

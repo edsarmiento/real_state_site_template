@@ -1,5 +1,8 @@
+import {
+  collectPublicContactChannels,
+  type PublicContactChannel,
+} from "@/lib/public-contact-channels";
 import type { PublicSiteContent } from "@/lib/public-site-content";
-import { isExampleEmail } from "@/lib/example-contact";
 import type { SiteDictionary } from "@/lib/site-i18n";
 import { ultraContactChannels } from "@/themes/ultra/ultra-contact-channels";
 import {
@@ -12,73 +15,7 @@ import {
 import { UltraReveal } from "@/themes/ultra/ultra-reveal";
 import { UltraSocialLinks } from "@/themes/ultra/ultra-social-links";
 
-type Channel = {
-  key: string;
-  eyebrow: string;
-  value: string;
-  href: string | null;
-  external?: boolean;
-  icon: "whatsapp" | "phone" | "email" | "schedule" | "location";
-};
-
-function collectChannels(
-  content: PublicSiteContent,
-  dict: SiteDictionary,
-): Channel[] {
-  const contact = content.contact;
-  const { whatsappHref, phone, phoneHref } = ultraContactChannels(content);
-  const channels: Channel[] = [];
-  if (whatsappHref) {
-    channels.push({
-      key: "whatsapp",
-      eyebrow: dict.contact.writeUs,
-      value: dict.whatsapp.label,
-      href: whatsappHref,
-      external: true,
-      icon: "whatsapp",
-    });
-  }
-  if (phoneHref) {
-    channels.push({
-      key: "phone",
-      eyebrow: dict.contact.callUs,
-      value: phone || dict.contact.callUs,
-      href: phoneHref,
-      icon: "phone",
-    });
-  }
-  if (contact.emailHref && contact.email && !isExampleEmail(contact.email)) {
-    channels.push({
-      key: "email",
-      eyebrow: dict.contact.email,
-      value: contact.email,
-      href: contact.emailHref,
-      icon: "email",
-    });
-  }
-  if (contact.scheduleCallUrl) {
-    channels.push({
-      key: "schedule",
-      eyebrow: dict.contact.schedule,
-      value: dict.contact.scheduleValue,
-      href: contact.scheduleCallUrl,
-      external: true,
-      icon: "schedule",
-    });
-  }
-  if (contact.location) {
-    channels.push({
-      key: "location",
-      eyebrow: dict.contact.location,
-      value: contact.location,
-      href: null,
-      icon: "location",
-    });
-  }
-  return channels;
-}
-
-function ChannelIcon({ name }: { name: Channel["icon"] }) {
+function ChannelIcon({ name }: { name: PublicContactChannel["icon"] }) {
   if (name === "whatsapp") return <UltraIconWhatsApp className="h-5 w-5" />;
   if (name === "phone") return <UltraIconPhone className="h-5 w-5" />;
   if (name === "email") return <UltraIconMail className="h-5 w-5" />;
@@ -95,7 +32,7 @@ type Props = {
 export function UltraContact({ content, dict, description }: Props) {
   const { social } = content;
   const whatsappHref = ultraContactChannels(content).whatsappHref;
-  const channels = collectChannels(content, dict);
+  const channels = collectPublicContactChannels(content, dict);
   const title = content.finalCta.title || dict.finalCta.title;
 
   return (

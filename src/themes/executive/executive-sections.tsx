@@ -1,3 +1,7 @@
+import {
+  collectPublicContactChannels,
+  type PublicContactChannel,
+} from "@/lib/public-contact-channels";
 import Link from "next/link";
 import type { PublicListingCard } from "@/lib/listing-types";
 import type { PublicSiteContent } from "@/lib/public-site-content";
@@ -241,81 +245,7 @@ export function ExecutiveProcess({ dict }: Pick<Shared, "dict">) {
   );
 }
 
-type Channel = {
-  key: string;
-  eyebrow: string;
-  value: string;
-  href: string | null;
-  external?: boolean;
-  icon: "whatsapp" | "phone" | "email" | "schedule" | "location";
-};
-
-function collectChannels(
-  content: PublicSiteContent,
-  dict: SiteDictionary,
-): Channel[] {
-  const contact = content.contact;
-  const resolved = normalizeExecutiveFooterContact({
-    whatsappHref: executiveContactChannels(content).whatsappHref,
-    phone: contact.phone,
-    phoneHref: contact.phoneHref,
-    email: contact.email,
-    emailHref: contact.emailHref,
-  });
-  const scheduleCallUrl = contact.scheduleCallUrl?.trim() || null;
-  const location = contact.location?.trim() || null;
-  const channels: Channel[] = [];
-  if (resolved.whatsappHref) {
-    channels.push({
-      key: "whatsapp",
-      eyebrow: dict.contact.writeUs,
-      value: dict.whatsapp.label,
-      href: resolved.whatsappHref,
-      external: true,
-      icon: "whatsapp",
-    });
-  }
-  if (resolved.phone && resolved.phoneHref) {
-    channels.push({
-      key: "phone",
-      eyebrow: dict.contact.callUs,
-      value: resolved.phone,
-      href: resolved.phoneHref,
-      icon: "phone",
-    });
-  }
-  if (resolved.email && resolved.emailHref) {
-    channels.push({
-      key: "email",
-      eyebrow: dict.contact.email,
-      value: resolved.email,
-      href: resolved.emailHref,
-      icon: "email",
-    });
-  }
-  if (scheduleCallUrl) {
-    channels.push({
-      key: "schedule",
-      eyebrow: dict.contact.schedule,
-      value: dict.contact.scheduleValue,
-      href: scheduleCallUrl,
-      external: true,
-      icon: "schedule",
-    });
-  }
-  if (location) {
-    channels.push({
-      key: "location",
-      eyebrow: dict.contact.location,
-      value: location,
-      href: null,
-      icon: "location",
-    });
-  }
-  return channels;
-}
-
-function ChannelIcon({ name }: { name: Channel["icon"] }) {
+function ChannelIcon({ name }: { name: PublicContactChannel["icon"] }) {
   if (name === "whatsapp") return <ExecutiveIconWhatsApp className="h-5 w-5" />;
   if (name === "phone") return <ExecutiveIconPhone className="h-5 w-5" />;
   if (name === "email") return <ExecutiveIconMail className="h-5 w-5" />;
@@ -329,7 +259,27 @@ export function ExecutiveContact({
   copy,
 }: Pick<Shared, "content" | "dict" | "copy">) {
   const { contact, social } = content;
-  const channels = collectChannels(content, dict);
+  const resolved = normalizeExecutiveFooterContact({
+    whatsappHref: executiveContactChannels(content).whatsappHref,
+    phone: contact.phone,
+    phoneHref: contact.phoneHref,
+    email: contact.email,
+    emailHref: contact.emailHref,
+  });
+  const channels = collectPublicContactChannels(
+    {
+      ...content,
+      whatsapp: { ...content.whatsapp, href: resolved.whatsappHref },
+      contact: {
+        ...contact,
+        ...resolved,
+        phoneHref: resolved.phone ? resolved.phoneHref : null,
+        scheduleCallUrl: contact.scheduleCallUrl?.trim() || null,
+        location: contact.location?.trim() || null,
+      },
+    },
+    dict,
+  );
   const whatsappHref = executiveContactChannels(content).whatsappHref;
 
   return (

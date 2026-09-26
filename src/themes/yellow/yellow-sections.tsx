@@ -1,3 +1,7 @@
+import {
+  collectPublicContactChannels,
+  type PublicContactChannel,
+} from "@/lib/public-contact-channels";
 import Link from "next/link";
 import type { PublicListingCard } from "@/lib/listing-types";
 import type { PublicSiteContent } from "@/lib/public-site-content";
@@ -5,7 +9,6 @@ import {
   pickLocalized,
   type PublicLocation,
 } from "@/lib/public-site-content";
-import { isExampleEmail } from "@/lib/example-contact";
 import {
   fillTemplate,
   type SiteDictionary,
@@ -16,6 +19,8 @@ import { YellowCoverImage } from "@/themes/yellow/yellow-cover-image";
 import {
   YellowIconArrowRight,
   YellowIconCheck,
+  YellowIconCalendar,
+  YellowIconMapPin,
   YellowIconHome,
   YellowIconMail,
   YellowIconPhone,
@@ -252,57 +257,12 @@ export function YellowProcess({ dict }: Pick<Shared, "dict">) {
   );
 }
 
-type Channel = {
-  key: string;
-  eyebrow: string;
-  value: string;
-  href: string | null;
-  external?: boolean;
-  icon: "whatsapp" | "phone" | "email";
-};
-
-function collectChannels(
-  content: PublicSiteContent,
-  dict: SiteDictionary,
-): Channel[] {
-  const contact = content.contact;
-  const { whatsappHref, phone, phoneHref } = yellowContactChannels(content);
-  const channels: Channel[] = [];
-  if (whatsappHref) {
-    channels.push({
-      key: "whatsapp",
-      eyebrow: dict.contact.writeUs,
-      value: dict.whatsapp.label,
-      href: whatsappHref,
-      external: true,
-      icon: "whatsapp",
-    });
-  }
-  if (phoneHref) {
-    channels.push({
-      key: "phone",
-      eyebrow: dict.contact.callUs,
-      value: phone || dict.contact.callUs,
-      href: phoneHref,
-      icon: "phone",
-    });
-  }
-  if (contact.emailHref && contact.email && !isExampleEmail(contact.email)) {
-    channels.push({
-      key: "email",
-      eyebrow: dict.contact.email,
-      value: contact.email,
-      href: contact.emailHref,
-      icon: "email",
-    });
-  }
-  return channels;
-}
-
-function ChannelIcon({ name }: { name: Channel["icon"] }) {
+function ChannelIcon({ name }: { name: PublicContactChannel["icon"] }) {
   if (name === "whatsapp") return <YellowIconWhatsApp className="h-5 w-5" />;
   if (name === "phone") return <YellowIconPhone className="h-5 w-5" />;
-  return <YellowIconMail className="h-5 w-5" />;
+  if (name === "email") return <YellowIconMail className="h-5 w-5" />;
+  if (name === "schedule") return <YellowIconCalendar className="h-5 w-5" />;
+  return <YellowIconMapPin className="h-5 w-5" />;
 }
 
 export function YellowContact({
@@ -311,7 +271,7 @@ export function YellowContact({
   description,
 }: Pick<Shared, "content" | "dict"> & { description: string }) {
   const { social } = content;
-  const channels = collectChannels(content, dict);
+  const channels = collectPublicContactChannels(content, dict);
   const whatsapp = yellowContactChannels(content).whatsappHref;
 
   return (
