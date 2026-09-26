@@ -42,16 +42,25 @@ export async function OrangeCatalog({
 }: CatalogThemeProps) {
   const { dict, copy, defaultLocale } = getOrangeUi({ content, config, locale });
   const homeHref = localizedHref("/", locale, null, defaultLocale);
+  const clearHref = localizedHref(
+    "/#catalogo",
+    locale,
+    oferta === "all"
+      ? null
+      : { oferta: oferta === "sale" ? "venta" : "renta" },
+    defaultLocale,
+  );
   const propertiesHref = content.hero.primaryCta
     ? localizeSiteHref(content.hero.primaryCta.href, locale, defaultLocale)
     : localizedHref("/#catalogo", locale, null, defaultLocale);
   const aboutHref = content.hero.secondaryCta
     ? localizeSiteHref(content.hero.secondaryCta.href, locale, defaultLocale)
     : localizedHref("/#about", locale, null, defaultLocale);
-  const hasFilters = Boolean(propertyType || bedrooms || city || oferta !== "all");
+  const hasFilters = Boolean(propertyType || bedrooms || city);
+  const hasAnyFilter = hasFilters || oferta !== "all";
   const heroSources = { configuredUrl: content.hero.imageUrl, galleryUrls: heroPhotoUrls, listings };
   const resolved = resolveHeroPhotoUrls(heroSources);
-  const catalogUrls = needsUnfilteredHeroCatalog({ hasAnyFilter: hasFilters, catalogOk, resolvedCount: resolved.length })
+  const catalogUrls = needsUnfilteredHeroCatalog({ hasAnyFilter, catalogOk, resolvedCount: resolved.length })
     ? await fetchUnfilteredHeroPhotoUrls() : [];
   const heroUrls = resolveHeroPhotoUrls({ ...heroSources, catalogUrls });
   const locations = content.locations.length ? content.locations : locationsFromListings(listings);
@@ -126,7 +135,7 @@ export async function OrangeCatalog({
           <div className="orange-section__intro">
             <span className="orange-kicker">{dict.results.kicker}</span>
             <h2 className="orange-section__title">{heading}</h2>
-            {hasFilters ? <Link href={homeHref} className="orange-inline-link">{dict.results.clearFilters}</Link> : null}
+            {hasFilters ? <Link href={clearHref} className="orange-inline-link">{dict.results.clearFilters}</Link> : null}
           </div>
         </OrangeReveal>
 
@@ -144,8 +153,8 @@ export async function OrangeCatalog({
               {localizedType ? ` · ${localizedType}` : ""}
               {bedrooms ? ` · ${fillTemplate(dict.results.bedroomsFilter, { count: bedrooms })}` : ""}.
             </p>
-            <Link href={homeHref} className="orange-btn orange-btn--dark">
-              {dict.results.clearFilters}
+            <Link href={hasFilters ? clearHref : homeHref} className="orange-btn orange-btn--dark">
+              {hasFilters ? dict.results.clearFilters : dict.results.viewAll}
             </Link>
           </div>
         ) : (
